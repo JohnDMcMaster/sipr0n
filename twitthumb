@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# min 600 X 335 pixels, although larger images (for example 1200 X 675) will be better optimized for when users click to expand images
+# Aspect ratio: 16:9
+# Image file size: Max 15mb on twitter.com
+# convert input.jpg -resize 1200 output.jpg
+# https://superuser.com/questions/1358715/how-do-i-resize-and-pad-an-image-to-a-given-size-using-imagemagick
+day=$(wakedate)
+for fn in "$@" ; do
+    base=$(basename $fn)
+    fn_out="/tmp/${day}_${base}_twit.jpg"
+    echo "$fn => $fn_out"
+    convert  -limit memory 12000mb  $fn -resize 1200x675 -background black -gravity center -extent 1200x675 $fn_out
+done
+
