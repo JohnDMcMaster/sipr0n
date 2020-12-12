@@ -59,7 +59,7 @@ def run(dir_in, dir_out, img2doku_optstr=''):
                 print '  %s' % fn
             img2doku(filenames.values(), page_fn, img2doku_optstr)
 
-if __name__ == "__main__":
+def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Generate sipr0n wiki template pages from image files')
@@ -68,3 +68,6 @@ if __name__ == "__main__":
     parser.add_argument('dir_out', help='Output page directory')
     args = parser.parse_args()
     run(args.dir_in, args.dir_out)
+
+if __name__ == "__main__":
+    main()
