@@ -7,6 +7,7 @@ import re
 import errno
 import subprocess
 
+
 # https://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
 def mkdir_p(path):
     try:
@@ -17,14 +18,17 @@ def mkdir_p(path):
         else:
             raise
 
+
 def parse_image_name(fn):
-    m = re.match(r'([A-Za-z0-9-]+)_([A-Za-z0-9-]+)_(.*).jpg', os.path.basename(fn))
+    m = re.match(r'([A-Za-z0-9-]+)_([A-Za-z0-9-]+)_(.*).jpg',
+                 os.path.basename(fn))
     if not m:
-        raise Exception("Bad file name: %s" % (fn,))
+        raise Exception("Bad file name: %s" % (fn, ))
     vendor = m.group(1)
     chipid = m.group(2)
     flavor = m.group(3)
     return (vendor, chipid, flavor)
+
 
 def index_image_dir(dir_in):
     """Return dict as ret[vendor][chipid][flavor] = file_name"""
@@ -44,8 +48,12 @@ def index_image_dir(dir_in):
 
     return vendors
 
+
 def img2doku(filenames, page_fn, optstr=''):
-    subprocess.check_call('img2doku -L %s %s >%s' % (optstr, ' '.join(filenames), page_fn), shell=True)
+    subprocess.check_call('img2doku -L %s %s >%s' %
+                          (optstr, ' '.join(filenames), page_fn),
+                          shell=True)
+
 
 def run(dir_in, dir_out, img2doku_optstr=''):
     vendors = index_image_dir(args.dir_in)
@@ -59,15 +67,20 @@ def run(dir_in, dir_out, img2doku_optstr=''):
                 print '  %s' % fn
             img2doku(filenames.values(), page_fn, img2doku_optstr)
 
+
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Generate sipr0n wiki template pages from image files')
-    parser.add_argument('--verbose', action="store_true", help='Verbose output')
+    parser = argparse.ArgumentParser(
+        description='Generate sipr0n wiki template pages from image files')
+    parser.add_argument('--verbose',
+                        action="store_true",
+                        help='Verbose output')
     parser.add_argument('dir_in', help='Input image directory')
     parser.add_argument('dir_out', help='Output page directory')
     args = parser.parse_args()
     run(args.dir_in, args.dir_out)
+
 
 if __name__ == "__main__":
     main()

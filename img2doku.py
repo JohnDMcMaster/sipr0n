@@ -3,23 +3,35 @@
 import subprocess
 import re
 import os
+import glob
 
-def header_pack(wiki_page, collect, vendor, print_pack=True):
+def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()):
     ret = ""
     ret += f"""\
 {{{{tag>collection_{collect} vendor_{vendor} type_unknown year_unknown foundry_unknown}}}}
 
+"""
+
+    ret += f"""
 ====== Package ======
 
 """
 
     if print_pack:
-        ret += f"""\
+        pack_top = True
+        pack_btm = True
+        if len(page_fns_base):
+            pack_top = "pack_top.jpg" in page_fns_base
+            pack_btm = "pack_btm.jpg" in page_fns_base
+        if pack_top:
+            ret += f"""\
 {{{{:{wiki_page}:pack_top.jpg?300|}}}}
 
 <code>
 </code>
-
+"""
+        if pack_btm:
+            ret += f"""\
 {{{{:{wiki_page}:pack_btm.jpg?300|}}}}
 
 <code>
@@ -28,7 +40,7 @@ def header_pack(wiki_page, collect, vendor, print_pack=True):
     else:
         ret += "Unknown"
 
-    ret += """\
+    ret += """
 
 ====== Die ======
 
@@ -49,10 +61,33 @@ def parse_image_name(fn):
     flavor = m.group(3)
     return (fnbase, vendor, chipid, flavor)
 
+def process_fns(fns):
+    """
+    Support two inputs:
+    -A single input that is a directory containing:
+        Misc files, which will be added to the page
+        A directory called "single" which contains map files
+    -Individual .jpg files which are for map
+    
+    Since vendor and chipid are from map file name, at least one is required currently
+    """
+    map_fns = []
+    page_fns = []
+    
+    for fn in fns:
+        if os.path.isdir(fn):
+            page_fns += list(glob.glob(fn + "/*.jpg"))
+            map_fns += list(glob.glob(fn + "/single/*.jpg"))
+        else:
+            map_fns.append(fn)
+    
+    _fnbase, vendor, chipid, _flavor = parse_image_name(map_fns[0])
+    return map_fns, page_fns, vendor, chipid
 
 def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
         print_pack=True, write=False, overwrite=False):
-    _fnbase, vendor, chipid, _flavor = parse_image_name(fns[0])
+    map_fns, page_fns, vendor, chipid = process_fns(fns)
+
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
     wiki_url = f"{host}/archive/doku.php?id={wiki_page}" 
     map_chipid_url = f"{host}/{mappre}/{vendor}/{chipid}"
@@ -63,10 +98,23 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
         print("")
         print("")
 
-    out = ""
-    out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack)
+    page_fns_base = set()
+    for fn in sorted(page_fns):
+        page_fns_base.add(os.path.basename(fn)) 
 
-    for fn in fns:
+    out = ""
+    out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base)
+
+    if page_fns:
+        for fn in sorted(page_fns):
+            fn = os.path.basename(fn)
+            page_fns_base.add(fn) 
+            if fn in ("pack_top.jpg", "pack_btm.jpg"):
+                continue
+            out += f"{{{{:{wiki_page}:{fn}?300|}}}}\n"
+            out += "\n"
+
+    for fn in map_fns:
         fnbase, vendor_this, chipid_this, flavor = parse_image_name(fn)
         assert vendor == vendor_this
         assert chipid == chipid_this
@@ -82,7 +130,10 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
 
 """
     if write:
-        page_path = "/var/www/wiki/data/pages/" + wiki_page.replace(":", "/")
+        wiki_data_dir = "/var/www/wiki/data"
+        page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/")
+        
+        page_fns
         if os.path.exists(page_path):
             if not overwrite:
                 raise Exception(f"Refusing to overwrite existing page {page_path}")
