@@ -40,7 +40,7 @@ def thumbfilelist():
 	
 	result = []
 	
-	for path in thumbpaths:
+	for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True):
 		tilemappath = None
 		parentdir = os.path.dirname(path)
 		parentdir_contents = os.listdir(parentdir)
