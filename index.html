@@ -1,0 +1,115 @@
+<!DOCTYPE html> 
+
+<head>
+<meta charset="UTF-8">
+<center>
+<br>
+<img src= "title3.png">
+</center>
+</head>
+<title>
+Siliconpr0n
+</title>
+<link rel="shortcut icon" href="favicon.png">
+<style type="text/css">
+a:link, a:active, a:visited { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: smaller; color: #049B04 ; text-decoration: none}
+a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; text-decoration: none; font-size: 100%; line-height: normal}
+</style>
+<body topmargin=0 leftmargin=0 marginheight=0 marginwidth=200 background="background.jpg" text="#9AAEB5">
+<table>
+	<tr>
+		<td>
+			<A href="wiki"><IMG src="wiki.jpg" /></A>
+		</td>
+		<td>
+			<H3><A href="wiki">[ Wiki ]</A>
+			<br> 
+			Integrated circuit reverse engineering wiki</H3>
+		</td>
+		<td>
+			<A href="map"><IMG src="archive.jpg" /></A>
+		</td>
+		<td>
+			<A href="archive"><H3>[ Archive ]</A>
+			<br> 
+			Integrated circuit die images and info</H3>
+		</td>
+	</tr>
+</table>
+<br>
+
+<hr color="#4B6B50">
+
+<div class="outer">
+<div id="grid" class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'>
+</div>
+</div>
+
+<hr color="#4B6B50">
+</body>
+
+<footer>
+	<table width=100%>
+		<tr>
+			<td colspan="2">
+				<p>Contact: JohnDMcMaster *at* gmail.com</p>
+				<p>Santa Clara, CA</p>
+			</td>
+		</tr>
+	</table>
+</footer>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+<!-- or
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script> -->
+
+<style>
+
+.outer {
+	width: 500px;
+	height: 500px;
+}
+
+.grid {
+	width: 100%;
+	height: 100%;
+}
+
+.grid-item {
+  float: left;
+  width: 160px;
+  border: 2px solid hsla(0, 0%, 0%, 0.9);
+}
+
+</style>
+
+<script>
+
+var client = new XMLHttpRequest();
+client.open('GET', '/gallery.txt');
+client.onreadystatechange = function() {
+	if(client.readyState !== 4) return;
+	
+	var paths = client.responseText.split("\n");
+	for (var path of paths) {
+		var [imgpath, linkpath] = path.split("\t");
+		console.log(imgpath, linkpath)
+		var link = document.createElement('a');
+		link.href = linkpath
+		var img = document.createElement('img'); 
+		img.src = imgpath;
+		img.classList.add('grid-item');
+		link.appendChild(img);
+		document.getElementById('grid').appendChild(link); 
+	}
+	
+	// init with selector
+	var msnry = new Masonry( '.grid', {
+		itemSelector: '.grid-item',
+	});
+	
+		
+}
+client.send();
+
+</script>
+</html>
