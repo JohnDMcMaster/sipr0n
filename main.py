@@ -10,6 +10,8 @@ from watchdog.observers import Observer
 # Have to disable DecompressionBombError limits because these images are large
 PIL.Image.MAX_IMAGE_PIXELS = None
 
+GALLERY_IMAGES = 20
+
 ALLOWED_ENDINGS = ["png", "jpg", "jpeg"]
 
 PATH = "map/"
@@ -20,7 +22,7 @@ MEDIUM_MAX_WIDTH = MEDIUM_MAX_HEIGHT = 1024
 
 def thumb(path):
 
-	if ".thumb." in path:
+	if ".thumb" in path:
 		return
 
 	if path.rsplit(".", 1)[-1].lower() not in ALLOWED_ENDINGS:
@@ -48,7 +50,7 @@ def thumbfilelist():
 
 	result = []
 
-	for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True):
+	for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True)[:GALLERY_IMAGES]:
 		tilemappath = None
 		parentdir = os.path.dirname(os.path.dirname(path))
 		parentdir_contents = os.listdir(parentdir)
