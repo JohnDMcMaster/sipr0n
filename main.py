@@ -20,6 +20,8 @@ THUMBFILELIST = "gallery.txt"
 SMALL_MAX_WIDTH = SMALL_MAX_HEIGHT = 300
 MEDIUM_MAX_WIDTH = MEDIUM_MAX_HEIGHT = 1024
 
+GENERATE_MEDIUM = False
+
 def thumb(path):
 
 	if ".thumb" in path:
@@ -39,9 +41,10 @@ def thumb(path):
 	img.thumbnail((SMALL_MAX_WIDTH, SMALL_MAX_HEIGHT), Image.ANTIALIAS)
 	img.save(withoutext + ".thumb." + ext)
 
-	img = Image.open(path)
-	img.thumbnail((MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT), Image.ANTIALIAS)
-	img.save(withoutext + ".thumb2." + ext)
+	if GENERATE_MEDIUM:
+		img = Image.open(path)
+		img.thumbnail((MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT), Image.ANTIALIAS)
+		img.save(withoutext + ".thumb2." + ext)
 
 def thumbfilelist():
 	print("Generating "+THUMBFILELIST)
@@ -64,8 +67,10 @@ def thumbfilelist():
 		line = parentdir + "\t" + path + "\t"
 		if tilemappath:
 			line += tilemappath
-		else:
+		elif GENERATE_MEDIUM:
 			line += path.replace(".thumb.", ".thumb2.")#bigpath
+		else:
+			line += path
 
 		result.append(line)
 
