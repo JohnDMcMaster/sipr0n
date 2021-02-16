@@ -15,7 +15,8 @@ ALLOWED_ENDINGS = ["png", "jpg", "jpeg"]
 PATH = "map/"
 THUMBFILELIST = "gallery.txt"
 
-MAX_WIDTH = MAX_HEIGHT = 1024
+SMALL_MAX_WIDTH = SMALL_MAX_HEIGHT = 300
+MEDIUM_MAX_WIDTH = MEDIUM_MAX_HEIGHT = 1024
 
 def thumb(path):
 
@@ -29,11 +30,16 @@ def thumb(path):
 		return
 
 	print("Resizing", path)
-	img = Image.open(path)
-	img.thumbnail((MAX_WIDTH, MAX_HEIGHT), Image.ANTIALIAS)
-	path, ext = path.rsplit(".", 1)
-	img.save(path + ".thumb." + ext)
 
+	withoutext, ext = path.rsplit(".", 1)
+
+	img = Image.open(path)
+	img.thumbnail((SMALL_MAX_WIDTH, SMALL_MAX_HEIGHT), Image.ANTIALIAS)
+	img.save(withoutext + ".thumb." + ext)
+
+	img = Image.open(path)
+	img.thumbnail((MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT), Image.ANTIALIAS)
+	img.save(withoutext + ".thumb2." + ext)
 
 def thumbfilelist():
 	print("Generating "+THUMBFILELIST)
@@ -57,7 +63,7 @@ def thumbfilelist():
 		if tilemappath:
 			line += tilemappath
 		else:
-			line += path#bigpath
+			line += path.replace(".thumb.", ".thumb2.")#bigpath
 
 		result.append(line)
 
