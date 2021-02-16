@@ -2,35 +2,36 @@
 
 <head>
 <meta charset="UTF-8">
-<center>
-<br>
-<img class="title" src= "title3.png">
-</center>
 </head>
 <title>
-Siliconpr0n
+	Siliconpr0n
 </title>
 <link rel="shortcut icon" href="favicon.png">
 <style type="text/css">
 a:link, a:active, a:visited { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: smaller; color: #049B04 ; text-decoration: none}
 a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; text-decoration: none; font-size: 100%; line-height: normal}
 </style>
-<body topmargin=0 leftmargin=0 marginheight=0 marginwidth=200 background="background.jpg" text="#9AAEB5">
+<body>
+
+<br>
+<center>
+<img class="title" src= "title3.png">
+</center>
 <table>
 	<tr>
 		<td>
-			<A href="wiki"><IMG src="wiki.jpg" /></A>
+			<a href="wiki"><img src="wiki.jpg" /></a>
 		</td>
 		<td>
-			<H3><A href="wiki">[ Wiki ]</A>
+			<H3><a href="wiki">[ Wiki ]</a>
 			<br>
 			Integrated circuit reverse engineering wiki</H3>
 		</td>
 		<td>
-			<A href="map"><IMG src="archive.jpg" /></A>
+			<a href="map"><img src="archive.jpg" /></a>
 		</td>
 		<td>
-			<A href="archive"><H3>[ Archive ]</A>
+			<a href="archive"><H3>[ Archive ]</a>
 			<br>
 			Integrated circuit die images and info</H3>
 		</td>
@@ -39,14 +40,14 @@ a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; t
 <br>
 
 Most recent additions
-<hr color="#4B6B50">
+<hr>
 
 <div class="outer">
 <div id="grid" class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'>
 </div>
 </div>
 
-<hr color="#4B6B50">
+<hr>
 </body>
 
 <footer>
@@ -65,13 +66,26 @@ Most recent additions
 
 <style>
 
+body {
+	 margin-top: 0;
+	 margin-left:0;
+	 margin-left: 200px;
+	 margin-right: 200px;
+	 background-image: url(background.jpg);
+	 color: #9AAEB5;
+}
+
+hr {
+	 color: #4B6B50;
+}
+
 .title {
 	width: 45%;
 }
 
 .outer {
 	width: 500px;
-	height: 500px;
+	height: 400px;
 }
 
 .grid {
@@ -79,7 +93,7 @@ Most recent additions
 	height: 100%;
 }
 
-.grid-item, img {
+.grid-item, a img {
   float: left;
   width: 160px;
   border: 2px solid hsla(0, 0%, 0%, 0.9);
