@@ -15,16 +15,16 @@ ALLOWED_ENDINGS = ["png", "jpg", "jpeg"]
 PATH = "map/"
 THUMBFILELIST = "gallery.txt"
 
-MAX_WIDTH = MAX_HEIGHT = 512
+MAX_WIDTH = MAX_HEIGHT = 1024
 
 def thumb(path):
 
 	if ".thumb." in path:
 		return
-		
+
 	if path.rsplit(".", 1)[-1].lower() not in ALLOWED_ENDINGS:
 		return
-		
+
 	if path.split(os.path.sep)[-2] != "single":
 		return
 
@@ -33,32 +33,34 @@ def thumb(path):
 	img.thumbnail((MAX_WIDTH, MAX_HEIGHT), Image.ANTIALIAS)
 	path, ext = path.rsplit(".", 1)
 	img.save(path + ".thumb." + ext)
-	
+
 
 def thumbfilelist():
+	print("Generating "+THUMBFILELIST)
+
 	thumbpaths = glob("map/**/*.thumb.*", recursive=True)
-	
+
 	result = []
-	
+
 	for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True):
 		tilemappath = None
-		parentdir = os.path.dirname(path)
+		parentdir = os.path.dirname(os.path.dirname(path))
 		parentdir_contents = os.listdir(parentdir)
 		for siblingdir in parentdir_contents:
 			if siblingdir != "single":
 				tilemappath = os.path.join(parentdir, siblingdir)
 				break
-		
+
 		bigpath = path.replace(".thumb", "")
-		
-		line = path + "\t"
+
+		line = parentdir + "\t" + path + "\t"
 		if tilemappath:
 			line += tilemappath
 		else:
-			line += bigpath
-				
+			line += path#bigpath
+
 		result.append(line)
-				
+
 	with open(THUMBFILELIST, "w+") as f:
 		f.write("\n".join(result))
 
@@ -89,7 +91,7 @@ def mode_manual():
 	paths = []
 	for ending in ALLOWED_ENDINGS:
 		paths += glob("map/**/*."+ending, recursive=True)
-	
+
 	for path in paths:
 		thumb(path)
 
@@ -99,5 +101,5 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser("generate image thumbnails and info")
 	parser.add_argument("--watch", dest="mode", action="store_const", const=mode_observe, default=mode_manual, help="watch")
 	args = parser.parse_args()
-	
+
 	args.mode()

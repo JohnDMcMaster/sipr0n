@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 
 <head>
 <meta charset="UTF-8">
@@ -23,7 +23,7 @@ a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; t
 		</td>
 		<td>
 			<H3><A href="wiki">[ Wiki ]</A>
-			<br> 
+			<br>
 			Integrated circuit reverse engineering wiki</H3>
 		</td>
 		<td>
@@ -31,13 +31,14 @@ a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; t
 		</td>
 		<td>
 			<A href="archive"><H3>[ Archive ]</A>
-			<br> 
+			<br>
 			Integrated circuit die images and info</H3>
 		</td>
 	</tr>
 </table>
 <br>
 
+Most recent additions
 <hr color="#4B6B50">
 
 <div class="outer">
@@ -74,10 +75,14 @@ a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; t
 	height: 100%;
 }
 
-.grid-item {
+.grid-item, img {
   float: left;
   width: 160px;
   border: 2px solid hsla(0, 0%, 0%, 0.9);
+}
+
+.caption {
+	text-align: center;
 }
 
 </style>
@@ -88,26 +93,38 @@ var client = new XMLHttpRequest();
 client.open('GET', '/gallery.txt');
 client.onreadystatechange = function() {
 	if(client.readyState !== 4) return;
-	
+
 	var paths = client.responseText.split("\n");
 	for (var path of paths) {
-		var [imgpath, linkpath] = path.split("\t");
-		console.log(imgpath, linkpath)
+		var [parentdir, imgpath, linkpath] = path.split("\t");
+		console.log(parentdir, imgpath, linkpath)
+
+		var griditem = document.createElement("div");
+		griditem.classList.add('grid-item');
+
 		var link = document.createElement('a');
 		link.href = linkpath
-		var img = document.createElement('img'); 
+
+		var img = document.createElement('img');
 		img.src = imgpath;
-		img.classList.add('grid-item');
 		link.appendChild(img);
-		document.getElementById('grid').appendChild(link); 
+
+		var caption = document.createElement("div");
+		caption.innerHTML = `<a href="${parentdir}">Test${parentdir.split(/\/(.+)/)[1]}</a>`
+		caption.classList.add('caption')
+
+		griditem.appendChild(link)
+		griditem.appendChild(caption)
+
+		document.getElementById('grid').appendChild(griditem);
 	}
-	
+
 	// init with selector
 	var msnry = new Masonry( '.grid', {
 		itemSelector: '.grid-item',
 	});
-	
-		
+
+
 }
 client.send();
 
