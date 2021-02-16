@@ -110,7 +110,7 @@ client.onreadystatechange = function() {
 		link.appendChild(img);
 
 		var caption = document.createElement("div");
-		caption.innerHTML = `<a href="${parentdir}">Test${parentdir.split(/\/(.+)/)[1]}</a>`
+		caption.innerHTML = `<a href="${parentdir}">${parentdir.split(/\/(.+)/)[1]}</a>`
 		caption.classList.add('caption')
 
 		griditem.appendChild(link)
