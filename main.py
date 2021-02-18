@@ -54,13 +54,8 @@ def thumbfilelist():
 	result = []
 
 	for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True)[:GALLERY_IMAGES]:
-		tilemappath = None
-		parentdir = os.path.dirname(os.path.dirname(path))
-		parentdir_contents = os.listdir(parentdir)
-		for siblingdir in parentdir_contents:
-			if siblingdir != "single":
-				tilemappath = os.path.join(parentdir, siblingdir)
-				break
+
+		tilemappath = "map/" + os.path.sep.join(os.path.basename(path).split(".", 1)[0].split("_", 2))
 
 		bigpath = path.replace(".thumb", "")
 
