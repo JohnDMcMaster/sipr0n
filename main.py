@@ -64,8 +64,6 @@ def thumbfilelist():
 		line = parentdir + "\t" + path + "\t"
 		if tilemappath:
 			line += tilemappath
-		elif GENERATE_MEDIUM:
-			line += path.replace(".thumb.", ".thumb2.")#bigpath
 		else:
 			line += path
 
