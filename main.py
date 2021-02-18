@@ -20,10 +20,7 @@ THUMBFILELIST = "gallery.txt"
 SMALL_MAX_WIDTH = SMALL_MAX_HEIGHT = 300
 MEDIUM_MAX_WIDTH = MEDIUM_MAX_HEIGHT = 1024
 
-GENERATE_MEDIUM = False
-
-# Use the first directory that is not called single if no tilemap path can be mapped from the thumbnail name
-USEFIRSTDIRNOTSINGLE = False
+FORCE_REGEN = False
 
 def thumb(path):
 
@@ -36,18 +33,17 @@ def thumb(path):
 	if path.split(os.path.sep)[-2] != "single":
 		return
 
-	print("Resizing", path)
-
 	withoutext, ext = path.rsplit(".", 1)
+	smallthumbpath = withoutext + ".thumb." + ext
+
+	if not FORCE_REGEN and os.path.exists(smallthumbpath):
+		return
+
+	print("Resizing", path)
 
 	img = Image.open(path)
 	img.thumbnail((SMALL_MAX_WIDTH, SMALL_MAX_HEIGHT), Image.ANTIALIAS)
-	img.save(withoutext + ".thumb." + ext)
-
-	if GENERATE_MEDIUM:
-		img = Image.open(path)
-		img.thumbnail((MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT), Image.ANTIALIAS)
-		img.save(withoutext + ".thumb2." + ext)
+	img.save(smallthumbpath)
 
 def thumbfilelist():
 	print("Generating "+THUMBFILELIST)
@@ -62,18 +58,7 @@ def thumbfilelist():
 		tilemappath = "map/" + os.path.sep.join(os.path.basename(path).split(".", 1)[0].split("_", 2))
 
 		if not os.path.isdir(tilemappath):
-			tilemappath = None
-
-			if USEFIRSTDIRNOTSINGLE:
-
-				parentdir_contents = os.listdir(parentdir)
-				for siblingdir in parentdir_contents:
-					if siblingdir != "single":
-						tilemappath = os.path.join(parentdir, siblingdir)
-						break
-
-			if tilemappath is None:
-				raise Exception("Tilemap doesn't exist! " + path)
+			raise Exception("Tilemap doesn't exist! " + path)
 
 		bigpath = path.replace(".thumb", "")
 
@@ -126,6 +111,7 @@ def mode_manual():
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser("generate image thumbnails and info")
 	parser.add_argument("--watch", dest="mode", action="store_const", const=mode_observe, default=mode_manual, help="watch")
+	parser.add_argument("--force", dest="force", action="store_const", const=True, default=False, help="Force regeneration of existing thumbnails")
 	args = parser.parse_args()
-
+	FORCE_REGEN = args.force
 	args.mode()
