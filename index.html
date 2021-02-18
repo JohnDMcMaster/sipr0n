@@ -67,6 +67,7 @@ Most recent additions
 <style>
 
 body {
+	 background-color: black;
 	 margin-top: 0;
 	 margin-left:0;
 	 margin-left: 200px;
@@ -84,8 +85,7 @@ hr {
 }
 
 .outer {
-	width: 500px;
-	height: 400px;
+	width: 100%;
 }
 
 .grid {
@@ -108,11 +108,26 @@ hr {
 <script>
 
 var client = new XMLHttpRequest();
+
+var imageloadcounter = 0;
+var numimages = 20;
+
+function incrementCounter() {
+	imageloadcounter++;
+	if (imageloadcounter == numimages) {
+		// init with selector
+		var msnry = new Masonry( '.grid', {
+			itemSelector: '.grid-item',
+		});
+	}
+}
+
 client.open('GET', '/gallery.txt');
 client.onreadystatechange = function() {
 	if(client.readyState !== 4) return;
 
 	var paths = client.responseText.split("\n");
+	numimages = paths.length;
 	for (var path of paths) {
 		var [parentdir, imgpath, linkpath] = path.split("\t");
 		console.log(parentdir, imgpath, linkpath)
@@ -124,6 +139,7 @@ client.onreadystatechange = function() {
 		link.href = linkpath
 
 		var img = document.createElement('img');
+		img.addEventListener("load", incrementCounter);
 		img.src = imgpath;
 		link.appendChild(img);
 
@@ -136,11 +152,6 @@ client.onreadystatechange = function() {
 
 		document.getElementById('grid').appendChild(griditem);
 	}
-
-	// init with selector
-	var msnry = new Masonry( '.grid', {
-		itemSelector: '.grid-item',
-	});
 
 
 }
