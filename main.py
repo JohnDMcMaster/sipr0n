@@ -116,7 +116,7 @@ def mode_observe():
 def mode_manual():
 	paths = []
 	for ending in ALLOWED_ENDINGS:
-		paths += glob("map/**/*."+ending, recursive=True)
+		paths += glob("map/**/single/*."+ending, recursive=True)
 
 	for path in paths:
 		thumb(path)
