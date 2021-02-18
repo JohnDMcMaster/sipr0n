@@ -22,6 +22,9 @@ MEDIUM_MAX_WIDTH = MEDIUM_MAX_HEIGHT = 1024
 
 GENERATE_MEDIUM = False
 
+# Use the first directory that is not called single if no tilemap path can be mapped from the thumbnail name
+USEFIRSTDIRNOTSINGLE = False
+
 def thumb(path):
 
 	if ".thumb" in path:
@@ -49,13 +52,28 @@ def thumb(path):
 def thumbfilelist():
 	print("Generating "+THUMBFILELIST)
 
-	thumbpaths = glob("map/**/*.thumb.*", recursive=True)
+	thumbpaths = glob("map/**/single/*.thumb.*", recursive=True)
 
 	result = []
 
 	for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True)[:GALLERY_IMAGES]:
+		parentdir = os.path.dirname(os.path.dirname(path))
 
 		tilemappath = "map/" + os.path.sep.join(os.path.basename(path).split(".", 1)[0].split("_", 2))
+
+		if not os.path.isdir(tilemappath):
+			tilemappath = None
+
+			if USEFIRSTDIRNOTSINGLE:
+
+				parentdir_contents = os.listdir(parentdir)
+				for siblingdir in parentdir_contents:
+					if siblingdir != "single":
+						tilemappath = os.path.join(parentdir, siblingdir)
+						break
+
+			if tilemappath is None:
+				raise Exception("Tilemap doesn't exist! " + path)
 
 		bigpath = path.replace(".thumb", "")
 
