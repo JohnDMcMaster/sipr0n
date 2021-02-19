@@ -122,7 +122,7 @@ function incrementCounter() {
 	}
 }
 
-client.open('GET', '/gallery.txt');
+client.open('GET', '/gallery.txt?' + (new Date()).getTime());
 client.onreadystatechange = function() {
 	if(client.readyState !== 4) return;
 
