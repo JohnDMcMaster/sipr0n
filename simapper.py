@@ -4,6 +4,7 @@ import re
 import os
 import glob
 import urllib
+import urllib.request
 import tempfile
 import shutil
 import subprocess
@@ -32,6 +33,10 @@ def parse_page(page):
     # Check table entries
     for l in f:
         l = l.strip()
+        if not l:
+            continue
+        if l == "^ User ^ URL ^ Status ^ Notes ^":
+            continue
         _a, user, url, status, notes, _b = l.split("|")
         ret.append({
             "user": user.strip(),
@@ -56,7 +61,13 @@ See also: https://siliconpr0n.org/lib/simapper.txt
 """
     for entry in entries:
         buff += "| %s | %s | %s | %s |" % (entry["user"], entry["url"], entry["status"], entry["notes"])
-    open(page, "w").write(buff)
+    f = open(page + ".tmp", "w")
+    f.write(buff)
+    f.flush()
+    f.close()
+    shutil.move(page + ".tmp", page)
+    subprocess.check_call("chgrp www-data %s" % page, shell=True)
+    # subprocess.check_call("chown www-data %s" % page, shell=True)
 
 def process(entry):
     print("")
@@ -64,7 +75,7 @@ def process(entry):
     print("Validating URL file name...")
     fnbase, vendor, chipid, flavor = parse_image_name(entry["url"])
 
-    if not re.match("a-z", entry["user"]):
+    if not re.match("[a-z]+", entry["user"]):
         print("Invalid user name: %s" % entry["user"])
         entry["status"] = STATUS_ERROR
         return
@@ -75,19 +86,19 @@ def process(entry):
         return
 
     print("Checking if exists..")
-    vendor_dir = "/var/ww/map/%s/" % (vendor,)
-    chipid_dir = "/var/ww/map/%s/%s/" % (vendor, chipid)
-    single_dir = "/var/ww/map/%s/%s/single/" % (vendor, chipid)
-    single_fn = "/var/ww/map/%s/%s/single/%s" % (vendor, chipid, fnbase)
-    map_fn = "/var/ww/map/%s/%s/%s" % (vendor, chipid, flavor)
+    vendor_dir = "/var/www/map/%s/" % (vendor,)
+    chipid_dir = "/var/www/map/%s/%s/" % (vendor, chipid)
+    single_dir = "/var/www/map/%s/%s/single/" % (vendor, chipid)
+    single_fn = "/var/www/map/%s/%s/single/%s" % (vendor, chipid, fnbase)
+    map_fn = "/var/www/map/%s/%s/%s" % (vendor, chipid, flavor)
     print("Checking %s...." % single_fn)
     if os.path.exists(single_fn):
-        print("Collision (single)")
+        print("Collision (single): %s" % single_fn)
         entry["status"] = STATUS_COLLISION
         return
     print("Checking %s...." % map_fn)
-    if os.path.exists(single_fn):
-        print("Collision (map)")
+    if os.path.exists(map_fn):
+        print("Collision (map): %s" % map_fn)
         entry["status"] = STATUS_COLLISION
         return
 
@@ -104,9 +115,13 @@ def process(entry):
 
     print("Fetching file...")
     with urllib.request.urlopen(entry["url"]) as response:
-        ftmp = open(single_fn, "w")
+        ftmp = open(single_fn, "wb")
         shutil.copyfileobj(response, ftmp)
         ftmp.close()
+    """
+    with urllib.request.urlopen('http://www.example.com/') as f:
+        open(single_fn, "wb").write(f.read())
+    """
 
     print("Converting...")
     try:
@@ -123,7 +138,9 @@ def run(page):
     if not os.path.exists("/tmp/simapper"):
         os.mkdir("/tmp/simapper")
 
+    print("Running")
     while True:
+        time.sleep(3)
         changed = False
         try:
             entries = parse_page(page)
@@ -136,6 +153,7 @@ def run(page):
             print("")
             print("")
             print("")
+            raise
             continue
 
         for entry in entries:
@@ -146,16 +164,15 @@ def run(page):
             update_page(page, entries)
             process(entry)
     
-        if 0 and changed:
+        if changed:
             update_page(page, entries)
-        time.sleep(10)
 
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Monitor for sipr0n map imports')
-    parser.add_argument('--page', default="/var/www/wiki/data/pages/simapper.txt", help='Page to monitor')
+    parser.add_argument('--page', default="/var/www/archive/data/pages/simapper.txt", help='Page to monitor')
     parser.add_argument('--log', default="/var/www/lib/simapper.txt", help='Log file')
     args = parser.parse_args()
 
