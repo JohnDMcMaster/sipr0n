@@ -9,6 +9,8 @@ import tempfile
 import shutil
 import subprocess
 import time
+import getpass
+import datetime
 
 from img2doku import parse_image_name
 
@@ -18,15 +20,16 @@ STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
 def parse_page(page):
-    ret = []
+    header = ""
+    entries = []
 
     f = open(page)
 
     # Find table entry
     for l in f:
-        l = l.strip()
-        if l == "====== Table ======":
+        if l.strip() == "====== Table ======":
             break
+        header += l
     else:
         raise ValueError("Failed to find table sync")
 
@@ -35,26 +38,36 @@ def parse_page(page):
         l = l.strip()
         if not l:
             continue
-        if l == "^ User ^ URL ^ Status ^ Notes ^":
+        if re.match(r"\^ *User *\^ *URL *\^ *Status *\^ *Notes *\^", l):
             continue
-        _a, user, url, status, notes, _b = l.split("|")
-        ret.append({
+        try:
+            _a, user, url, status, notes, _b = l.split("|")
+        except:
+            print("Bad: %s" % l)
+            raise
+        entries.append({
             "user": user.strip(),
             "url": url.strip(),
             "status": status.strip(),
             "notes": notes.strip(),
             })
 
-    return ret
+    return header, entries
 
-def update_page(page, entries=[]):
-    buff = """\
+def update_page(page, header, entries=[]):
+    buff = ""
+
+    if not header:
+        header = """
 This page is used to import images into https://siliconpr0n.org/map/
 
 For now only .jpg is supported
 
 See also: https://siliconpr0n.org/lib/simapper.txt
-
+"""
+    buff += header
+    
+    buff += """\
 ====== Table ======
 
 ^ User ^ URL ^ Status ^ Notes ^
@@ -66,7 +79,7 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     f.flush()
     f.close()
     shutil.move(page + ".tmp", page)
-    subprocess.check_call("chgrp www-data %s" % page, shell=True)
+    # subprocess.check_call("chgrp www-data %s" % page, shell=True)
     # subprocess.check_call("chown www-data %s" % page, shell=True)
 
 def process(entry):
@@ -135,15 +148,18 @@ def process(entry):
     entry["status"] = STATUS_DONE
 
 def run(page):
+    # assert getpass.getuser() == "www-data"
+
     if not os.path.exists("/tmp/simapper"):
         os.mkdir("/tmp/simapper")
 
     print("Running")
     while True:
+        # Consider select() / notify instead
         time.sleep(3)
         changed = False
         try:
-            entries = parse_page(page)
+            header, entries = parse_page(page)
         except:
             print("")
             print("")
@@ -156,16 +172,17 @@ def run(page):
             raise
             continue
 
+        print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(),))
         for entry in entries:
             if not (entry["status"] == "" or entry["status"] == STATUS_PENDING):
                 continue
             changed = True
             entry["status"] = STATUS_PENDING
-            update_page(page, entries)
+            update_page(page, header, entries)
             process(entry)
     
         if changed:
-            update_page(page, entries)
+            update_page(page, header, entries)
 
 
 def main():
