@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 Take an input directory of image files and output directory sorted into pages
 '''
@@ -56,15 +57,15 @@ def img2doku(filenames, page_fn, optstr=''):
 
 
 def run(dir_in, dir_out, img2doku_optstr=''):
-    vendors = index_image_dir(args.dir_in)
+    vendors = index_image_dir(dir_in)
     for vendor, chipids in vendors.iteritems():
         vendor_dir = os.path.join(dir_out, vendor)
         mkdir_p(vendor_dir)
         for chipid, filenames in chipids.iteritems():
             page_fn = os.path.join(vendor_dir, "%s.txt" % chipid)
-            print "%s" % page_fn
+            print("%s" % page_fn)
             for fn in filenames.values():
-                print '  %s' % fn
+                print('  %s' % fn)
             img2doku(filenames.values(), page_fn, img2doku_optstr)
 
 

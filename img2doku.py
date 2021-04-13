@@ -86,7 +86,7 @@ def process_fns(fns):
     return map_fns, page_fns, vendor, chipid
 
 def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
-        print_pack=True, write=False, overwrite=False):
+        print_pack=True, write=False, overwrite=False, write_lazy=False):
     map_fns, page_fns, vendor, chipid = process_fns(fns)
 
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
@@ -130,18 +130,24 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
   * [[{map_chipid_url}/single/{fnbase}|Single]] ({wh}, {size})
 
 """
-    if write:
+    def try_write():
         wiki_data_dir = "/var/www/wiki/data"
         page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/")
         
         page_fns
         if os.path.exists(page_path):
+            if write_lazy:
+                print("Skip write (lazy: already exists)")
+                return
             if not overwrite:
                 raise Exception(f"Refusing to overwrite existing page {page_path}")
         open(page_path, "w").write(out)
         # subprocess.run(f"sudo chown www-data:www-data {page_path}", shell=True)
+    if write:
+        try_write()
     else:
         print(out)
+    return (out, wiki_page, wiki_url, map_chipid_url)
 
 def add_bool_arg(parser, yes_arg, default=False, **kwargs):
     dashed = yes_arg.replace('--', '')
