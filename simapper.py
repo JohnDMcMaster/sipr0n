@@ -19,6 +19,9 @@ STATUS_PENDING = "Pending"
 STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
+# TMP_DIR = "/tmp/simapper"
+MAP_DIR = "/var/www/map"
+
 def parse_page(page):
     header = ""
     entries = []
@@ -73,7 +76,7 @@ See also: https://siliconpr0n.org/lib/simapper.txt
 ^ User ^ URL ^ Status ^ Notes ^
 """
     for entry in entries:
-        buff += "| %s | %s | %s | %s |" % (entry["user"], entry["url"], entry["status"], entry["notes"])
+        buff += "| %s | %s | %s | %s |\n" % (entry["user"], entry["url"], entry["status"], entry["notes"])
     f = open(page + ".tmp", "w")
     f.write(buff)
     f.flush()
@@ -86,7 +89,8 @@ def process(entry):
     print("")
     print(entry)
     print("Validating URL file name...")
-    fnbase, vendor, chipid, flavor = parse_image_name(entry["url"])
+    # Patch up case errors server side
+    fnbase, vendor, chipid, flavor = parse_image_name(entry["url"].lower())
 
     if not re.match("[a-z]+", entry["user"]):
         print("Invalid user name: %s" % entry["user"])
@@ -99,10 +103,10 @@ def process(entry):
         return
 
     print("Checking if exists..")
-    vendor_dir = "/var/www/map/%s/" % (vendor,)
-    chipid_dir = "/var/www/map/%s/%s/" % (vendor, chipid)
-    single_dir = "/var/www/map/%s/%s/single/" % (vendor, chipid)
-    single_fn = "/var/www/map/%s/%s/single/%s" % (vendor, chipid, fnbase)
+    vendor_dir = "%s/%s/" % (MAP_DIR, vendor,)
+    chipid_dir = MAP_DIR + "/" + vendor + "/" + chipid
+    single_dir = MAP_DIR + "/" + vendor + "/" + chipid + "/single"
+    single_fn = MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + fnbase
     map_fn = "/var/www/map/%s/%s/%s" % (vendor, chipid, flavor)
     print("Checking %s...." % single_fn)
     if os.path.exists(single_fn):
@@ -128,6 +132,7 @@ def process(entry):
 
     print("Fetching file...")
     with urllib.request.urlopen(entry["url"]) as response:
+        # Note: this fixes case issue as we explicitly set output case lower
         ftmp = open(single_fn, "wb")
         shutil.copyfileobj(response, ftmp)
         ftmp.close()
@@ -139,7 +144,7 @@ def process(entry):
     print("Converting...")
     try:
         # Scary
-        subprocess.check_call("cd %s && %s %s" % (chipid_dir, script_fn, single_fn), shell=True)
+        subprocess.check_call("cd '%s' && '%s' '%s'" % (chipid_dir, script_fn, single_fn), shell=True)
     except:
         print("Conversion failed")
         entry["status"] = STATUS_ERROR
@@ -147,16 +152,22 @@ def process(entry):
 
     entry["status"] = STATUS_DONE
 
-def run(page):
+def run(page, once=False):
     # assert getpass.getuser() == "www-data"
 
-    if not os.path.exists("/tmp/simapper"):
-        os.mkdir("/tmp/simapper")
+    # if not os.path.exists(TMP_DIR):
+    #    os.mkdir(TMP_DIR)
 
     print("Running")
+    iters = 0
     while True:
+        iters += 1
+        if iters > 1 and once:
+            print("Break on test mode")
+            break
         # Consider select() / notify instead
-        time.sleep(3)
+        if iters > 1:
+            time.sleep(3)
         changed = False
         try:
             header, entries = parse_page(page)
@@ -190,7 +201,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Monitor for sipr0n map imports')
     parser.add_argument('--page', default="/var/www/archive/data/pages/simapper.txt", help='Page to monitor')
-    parser.add_argument('--log', default="/var/www/lib/simapper.txt", help='Log file')
+    # parser.add_argument('--log', default="/var/www/lib/simapper.txt", help='Log file')
     args = parser.parse_args()
 
     run(page=args.page)

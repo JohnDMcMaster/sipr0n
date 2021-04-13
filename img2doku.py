@@ -51,11 +51,12 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
     return ret
 
 
+# Keep pr0nmap/main.py and sipr0n/img2doku.py in sync
 def parse_image_name(fn):
     fnbase = os.path.basename(fn)
-    m = re.match(r'([A-Za-z0-9-]+)_([A-Za-z0-9-]+)_(.*).jpg', fnbase)
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).jpg', fnbase)
     if not m:
-        raise Exception("Bad file name: %s" % (fn,))
+        raise Exception("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
     vendor = m.group(1)
     chipid = m.group(2)
     flavor = m.group(3)
