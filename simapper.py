@@ -9,8 +9,9 @@ import tempfile
 import shutil
 import subprocess
 import time
-import getpass
 import datetime
+import traceback
+import sys
 
 from img2doku import parse_image_name
 
@@ -21,6 +22,7 @@ STATUS_COLLISION = "Collision"
 
 # TMP_DIR = "/tmp/simapper"
 MAP_DIR = "/var/www/map"
+
 
 def parse_page(page):
     header = ""
@@ -53,9 +55,10 @@ def parse_page(page):
             "url": url.strip(),
             "status": status.strip(),
             "notes": notes.strip(),
-            })
+        })
 
     return header, entries
+
 
 def update_page(page, header, entries=[]):
     buff = ""
@@ -69,14 +72,15 @@ For now only .jpg is supported
 See also: https://siliconpr0n.org/lib/simapper.txt
 """
     buff += header
-    
+
     buff += """\
 ====== Table ======
 
 ^ User ^ URL ^ Status ^ Notes ^
 """
     for entry in entries:
-        buff += "| %s | %s | %s | %s |\n" % (entry["user"], entry["url"], entry["status"], entry["notes"])
+        buff += "| %s | %s | %s | %s |\n" % (entry["user"], entry["url"],
+                                             entry["status"], entry["notes"])
     f = open(page + ".tmp", "w")
     f.write(buff)
     f.flush()
@@ -84,6 +88,7 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     shutil.move(page + ".tmp", page)
     # subprocess.check_call("chgrp www-data %s" % page, shell=True)
     # subprocess.check_call("chown www-data %s" % page, shell=True)
+
 
 def process(entry):
     print("")
@@ -103,7 +108,10 @@ def process(entry):
         return
 
     print("Checking if exists..")
-    vendor_dir = "%s/%s/" % (MAP_DIR, vendor,)
+    vendor_dir = "%s/%s/" % (
+        MAP_DIR,
+        vendor,
+    )
     chipid_dir = MAP_DIR + "/" + vendor + "/" + chipid
     single_dir = MAP_DIR + "/" + vendor + "/" + chipid + "/single"
     single_fn = MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + fnbase
@@ -144,13 +152,16 @@ def process(entry):
     print("Converting...")
     try:
         # Scary
-        subprocess.check_call("cd '%s' && '%s' '%s'" % (chipid_dir, script_fn, single_fn), shell=True)
+        subprocess.check_call("cd '%s' && '%s' '%s'" %
+                              (chipid_dir, script_fn, single_fn),
+                              shell=True)
     except:
         print("Conversion failed")
         entry["status"] = STATUS_ERROR
         return
 
     entry["status"] = STATUS_DONE
+
 
 def run(page, once=False):
     # assert getpass.getuser() == "www-data"
@@ -170,41 +181,51 @@ def run(page, once=False):
             time.sleep(3)
         changed = False
         try:
-            header, entries = parse_page(page)
-        except:
-            print("")
-            print("")
-            print("")
-            print("Failed to parse")
-            print(open(page, "r").read())
-            print("")
-            print("")
-            print("")
-            raise
-            continue
-
-        print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(),))
-        for entry in entries:
-            if not (entry["status"] == "" or entry["status"] == STATUS_PENDING):
+            try:
+                header, entries = parse_page(page)
+            except:
+                print("")
+                print("")
+                print("")
+                print("Failed to parse")
+                print(open(page, "r").read())
+                print("")
+                print("")
+                print("")
+                raise
                 continue
-            changed = True
-            entry["status"] = STATUS_PENDING
-            update_page(page, header, entries)
-            process(entry)
-    
-        if changed:
-            update_page(page, header, entries)
+
+            print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
+            for entry in entries:
+                if not (entry["status"] == ""
+                        or entry["status"] == STATUS_PENDING):
+                    continue
+                changed = True
+                entry["status"] = STATUS_PENDING
+                update_page(page, header, entries)
+                process(entry)
+
+            if changed:
+                update_page(page, header, entries)
+        except Exception as e:
+            print("WARNING: exception: %s" % (e, ))
+            traceback.print_exc()
+            pass
 
 
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Monitor for sipr0n map imports')
-    parser.add_argument('--page', default="/var/www/archive/data/pages/simapper.txt", help='Page to monitor')
+    parser = argparse.ArgumentParser(
+        description='Monitor for sipr0n map imports')
+    parser.add_argument('--page',
+                        default="/var/www/archive/data/pages/simapper.txt",
+                        help='Page to monitor')
     # parser.add_argument('--log', default="/var/www/lib/simapper.txt", help='Log file')
     args = parser.parse_args()
 
     run(page=args.page)
+
 
 if __name__ == "__main__":
     main()
