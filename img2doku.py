@@ -131,7 +131,7 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
 
 """
     def try_write():
-        wiki_data_dir = "/var/www/wiki/data"
+        wiki_data_dir = "/var/www/archive/data"
         page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/") + ".txt"
 
         if os.path.exists(page_path):
