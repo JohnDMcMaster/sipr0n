@@ -45,10 +45,10 @@ def parse_page(page):
         l = l.strip()
         if not l:
             continue
-        if re.match(r"\^ *User *\^ *URL *\^ *Status *\^ *Notes *\^", l):
+        if re.match(r"\^ *User *\^ *URL *\^ *Status *\^ *Map *\^ *Wiki *\^ *Notes *\^", l):
             continue
         try:
-            _a, user, url, status, notes, _b = l.split("|")
+            _a, user, url, status, map_, wiki, notes, _b = l.split("|")
         except:
             print("Bad: %s" % l)
             raise
@@ -56,6 +56,8 @@ def parse_page(page):
             "user": user.strip(),
             "url": url.strip(),
             "status": status.strip(),
+            "map": map_.strip(),
+            "wiki": wiki.strip(),
             "notes": notes.strip(),
         })
 
@@ -78,11 +80,12 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     buff += """\
 ====== Table ======
 
-^ User ^ URL ^ Status ^ Notes ^
+^ User ^ URL ^ Status ^ Map ^ Wiki ^ Notes ^
 """
     for entry in entries:
-        buff += "| %s | %s | %s | %s |\n" % (entry["user"], entry["url"],
-                                             entry["status"], entry["notes"])
+        buff += "| %s | %s | %s | %s | %s | %s |\n" % (entry["user"], entry["url"],
+                                             entry["status"], entry["map"],
+                                             entry["wiki"], entry["notes"])
     f = open(page + ".tmp", "w")
     f.write(buff)
     f.flush()
@@ -166,7 +169,9 @@ def process(entry):
         return
     """
     try:
-        map_user.run(user=entry["user"], files=[single_fn])
+        _wiki_page, wiki_url, map_chipid_url = map_user.run(user=entry["user"], files=[single_fn])
+        entry["map"] = map_chipid_url
+        entry["wiki"] = wiki_url
     except:
         print("Conversion failed")
         traceback.print_exc()
