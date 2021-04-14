@@ -134,13 +134,19 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
         wiki_data_dir = "/var/www/wiki/data"
         page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/")
         
-        page_fns
         if os.path.exists(page_path):
             if write_lazy:
                 print("Skip write (lazy: already exists)")
                 return
             if not overwrite:
                 raise Exception(f"Refusing to overwrite existing page {page_path}")
+        # Might be the first page for this vendor (or maybe even user?)
+        vendor_dir = os.path.dirname(page_path)
+        user_dir = os.path.dirname(vendor_dir)
+        if not os.path.exists(user_dir):
+            os.mkdir(user_dir)
+        if not os.path.exists(vendor_dir):
+            os.mkdir(vendor_dir)
         open(page_path, "w").write(out)
         # subprocess.run(f"sudo chown www-data:www-data {page_path}", shell=True)
     if write:

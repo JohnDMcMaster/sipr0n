@@ -12,6 +12,7 @@ COPYRIGHT_TXT = "/var/www/archive/data/pages/protected/copyright.txt"
 if os.path.exists("/mnt/si"):
     COPYRIGHT_TXT = "/mnt/si" + COPYRIGHT_TXT
 
+
 def default_copyright(user):
     """
     cat /var/www/archive/data/pages/protected/copyright.txt 
@@ -32,6 +33,7 @@ def default_copyright(user):
     else:
         raise Exception("Failed to find copyright for " + user)
 
+
 def run(user, copyright, files):
     if not copyright:
         copyright = default_copyright(user)
@@ -41,7 +43,8 @@ def run(user, copyright, files):
     print("")
     print("")
     print("")
-    copyright = "&copy; " + str(datetime.datetime.today().year) + " " + copyright
+    copyright = "&copy; " + str(
+        datetime.datetime.today().year) + " " + copyright
     print("Copyright: " + copyright)
     cmd = "pr0nmap -c '%s' %s" % (copyright, " ".join(files))
     print("Running: " + cmd)
@@ -50,8 +53,9 @@ def run(user, copyright, files):
     print("")
     print("")
 
-    # Only write if the page doesn't already exist 
-    _out_txt, wiki_page, wiki_url, map_chipid_url = img2doku.run(fns=files, collect=user, write=True, write_lazy=True)
+    # Only write if the page doesn't already exist
+    _out_txt, wiki_page, wiki_url, map_chipid_url = img2doku.run(
+        fns=files, collect=user, write=True, write_lazy=True)
     print("wiki_page: " + wiki_page)
     print("wiki_url: " + wiki_url)
     print("map_chipid_url: " + map_chipid_url)
@@ -72,8 +76,12 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='Generate map and template wiki for image')
-    parser.add_argument('--user', required=True, help='User name (ie wiki user name)')
-    parser.add_argument('--copyright', default=None, help='Copyright release base')
+    parser.add_argument('--user',
+                        required=True,
+                        help='User name (ie wiki user name)')
+    parser.add_argument('--copyright',
+                        default=None,
+                        help='Copyright release base')
     parser.add_argument('files', nargs="+", help='Images to map')
     args = parser.parse_args()
     run(user=args.user, copyright=args.copyright, files=args.files)
