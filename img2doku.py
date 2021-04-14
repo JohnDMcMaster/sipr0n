@@ -132,8 +132,8 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
 """
     def try_write():
         wiki_data_dir = "/var/www/wiki/data"
-        page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/")
-        
+        page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/") + ".txt"
+
         if os.path.exists(page_path):
             if write_lazy:
                 print("Skip write (lazy: already exists)")
