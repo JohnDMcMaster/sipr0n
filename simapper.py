@@ -12,6 +12,7 @@ import time
 import datetime
 import traceback
 import sys
+import map_user
 
 from img2doku import parse_image_name
 
@@ -20,8 +21,9 @@ STATUS_PENDING = "Pending"
 STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
-# TMP_DIR = "/tmp/simapper"
 MAP_DIR = "/var/www/map"
+if os.path.exists("/mnt/si"):
+    MAP_DIR = "/mnt/si" + MAP_DIR
 
 
 def parse_page(page):
@@ -101,11 +103,13 @@ def process(entry):
         print("Invalid user name: %s" % entry["user"])
         entry["status"] = STATUS_ERROR
         return
+    """
     script_fn = "/home/mcmaster/bin/map-%s" % entry["user"]
     if not os.path.exists(script_fn):
         print("Import script not found: %s" % script_fn)
         entry["status"] = STATUS_ERROR
         return
+    """
 
     print("Checking if exists..")
     vendor_dir = "%s/%s/" % (
@@ -115,7 +119,7 @@ def process(entry):
     chipid_dir = MAP_DIR + "/" + vendor + "/" + chipid
     single_dir = MAP_DIR + "/" + vendor + "/" + chipid + "/single"
     single_fn = MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + fnbase
-    map_fn = "/var/www/map/%s/%s/%s" % (vendor, chipid, flavor)
+    map_fn = MAP_DIR + "/%s/%s/%s" % (vendor, chipid, flavor)
     print("Checking %s...." % single_fn)
     if os.path.exists(single_fn):
         print("Collision (single): %s" % single_fn)
@@ -150,6 +154,7 @@ def process(entry):
     """
 
     print("Converting...")
+    """
     try:
         # Scary
         subprocess.check_call("cd '%s' && '%s' '%s'" %
@@ -157,6 +162,14 @@ def process(entry):
                               shell=True)
     except:
         print("Conversion failed")
+        entry["status"] = STATUS_ERROR
+        return
+    """
+    try:
+        map_user.run(user=entry["user"], files=[single_fn])
+    except:
+        print("Conversion failed")
+        traceback.print_exc()
         entry["status"] = STATUS_ERROR
         return
 

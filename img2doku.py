@@ -86,7 +86,7 @@ def process_fns(fns):
     return map_fns, page_fns, vendor, chipid
 
 def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
-        print_pack=True, write=False, overwrite=False, write_lazy=False):
+        print_pack=True, write=False, overwrite=False, write_lazy=False, print_=True):
     map_fns, page_fns, vendor, chipid = process_fns(fns)
 
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
@@ -137,23 +137,29 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
         if os.path.exists(page_path):
             if write_lazy:
                 print("Skip write (lazy: already exists)")
-                return
+                return False
             if not overwrite:
                 raise Exception(f"Refusing to overwrite existing page {page_path}")
         # Might be the first page for this vendor (or maybe even user?)
         vendor_dir = os.path.dirname(page_path)
-        user_dir = os.path.dirname(vendor_dir)
-        if not os.path.exists(user_dir):
-            os.mkdir(user_dir)
+        # There should at least be a user landing page
+        # Leave this off for now
+        # user_dir = os.path.dirname(vendor_dir)
+        # if not os.path.exists(user_dir):
+        #    os.mkdir(user_dir)
         if not os.path.exists(vendor_dir):
+            write_lazy and print("Making vendor dir " + vendor_dir)
             os.mkdir(vendor_dir)
         open(page_path, "w").write(out)
+        write_lazy and print("Wrote to " + page_path)
         # subprocess.run(f"sudo chown www-data:www-data {page_path}", shell=True)
-    if write:
-        try_write()
-    else:
+        return True
+    wrote = False
+    if print_:
         print(out)
-    return (out, wiki_page, wiki_url, map_chipid_url)
+    if write:
+        wrote = try_write()
+    return (out, wiki_page, wiki_url, map_chipid_url, wrote)
 
 def add_bool_arg(parser, yes_arg, default=False, **kwargs):
     dashed = yes_arg.replace('--', '')

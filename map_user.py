@@ -34,7 +34,7 @@ def default_copyright(user):
         raise Exception("Failed to find copyright for " + user)
 
 
-def run(user, copyright, files):
+def run(user, copyright=None, files=[]):
     if not copyright:
         copyright = default_copyright(user)
     print("Files")
@@ -54,11 +54,12 @@ def run(user, copyright, files):
     print("")
 
     # Only write if the page doesn't already exist
-    _out_txt, wiki_page, wiki_url, map_chipid_url = img2doku.run(
+    _out_txt, wiki_page, wiki_url, map_chipid_url, wrote = img2doku.run(
         fns=files, collect=user, write=True, write_lazy=True)
     print("wiki_page: " + wiki_page)
     print("wiki_url: " + wiki_url)
     print("map_chipid_url: " + map_chipid_url)
+    print("wrote: " + str(wrote))
 
     # Is this needed? Whole thing should run as www-data now
     """
