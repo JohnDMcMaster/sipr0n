@@ -99,8 +99,14 @@ def process(entry):
     print("")
     print(entry)
     print("Validating URL file name...")
+    url_check = entry["url"]
+    print("Parsing raw URL: %s" % (url_check,))
     # Patch up case errors server side
-    fnbase, vendor, chipid, flavor = parse_image_name(entry["url"].lower())
+    url_check = url_check.lower()
+    # Allow query strings at end (ex: for filebin)
+    url_check = url_check.split("?")[0]
+    print("Parsing simplified URL: %s" % (url_check,))
+    fnbase, vendor, chipid, flavor = parse_image_name(url_check)
 
     if not re.match("[a-z]+", entry["user"]):
         print("Invalid user name: %s" % entry["user"])
