@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<head>
+<meta charset="UTF-8">
+</head>
+<title>
+	Siliconpr0n
+</title>
+<link rel="shortcut icon" href="favicon.png">
+<style type="text/css">
+a:link, a:active, a:visited { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: smaller; color: #049B04 ; text-decoration: none}
+a:hover { color: #16F024 ; font-family: Verdana, Arial, Helvetica, sans-serif; text-decoration: none; font-size: 100%; line-height: normal}
+</style>
+<body>
+
+<br>
+<center>
+<img class="title" src= "title3.png">
+</center>
+<table>
+	<tr>
+		<td>
+			<a href="wiki"><img src="wiki.jpg" /></a>
+		</td>
+		<td>
+			<H3><a href="wiki">[ Wiki ]</a>
+			<br>
+			Integrated circuit reverse engineering wiki</H3>
+		</td>
+		<td>
+			<a href="map"><img src="archive.jpg" /></a>
+		</td>
+		<td>
+			<a href="archive"><H3>[ Archive ]</a>
+			<br>
+			Integrated circuit die images and info</H3>
+		</td>
+	</tr>
+</table>
+<br>
+
+Most recent additions
+<hr>
+
+<div class="outer">
+<div id="grid" class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'>
+</div>
+</div>
+
+<hr>
+</body>
+
+<footer>
+	<table width=100%>
+		<tr>
+			<td colspan="2">
+				<p>Contact: JohnDMcMaster *at* gmail.com</p>
+				<p>Santa Clara, CA</p>
+			</td>
+		</tr>
+	</table>
+</footer>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+<!-- or
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script> -->
+
+<style>
+
+body {
+	 background-color: black;
+	 margin-top: 0;
+	 margin-left:0;
+	 margin-left: 200px;
+	 margin-right: 200px;
+	 background-image: url(background.jpg);
+	 color: #9AAEB5;
+}
+
+hr {
+	 color: #4B6B50;
+}
+
+.title {
+	width: 45%;
+}
+
+.outer {
+	width: 100%;
+}
+
+.grid {
+	width: 100%;
+	height: 100%;
+}
+
+.grid-item, a img {
+  float: left;
+  width: 160px;
+  border: 2px solid hsla(0, 0%, 0%, 0.9);
+}
+
+.caption {
+	text-align: center;
+}
+
+</style>
+
+<script>
+
+var client = new XMLHttpRequest();
+
+var imageloadcounter = 0;
+var numimages = 20;
+
+function incrementCounter() {
+	imageloadcounter++;
+	if (imageloadcounter == numimages) {
+		// init with selector
+		var msnry = new Masonry( '.grid', {
+			itemSelector: '.grid-item',
+		});
+	}
+}
+
+client.open('GET', '/gallery.txt?' + (new Date()).getTime());
+client.onreadystatechange = function() {
+	if(client.readyState !== 4) return;
+
+	var paths = client.responseText.split("\n");
+	numimages = paths.length;
+	for (var path of paths) {
+		var [parentdir, imgpath, linkpath] = path.split("\t");
+		console.log(parentdir, imgpath, linkpath)
+
+		var griditem = document.createElement("div");
+		griditem.classList.add('grid-item');
+
+		var link = document.createElement('a');
+		link.href = linkpath
+
+		var img = document.createElement('img');
+		img.addEventListener("load", incrementCounter);
+		img.src = imgpath;
+		link.appendChild(img);
+
+		var caption = document.createElement("div");
+		caption.innerHTML = `<a href="${parentdir}">${parentdir.split(/\/(.+)/)[1]}</a>`
+		caption.classList.add('caption')
+
+		griditem.appendChild(link)
+		griditem.appendChild(caption)
+
+		document.getElementById('grid').appendChild(griditem);
+	}
+
+
+}
+client.send();
+
+</script>
+</html>
