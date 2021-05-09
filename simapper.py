@@ -45,16 +45,17 @@ def parse_page(page):
         l = l.strip()
         if not l:
             continue
-        if re.match(r"\^ *User *\^ *URL *\^ *Status *\^ *Map *\^ *Wiki *\^ *Notes *\^", l):
+        if re.match(r"\^ *User *\^ *URL *\^ *Force name *\^ *Status *\^ *Map *\^ *Wiki *\^ *Notes *\^", l):
             continue
         try:
-            _a, user, url, status, map_, wiki, notes, _b = l.split("|")
+            _a, user, url, force_name, status, map_, wiki, notes, _b = l.split("|")
         except:
             print("Bad: %s" % l)
             raise
         entries.append({
             "user": user.strip(),
             "url": url.strip(),
+            "force_name": force_name.strip(),
             "status": status.strip(),
             "map": map_.strip(),
             "wiki": wiki.strip(),
@@ -80,10 +81,11 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     buff += """\
 ====== Table ======
 
-^ User ^ URL ^ Status ^ Map ^ Wiki ^ Notes ^
+^ User ^ URL ^ Force name ^ Status ^ Map ^ Wiki ^ Notes ^
 """
     for entry in entries:
-        buff += "| %s | %s | %s | %s | %s | %s |\n" % (entry["user"], entry["url"],
+        buff += "| %s | %s | %s | %s | %s | %s | %s |\n" % (entry["user"], entry["url"],
+                                             entry["force_name"],
                                              entry["status"], entry["map"],
                                              entry["wiki"], entry["notes"])
     f = open(page + ".tmp", "w")
@@ -99,7 +101,7 @@ def process(entry):
     print("")
     print(entry)
     print("Validating URL file name...")
-    url_check = entry["url"]
+    url_check = entry.get("force_name", entry["url"])
     print("Parsing raw URL: %s" % (url_check,))
     # Patch up case errors server side
     url_check = url_check.lower()
