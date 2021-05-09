@@ -219,7 +219,8 @@ def run(page, once=False):
                 raise
                 continue
 
-            print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
+            # Spams log too much
+            # print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
             for entry in entries:
                 if not (entry["status"] == ""
                         or entry["status"] == STATUS_PENDING):
