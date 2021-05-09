@@ -228,7 +228,13 @@ def run(page, once=False):
                 changed = True
                 entry["status"] = STATUS_PENDING
                 update_page(page, header, entries)
-                process(entry)
+                try:
+                    process(entry)
+                except Exception as e:
+                    print("WARNING: exception: %s" % (e, ))
+                    traceback.print_exc()
+                    entry["status"] = STATUS_ERROR
+                    update_page(page, header, entries)
 
             if changed:
                 update_page(page, header, entries)
