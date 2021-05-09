@@ -57,7 +57,8 @@ def thumbfilelist():
 		tilemappath = "map/" + os.path.sep.join(os.path.basename(path).split(".", 1)[0].split("_", 2))
 
 		if not os.path.isdir(tilemappath):
-			raise Exception("Tilemap doesn't exist! " + path)
+			print("WARNING: tilemap doesn't exist: " + path)
+			continue
 
 		bigpath = path.replace(".thumb", "")
 
