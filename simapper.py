@@ -190,7 +190,7 @@ def process(entry):
         if not os.path.exists(single_dir):
             print("Create %s" % single_dir)
             os.mkdir(single_dir)
-    
+
         print("Fetching file...")
         if "local_fn" in entry:
             print("Local copy %s => %s" % (entry["local_fn"], single_fn))
@@ -207,7 +207,7 @@ def process(entry):
         # Mostly intended for failing faster on HTML in non-direct link
         print(subprocess.check_output(["identify", single_fn]))
         print("Sanity check OK")
-    
+
         print("Converting...")
         try:
             map_user.run(user=entry["user"], files=[single_fn], run_img2doku=False)
@@ -227,7 +227,15 @@ def process(entry):
         print("eixsts: " + str(exists))
         entry["map"] = map_chipid_url
         entry["wiki"] = wiki_url
-    
+
+        if "local_fn" in entry:
+            done_dir = os.path.dirname(entry["local_fn"]) + "/done"
+            if not os.path.exists(done_dir):
+                os.mkdir(done_dir)
+            dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
+            print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
+            shutil.move(entry["local_fn"], dst_fn)
+
         entry["status"] = STATUS_DONE
     finally:
         if entry["status"] != STATUS_DONE:
@@ -288,6 +296,8 @@ def scrape_upload_dir():
             user = os.path.basename(user_dir)
             print("Checking user dir " + user_dir)
             for im_fn in glob.glob(user_dir + "/*"):
+                if not os.path.isfile(im_fn):
+                    continue
                 print("Found fn " + im_fn)
                 process(mk_entry(user=user, local_fn=im_fn))
 

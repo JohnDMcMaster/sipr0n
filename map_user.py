@@ -8,6 +8,8 @@ import datetime
 import img2doku
 import shutil
 
+# TODO: move to setup_env() in util.py
+# but good enough right now
 COPYRIGHT_TXT = "/var/www/archive/data/pages/protected/copyright.txt"
 if os.path.exists("/mnt/si"):
     COPYRIGHT_TXT = "/mnt/si" + COPYRIGHT_TXT
