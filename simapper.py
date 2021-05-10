@@ -13,7 +13,9 @@ import datetime
 import traceback
 import sys
 import map_user
+import os
 
+import img2doku
 from img2doku import parse_image_name
 
 STATUS_DONE = "Done"
@@ -21,10 +23,37 @@ STATUS_PENDING = "Pending"
 STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
-MAP_DIR = "/var/www/map"
-if os.path.exists("/mnt/si"):
-    MAP_DIR = "/mnt/si" + MAP_DIR
+def setup_env(dev=False, remote=False):
+    global WWW_DIR
+    # Directory containing high resolution maps
+    global MAP_DIR
+    # File holding manual import table
+    global WIKI_PAGE
+    # List of directories to look for high resolution images
+    # Must be in a sub-directory with the user that wants to import it
+    global HI_SCRAPE_DIRS
 
+    # Production
+    WWW_DIR = "/var/www"
+    # Production debugged remotely
+    # discouraged, used for intiial testing mostly
+    if remote:
+        WWW_DIR = "/mnt/si/var/www"
+    # Local development
+    if dev:
+        WWW_DIR = os.getcwd() + "/dev"
+    assert os.path.exists(WWW_DIR), "Failed to find " + WWW_DIR
+
+    MAP_DIR = WWW_DIR + "/map"
+    assert os.path.exists(MAP_DIR), MAP_DIR
+    WIKI_PAGE = WWW_DIR + "/archive/data/pages/simapper.txt"
+    assert os.path.exists(WIKI_PAGE), WIKI_PAGE
+    # TODO: consider SFTP bridge
+    HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
+    for d in HI_SCRAPE_DIRS:
+        assert os.path.exists(d), d
+    # TODO: create a way to quickly import low resolution images
+    # Add the image directly to the page
 
 def parse_page(page):
     header = ""
@@ -96,12 +125,12 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     # subprocess.check_call("chgrp www-data %s" % page, shell=True)
     # subprocess.check_call("chown www-data %s" % page, shell=True)
 
-
 def process(entry):
     print("")
     print(entry)
     print("Validating URL file name...")
-    url_check = entry.get("force_name", entry["url"])
+    source_fn = entry.get("local_fn") or entry["url"]
+    url_check = entry.get("force_name") or source_fn
     print("Parsing raw URL: %s" % (url_check,))
     # Patch up case errors server side
     url_check = url_check.lower()
@@ -142,54 +171,130 @@ def process(entry):
         entry["status"] = STATUS_COLLISION
         return
 
-    print("Checking if directories exist....")
-    if not os.path.exists(vendor_dir):
-        print("Create %s" % vendor_dir)
-        os.mkdir(vendor_dir)
-    if not os.path.exists(chipid_dir):
-        print("Create %s" % chipid_dir)
-        os.mkdir(chipid_dir)
-    if not os.path.exists(single_dir):
-        print("Create %s" % single_dir)
-        os.mkdir(single_dir)
+    def cleanup():
+        if os.path.exists(single_fn):
+            print("WARNING: deleting map image failure: " + single_fn)
+            os.unlink(single_fn)
+        if os.path.exists(map_fn):
+            print("WARNING: deleting map dir on failure: " + map_fn)
+            shutil.rmtree(map_fn)
 
-    print("Fetching file...")
-    with urllib.request.urlopen(entry["url"]) as response:
-        # Note: this fixes case issue as we explicitly set output case lower
-        ftmp = open(single_fn, "wb")
-        shutil.copyfileobj(response, ftmp)
-        ftmp.close()
-    """
-    with urllib.request.urlopen('http://www.example.com/') as f:
-        open(single_fn, "wb").write(f.read())
-    """
+    try:
+        print("Checking if directories exist....")
+        if not os.path.exists(vendor_dir):
+            print("Create %s" % vendor_dir)
+            os.mkdir(vendor_dir)
+        if not os.path.exists(chipid_dir):
+            print("Create %s" % chipid_dir)
+            os.mkdir(chipid_dir)
+        if not os.path.exists(single_dir):
+            print("Create %s" % single_dir)
+            os.mkdir(single_dir)
+    
+        print("Fetching file...")
+        if "local_fn" in entry:
+            print("Local copy %s => %s" % (entry["local_fn"], single_fn))
+            shutil.copy(entry["local_fn"], single_fn)
+        else:
+            print("Downloading %s => %s" % (entry["url"], single_fn))
+            with urllib.request.urlopen(entry["url"]) as response:
+                # Note: this fixes case issue as we explicitly set output case lower
+                ftmp = open(single_fn, "wb")
+                shutil.copyfileobj(response, ftmp)
+                ftmp.close()
 
-    print("Converting...")
-    """
-    try:
-        # Scary
-        subprocess.check_call("cd '%s' && '%s' '%s'" %
-                              (chipid_dir, script_fn, single_fn),
-                              shell=True)
-    except:
-        print("Conversion failed")
-        entry["status"] = STATUS_ERROR
-        return
-    """
-    try:
-        _wiki_page, wiki_url, map_chipid_url = map_user.run(user=entry["user"], files=[single_fn])
+        # Sanity check its image file / multimedia
+        # Mostly intended for failing faster on HTML in non-direct link
+        print(subprocess.check_output(["identify", single_fn]))
+        print("Sanity check OK")
+    
+        print("Converting...")
+        try:
+            map_user.run(user=entry["user"], files=[single_fn], run_img2doku=False)
+        except:
+            print("Conversion failed")
+            traceback.print_exc()
+            entry["status"] = STATUS_ERROR
+            return
+
+        _out_txt, wiki_page, wiki_url, map_chipid_url, wrote, exists = img2doku.run(
+            fns=[single_fn], collect=entry["user"], write=True, write_lazy=True,
+            www_dir=WWW_DIR)
+        print("wiki_page: " + wiki_page)
+        print("wiki_url: " + wiki_url)
+        print("map_chipid_url: " + map_chipid_url)
+        print("wrote: " + str(wrote))
+        print("eixsts: " + str(exists))
         entry["map"] = map_chipid_url
         entry["wiki"] = wiki_url
+    
+        entry["status"] = STATUS_DONE
+    finally:
+        if entry["status"] != STATUS_DONE:
+            print("Cleaning up on non-sucess")
+            cleanup()
+
+
+def scrape_wiki_page():
+    changed = False
+    try:
+        header, entries = parse_page(WIKI_PAGE)
     except:
-        print("Conversion failed")
-        traceback.print_exc()
-        entry["status"] = STATUS_ERROR
-        return
+        print("")
+        print("")
+        print("")
+        print("Failed to parse")
+        print(open(WIKI_PAGE, "r").read())
+        print("")
+        print("")
+        print("")
+        raise
 
-    entry["status"] = STATUS_DONE
+    # Spams log too much
+    # print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
+    for entry in entries:
+        if not (entry["status"] == ""
+                or entry["status"] == STATUS_PENDING):
+            continue
+        changed = True
+        entry["status"] = STATUS_PENDING
+        update_page(WIKI_PAGE, header, entries)
+        try:
+            process(entry)
+        except Exception as e:
+            print("WARNING: exception: %s" % (e, ))
+            traceback.print_exc()
+            entry["status"] = STATUS_ERROR
+            update_page(WIKI_PAGE, header, entries)
+
+    if changed:
+        update_page(WIKI_PAGE, header, entries)
+
+def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
+    assert user
+    ret = {"user": user, "status": status}
+    if force_name:
+        ret["force_name"] = force_name
+    if  url:
+        ret["url"] = url
+    if local_fn:
+        ret["local_fn"] = local_fn
+    return ret
+
+def scrape_upload_dir():
+    print("Scraping upload dir")
+    for scrape_dir in HI_SCRAPE_DIRS:
+        for user_dir in glob.glob(scrape_dir + "/*"):
+            user = os.path.basename(user_dir)
+            print("Checking user dir " + user_dir)
+            for im_fn in glob.glob(user_dir + "/*"):
+                print("Found fn " + im_fn)
+                process(mk_entry(user=user, local_fn=im_fn))
 
 
-def run(page, once=False):
+def run(once=False, dev=False, remote=False):
+    setup_env(dev=dev, remote=remote)
+
     # assert getpass.getuser() == "www-data"
 
     # if not os.path.exists(TMP_DIR):
@@ -205,59 +310,42 @@ def run(page, once=False):
         # Consider select() / notify instead
         if iters > 1:
             time.sleep(3)
-        changed = False
+
         try:
-            try:
-                header, entries = parse_page(page)
-            except:
-                print("")
-                print("")
-                print("")
-                print("Failed to parse")
-                print(open(page, "r").read())
-                print("")
-                print("")
-                print("")
-                raise
-                continue
-
-            # Spams log too much
-            # print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
-            for entry in entries:
-                if not (entry["status"] == ""
-                        or entry["status"] == STATUS_PENDING):
-                    continue
-                changed = True
-                entry["status"] = STATUS_PENDING
-                update_page(page, header, entries)
-                try:
-                    process(entry)
-                except Exception as e:
-                    print("WARNING: exception: %s" % (e, ))
-                    traceback.print_exc()
-                    entry["status"] = STATUS_ERROR
-                    update_page(page, header, entries)
-
-            if changed:
-                update_page(page, header, entries)
+            scrape_wiki_page()
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
-            traceback.print_exc()
-            pass
+            if once:
+                raise
+            else:
+                traceback.print_exc()
 
+        try:
+            scrape_upload_dir()
+        except Exception as e:
+            print("WARNING: exception: %s" % (e, ))
+            if once:
+                raise
+            else:
+                traceback.print_exc()
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(
         description='Monitor for sipr0n map imports')
-    parser.add_argument('--page',
-                        default="/var/www/archive/data/pages/simapper.txt",
-                        help='Page to monitor')
-    # parser.add_argument('--log', default="/var/www/lib/simapper.txt", help='Log file')
+    parser.add_argument('--dev',
+                        action="store_true",
+                        help='Local test')
+    parser.add_argument('--remote',
+                        action="store_true",
+                        help='Remote test')
+    parser.add_argument('--once',
+                        action="store_true",
+                        help='Test once and exit')
     args = parser.parse_args()
 
-    run(page=args.page)
+    run(dev=args.dev, remote=args.remote, once=args.once)
 
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ def default_copyright(user):
         raise Exception("Failed to find copyright for " + user)
 
 
-def run(user, copyright=None, files=[]):
+def run(user, copyright=None, files=[], run_img2doku=True):
     if not copyright:
         copyright = default_copyright(user)
     print("Files")
@@ -53,23 +53,14 @@ def run(user, copyright=None, files=[]):
     print("")
     print("")
 
-    # Only write if the page doesn't already exist
-    _out_txt, wiki_page, wiki_url, map_chipid_url, wrote = img2doku.run(
-        fns=files, collect=user, write=True, write_lazy=True)
-    print("wiki_page: " + wiki_page)
-    print("wiki_url: " + wiki_url)
-    print("map_chipid_url: " + map_chipid_url)
-    print("wrote: " + str(wrote))
-
-    # Is this needed? Whole thing should run as www-data now
-    """
-    print("")
-    print("")
-    print("")
-    print("Fixing permissions")
-    shutil.check_call("chgrp www-data " + " ".join(files), shell=True)
-    """
-    return (wiki_page, wiki_url, map_chipid_url)
+    if run_img2doku:
+        # Only write if the page doesn't already exist
+        _out_txt, wiki_page, wiki_url, map_chipid_url, wrote = img2doku.run(
+            fns=files, collect=user, write=True, write_lazy=True)
+        print("wiki_page: " + wiki_page)
+        print("wiki_url: " + wiki_url)
+        print("map_chipid_url: " + map_chipid_url)
+        print("wrote: " + str(wrote))
 
 
 def main():
@@ -85,7 +76,7 @@ def main():
                         help='Copyright release base')
     parser.add_argument('files', nargs="+", help='Images to map')
     args = parser.parse_args()
-    run(user=args.user, copyright=args.copyright, files=args.files)
+    run(user=args.user, copyright=args.copyright, files=args.files, run_img2doku=True)
 
 
 if __name__ == "__main__":

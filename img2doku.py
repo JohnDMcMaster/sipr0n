@@ -86,12 +86,18 @@ def process_fns(fns):
     return map_fns, page_fns, vendor, chipid
 
 def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
-        print_pack=True, write=False, overwrite=False, write_lazy=False, print_=True):
+        print_pack=True, write=False, overwrite=False, write_lazy=False, print_=True,
+        www_dir="/var/www"):
     map_fns, page_fns, vendor, chipid = process_fns(fns)
 
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
     wiki_url = f"{host}/archive/doku.php?id={wiki_page}" 
     map_chipid_url = f"{host}/{mappre}/{vendor}/{chipid}"
+
+    wiki_data_dir = www_dir + "/archive/data"
+    page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/") + ".txt"
+
+    exists = os.path.exists(page_path)
 
     if print_links:
         print(wiki_url)
@@ -104,9 +110,10 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
         page_fns_base.add(os.path.basename(fn)) 
 
     out = ""
-    out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base)
+    if not exists:
+        out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base)
 
-    if page_fns:
+    if page_fns and not exists:
         for fn in sorted(page_fns):
             fn = os.path.basename(fn)
             page_fns_base.add(fn) 
@@ -131,15 +138,8 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
 
 """
     def try_write():
-        wiki_data_dir = "/var/www/archive/data"
-        page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":", "/") + ".txt"
-
-        if os.path.exists(page_path):
-            if write_lazy:
-                print("Skip write (lazy: already exists)")
-                return False
-            if not overwrite:
-                raise Exception(f"Refusing to overwrite existing page {page_path}")
+        if exists and not write_lazy and not overwrite:
+            raise Exception(f"Refusing to overwrite existing page {page_path}")
         # Might be the first page for this vendor (or maybe even user?)
         vendor_dir = os.path.dirname(page_path)
         # There should at least be a user landing page
@@ -150,7 +150,7 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
         if not os.path.exists(vendor_dir):
             write_lazy and print("Making vendor dir " + vendor_dir)
             os.mkdir(vendor_dir)
-        open(page_path, "w").write(out)
+        open(page_path, "a").write(out)
         write_lazy and print("Wrote to " + page_path)
         # subprocess.run(f"sudo chown www-data:www-data {page_path}", shell=True)
         return True
@@ -159,7 +159,7 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
         print(out)
     if write:
         wrote = try_write()
-    return (out, wiki_page, wiki_url, map_chipid_url, wrote)
+    return (out, wiki_page, wiki_url, map_chipid_url, wrote, exists)
 
 def add_bool_arg(parser, yes_arg, default=False, **kwargs):
     dashed = yes_arg.replace('--', '')
