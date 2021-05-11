@@ -290,7 +290,13 @@ def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
     return ret
 
 def scrape_upload_dir(once=False, verbose=False):
-    print("Scraping upload dir")
+    """
+    TODO: consider implementing upload timeout
+    As currently implemented dokuwiki buffers files and writes them instantly
+    However might want to allow slower uploads such as through sftp
+    Consider verifying the file size is stable (say over 1 second)
+    """
+    verbose and print("Scraping upload dir")
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
             try:
