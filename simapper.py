@@ -308,7 +308,7 @@ def scrape_upload_dir(once=False, verbose=False):
                 for im_fn in glob.glob(user_dir + "/*"):
                     if not os.path.isfile(im_fn):
                         continue
-                    verbose and print("Found fn " + im_fn)
+                    print("Found fn " + im_fn)
                     process(mk_entry(user=user, local_fn=im_fn))
             except Exception as e:
                 print("WARNING: exception scraping user dir: %s" % (e, ))
