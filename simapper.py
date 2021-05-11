@@ -289,20 +289,27 @@ def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
         ret["local_fn"] = local_fn
     return ret
 
-def scrape_upload_dir():
+def scrape_upload_dir(once=False, verbose=False):
     print("Scraping upload dir")
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
-            if not os.path.isdir(user_dir):
-                print("WARNING: unexpected file " + user_dir)
-                continue
-            user = os.path.basename(user_dir)
-            print("Checking user dir " + user_dir)
-            for im_fn in glob.glob(user_dir + "/*"):
-                if not os.path.isfile(im_fn):
+            try:
+                if not os.path.isdir(user_dir):
+                    print("WARNING: unexpected file " + user_dir)
                     continue
-                print("Found fn " + im_fn)
-                process(mk_entry(user=user, local_fn=im_fn))
+                user = os.path.basename(user_dir)
+                verbose and print("Checking user dir " + user_dir)
+                for im_fn in glob.glob(user_dir + "/*"):
+                    if not os.path.isfile(im_fn):
+                        continue
+                    verbose and print("Found fn " + im_fn)
+                    process(mk_entry(user=user, local_fn=im_fn))
+            except Exception as e:
+                print("WARNING: exception scraping user dir: %s" % (e, ))
+                if once:
+                    raise
+                else:
+                    traceback.print_exc()
 
 
 def run(once=False, dev=False, remote=False):
@@ -334,7 +341,7 @@ def run(once=False, dev=False, remote=False):
                 traceback.print_exc()
 
         try:
-            scrape_upload_dir()
+            scrape_upload_dir(once=once)
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
             if once:
