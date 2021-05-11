@@ -293,6 +293,9 @@ def scrape_upload_dir():
     print("Scraping upload dir")
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
+            if not os.path.isdir(user_dir):
+                print("WARNING: unexpected file " + user_dir)
+                continue
             user = os.path.basename(user_dir)
             print("Checking user dir " + user_dir)
             for im_fn in glob.glob(user_dir + "/*"):
