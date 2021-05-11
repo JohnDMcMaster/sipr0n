@@ -73,7 +73,7 @@ def thumbfilelist():
         def relative(path):
             return path.replace("/var/www/", "")
 
-        line = parentdir + "\t" + relative(path) + "\t"
+        line = relative(parentdir) + "\t" + relative(path) + "\t"
         if tilemappath:
             line += relative(tilemappath)
         else:
