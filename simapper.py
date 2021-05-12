@@ -46,7 +46,7 @@ def setup_env(dev=False, remote=False):
 
     MAP_DIR = WWW_DIR + "/map"
     assert os.path.exists(MAP_DIR), MAP_DIR
-    WIKI_PAGE = WWW_DIR + "/archive/data/pages/simapper.txt"
+    WIKI_PAGE = WWW_DIR + "/archive/data/pages/simapper/start.txt"
     assert os.path.exists(WIKI_PAGE), WIKI_PAGE
     # TODO: consider SFTP bridge
     HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
@@ -264,6 +264,7 @@ def scrape_wiki_page():
         if not (entry["status"] == ""
                 or entry["status"] == STATUS_PENDING):
             continue
+        print_log_break()
         changed = True
         entry["status"] = STATUS_PENDING
         update_page(WIKI_PAGE, header, entries)
@@ -289,6 +290,11 @@ def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
         ret["local_fn"] = local_fn
     return ret
 
+def print_log_break():
+    for _ in range(6):
+        print("")
+    print("*" * 78)
+
 def scrape_upload_dir(once=False, verbose=False):
     """
     TODO: consider implementing upload timeout
@@ -296,18 +302,22 @@ def scrape_upload_dir(once=False, verbose=False):
     However might want to allow slower uploads such as through sftp
     Consider verifying the file size is stable (say over 1 second)
     """
+    warned = set()
     verbose and print("Scraping upload dir")
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
             try:
                 if not os.path.isdir(user_dir):
-                    print("WARNING: unexpected file " + user_dir)
+                    if not user_dir in warned:
+                        print("WARNING: unexpected file " + user_dir)
+                        warned.add(user_dir)
                     continue
                 user = os.path.basename(user_dir)
                 verbose and print("Checking user dir " + user_dir)
                 for im_fn in glob.glob(user_dir + "/*"):
                     if not os.path.isfile(im_fn):
                         continue
+                    print_log_break()
                     print("Found fn " + im_fn)
                     process(mk_entry(user=user, local_fn=im_fn))
             except Exception as e:

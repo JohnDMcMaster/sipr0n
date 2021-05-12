@@ -10,7 +10,7 @@ import shutil
 
 # TODO: move to setup_env() in util.py
 # but good enough right now
-COPYRIGHT_TXT = "/var/www/archive/data/pages/copyright.txt"
+COPYRIGHT_TXT = "/var/www/archive/data/pages/simapper/copyright.txt"
 if os.path.exists("/mnt/si"):
     COPYRIGHT_TXT = "/mnt/si" + COPYRIGHT_TXT
 
