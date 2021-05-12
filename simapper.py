@@ -243,6 +243,8 @@ def process(entry):
             cleanup()
 
 
+warned_wiki_page = set()
+
 def scrape_wiki_page():
     changed = False
     try:
@@ -271,10 +273,12 @@ def scrape_wiki_page():
         try:
             process(entry)
         except Exception as e:
-            print("WARNING: exception: %s" % (e, ))
-            traceback.print_exc()
+            if not user_dir in warned_wiki_page:
+                print("WARNING: exception: %s" % (e, ))
+                traceback.print_exc()
             entry["status"] = STATUS_ERROR
             update_page(WIKI_PAGE, header, entries)
+            warned_wiki_page.add(user_dir)
 
     if changed:
         update_page(WIKI_PAGE, header, entries)
@@ -295,6 +299,8 @@ def print_log_break():
         print("")
     print("*" * 78)
 
+tried_upload_dirs = set()
+
 def scrape_upload_dir(once=False, verbose=False):
     """
     TODO: consider implementing upload timeout
@@ -302,16 +308,16 @@ def scrape_upload_dir(once=False, verbose=False):
     However might want to allow slower uploads such as through sftp
     Consider verifying the file size is stable (say over 1 second)
     """
-    warned = set()
     verbose and print("Scraping upload dir")
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
+            if user_dir in tried_upload_dirs:
+                continue
+            tried_upload_dirs.add(user_dir)
+            
             try:
                 if not os.path.isdir(user_dir):
-                    if not user_dir in warned:
-                        print("WARNING: unexpected file " + user_dir)
-                        warned.add(user_dir)
-                    continue
+                    raise Exception("unexpected file " + user_dir)
                 user = os.path.basename(user_dir)
                 verbose and print("Checking user dir " + user_dir)
                 for im_fn in glob.glob(user_dir + "/*"):
