@@ -55,6 +55,13 @@ def setup_env(dev=False, remote=False):
     # TODO: create a way to quickly import low resolution images
     # Add the image directly to the page
 
+    print_log_break()
+    print("Environment:")
+    print("  WWW_DIR: ", WWW_DIR)
+    print("  MAP_DIR: ", MAP_DIR)
+    print("  WIKI_PAGE: ", WIKI_PAGE)
+    print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
+
 def parse_page(page):
     header = ""
     entries = []
@@ -299,7 +306,7 @@ def print_log_break():
         print("")
     print("*" * 78)
 
-tried_upload_dirs = set()
+tried_upload_files = set()
 
 def scrape_upload_dir(once=False, verbose=False):
     """
@@ -308,23 +315,33 @@ def scrape_upload_dir(once=False, verbose=False):
     However might want to allow slower uploads such as through sftp
     Consider verifying the file size is stable (say over 1 second)
     """
+    # verbose = True
+    verbose and print("")
     verbose and print("Scraping upload dir")
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
-            if user_dir in tried_upload_dirs:
+            if user_dir in tried_upload_files:
+                verbose and print("Ignoring tried: " + user_dir)
                 continue
-            tried_upload_dirs.add(user_dir)
-            
+
             try:
                 if not os.path.isdir(user_dir):
+                    verbose and print("Ignoring not a dir: " + user_dir)
+                    tried_upload_files.add(user_dir)
                     raise Exception("unexpected file " + user_dir)
                 user = os.path.basename(user_dir)
                 verbose and print("Checking user dir " + user_dir)
                 for im_fn in glob.glob(user_dir + "/*"):
+                    if im_fn in tried_upload_files:
+                        verbose and print("Already tried: " + im_fn)
+                        continue
+                    tried_upload_files.add(im_fn)
+                    # Ignore upload dir
                     if not os.path.isfile(im_fn):
+                        verbose and print("Not a file " + im_fn)
                         continue
                     print_log_break()
-                    print("Found fn " + im_fn)
+                    print("Found fn: " + im_fn)
                     process(mk_entry(user=user, local_fn=im_fn))
             except Exception as e:
                 print("WARNING: exception scraping user dir: %s" % (e, ))
