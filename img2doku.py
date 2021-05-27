@@ -5,12 +5,20 @@ import re
 import os
 import glob
 
-def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()):
+def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set(), code_txt=None, header_txt=None):
     ret = ""
     ret += f"""\
 {{{{tag>collection_{collect} vendor_{vendor} type_unknown year_unknown foundry_unknown}}}}
 
 """
+
+    if header_txt:
+        ret += header_txt + "\n"
+
+    if code_txt:
+        ret += "<code>\n"
+        ret += code_txt + "\n"
+        ret += "</code>\n"
 
     ret += f"""
 ====== Package ======
@@ -62,6 +70,18 @@ def parse_image_name(fn):
     flavor = m.group(3)
     return (fnbase, vendor, chipid, flavor)
 
+def parse_vendor_chipid_name(fn):
+    fnbase = os.path.basename(fn)
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)', fnbase)
+    if not m:
+        raise Exception("Non-confirming file name (need vendor_chipid): %s" % (fn,))
+    vendor = m.group(1)
+    chipid = m.group(2)
+    return (fnbase, vendor, chipid)
+
+def validate_username(username):
+    return re.match("[a-z]+", username)
+
 def process_fns(fns):
     """
     Support two inputs:
@@ -85,10 +105,16 @@ def process_fns(fns):
     _fnbase, vendor, chipid, _flavor = parse_image_name(map_fns[0])
     return map_fns, page_fns, vendor, chipid
 
-def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
+def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
         print_pack=True, write=False, overwrite=False, write_lazy=False, print_=True,
-        www_dir="/var/www"):
-    map_fns, page_fns, vendor, chipid = process_fns(fns)
+        www_dir="/var/www", code_txt=None, header_txt=None,
+        # Auto guess if given hi_fn
+        vendor=None, chipid=None):
+    if len(hi_fns):
+        map_fns, page_fns, vendor, chipid = process_fns(hi_fns)
+    else:
+        assert vendor
+        assert chipid
 
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
     wiki_url = f"{host}/archive/doku.php?id={wiki_page}" 
@@ -111,7 +137,7 @@ def run(fns, print_links=True, collect="mcmaster", nspre="", mappre="map", host=
 
     out = ""
     if not exists:
-        out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base)
+        out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base, code_txt=code_txt, header_txt=header_txt)
 
     if page_fns and not exists:
         for fn in sorted(page_fns):
@@ -189,7 +215,7 @@ def main():
     add_bool_arg(parser, '--link', default=True, help='no link text')
     parser.add_argument('fns_in', nargs="+")
     args = parser.parse_args()
-    run(fns=args.fns_in, print_pack=args.pack, collect=args.collect, write=args.write, overwrite=args.overwrite, nspre=args.nspre, mappre=args.mappre)
+    run(hi_fns=args.fns_in, print_pack=args.pack, collect=args.collect, write=args.write, overwrite=args.overwrite, nspre=args.nspre, mappre=args.mappre)
 
 if __name__ == "__main__":
     main()

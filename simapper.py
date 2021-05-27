@@ -16,17 +16,23 @@ import map_user
 import os
 
 import img2doku
-from img2doku import parse_image_name
+from img2doku import parse_image_name, validate_username
 
 STATUS_DONE = "Done"
 STATUS_PENDING = "Pending"
 STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
+WWW_DIR = None
+LO_SCRAPE_DIRS = None
+WIKI_NS_DIR = None
+WIKI_DIR = None
+
 def setup_env(dev=False, remote=False):
     global WWW_DIR
     # Directory containing high resolution maps
     global MAP_DIR
+    global WIKI_DIR
     # Directory containing simapper pages
     global WIKI_NS_DIR
     # File holding manual import table
@@ -34,6 +40,7 @@ def setup_env(dev=False, remote=False):
     # List of directories to look for high resolution images
     # Must be in a sub-directory with the user that wants to import it
     global HI_SCRAPE_DIRS
+    global LO_SCRAPE_DIRS
 
     # Production
     WWW_DIR = "/var/www"
@@ -48,12 +55,16 @@ def setup_env(dev=False, remote=False):
 
     MAP_DIR = WWW_DIR + "/map"
     assert os.path.exists(MAP_DIR), MAP_DIR
+    WIKI_DIR = WWW_DIR + "/archive"
     WIKI_NS_DIR = WWW_DIR + "/archive/data/pages/simapper"
     assert os.path.exists(WIKI_NS_DIR), WIKI_NS_DIR
     WIKI_PAGE = WIKI_NS_DIR + "/start.txt"
     assert os.path.exists(WIKI_PAGE), WIKI_PAGE
     # TODO: consider SFTP bridge
     HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
+    for d in HI_SCRAPE_DIRS:
+        assert os.path.exists(d), d
+    LO_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/sipager"]
     for d in HI_SCRAPE_DIRS:
         assert os.path.exists(d), d
     # TODO: create a way to quickly import low resolution images
@@ -65,6 +76,9 @@ def setup_env(dev=False, remote=False):
     print("  MAP_DIR: ", MAP_DIR)
     print("  WIKI_PAGE: ", WIKI_PAGE)
     print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
+
+def get_user_page(user):
+    return WIKI_NS_DIR + "/" + user + ".txt"
 
 def parse_page(page):
     header = ""
@@ -140,7 +154,7 @@ def log_simapper_update(entry):
     """
     Update user page w/ URL
     """
-    page = WIKI_NS_DIR + "/" + entry["user"] + ".txt"
+    page = get_user_page(entry["user"])
     print("Adding link to " + page)
     f = open(page, "a")
     try:
@@ -151,6 +165,13 @@ def log_simapper_update(entry):
     finally:
         f.close()
 
+def shift_done(entry):
+    done_dir = os.path.dirname(entry["local_fn"]) + "/done"
+    if not os.path.exists(done_dir):
+        os.mkdir(done_dir)
+    dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
+    print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
+    shutil.move(entry["local_fn"], dst_fn)
 
 def process(entry):
     print("")
@@ -166,7 +187,7 @@ def process(entry):
     print("Parsing simplified URL: %s" % (url_check,))
     fnbase, vendor, chipid, flavor = parse_image_name(url_check)
 
-    if not re.match("[a-z]+", entry["user"]):
+    if not validate_username(entry["user"]):
         print("Invalid user name: %s" % entry["user"])
         entry["status"] = STATUS_ERROR
         return
@@ -251,19 +272,13 @@ def process(entry):
         print("wiki_url: " + wiki_url)
         print("map_chipid_url: " + map_chipid_url)
         print("wrote: " + str(wrote))
-        print("eixsts: " + str(exists))
+        print("exists: " + str(exists))
         entry["map"] = map_chipid_url
         entry["wiki"] = wiki_url
         log_simapper_update(entry)
 
         if "local_fn" in entry:
-            done_dir = os.path.dirname(entry["local_fn"]) + "/done"
-            if not os.path.exists(done_dir):
-                os.mkdir(done_dir)
-            dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
-            print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
-            shutil.move(entry["local_fn"], dst_fn)
-
+            shift_done(entry)
         entry["status"] = STATUS_DONE
     finally:
         if entry["status"] != STATUS_DONE:
