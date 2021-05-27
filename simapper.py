@@ -27,6 +27,8 @@ def setup_env(dev=False, remote=False):
     global WWW_DIR
     # Directory containing high resolution maps
     global MAP_DIR
+    # Directory containing simapper pages
+    global WIKI_NS_DIR
     # File holding manual import table
     global WIKI_PAGE
     # List of directories to look for high resolution images
@@ -46,7 +48,9 @@ def setup_env(dev=False, remote=False):
 
     MAP_DIR = WWW_DIR + "/map"
     assert os.path.exists(MAP_DIR), MAP_DIR
-    WIKI_PAGE = WWW_DIR + "/archive/data/pages/simapper/start.txt"
+    WIKI_NS_DIR = WWW_DIR + "/archive/data/pages/simapper"
+    assert os.path.exists(WIKI_NS_DIR), WIKI_NS_DIR
+    WIKI_PAGE = WIKI_NS_DIR + "/start.txt"
     assert os.path.exists(WIKI_PAGE), WIKI_PAGE
     # TODO: consider SFTP bridge
     HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
@@ -131,6 +135,21 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     shutil.move(page + ".tmp", page)
     # subprocess.check_call("chgrp www-data %s" % page, shell=True)
     # subprocess.check_call("chown www-data %s" % page, shell=True)
+
+def log_simapper_update(entry):
+    """
+    Update user page w/ URL
+    """
+    page = WIKI_NS_DIR + "/" + entry["user"] + ".txt"
+    print("Adding link to " + page)
+    f = open(page, "a")
+    try:
+        f.write("\n")
+        f.write("[[" + entry["wiki"] + "]]")
+        f.flush()
+    finally:
+        f.close()
+
 
 def process(entry):
     print("")
@@ -234,6 +253,7 @@ def process(entry):
         print("eixsts: " + str(exists))
         entry["map"] = map_chipid_url
         entry["wiki"] = wiki_url
+        log_simapper_update(entry)
 
         if "local_fn" in entry:
             done_dir = os.path.dirname(entry["local_fn"]) + "/done"
