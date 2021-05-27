@@ -144,8 +144,9 @@ def log_simapper_update(entry):
     print("Adding link to " + page)
     f = open(page, "a")
     try:
+        # Double new line to put links on individual lines
         f.write("\n")
-        f.write("[[" + entry["wiki"] + "]]")
+        f.write("[[" + entry["wiki"] + "]]\n")
         f.flush()
     finally:
         f.close()
