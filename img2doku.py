@@ -137,17 +137,17 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
     if not exists:
         out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base, code_txt=code_txt, header_txt=header_txt)
 
-    if page_fns and not exists:
-        for fn in sorted(page_fns):
-            fn = os.path.basename(fn)
-            page_fns_base.add(fn) 
-            if fn in ("pack_top.jpg", "pack_btm.jpg"):
-                continue
-            out += f"{{{{:{wiki_page}:{fn}?300|}}}}\n"
-            out += "\n"
+        if page_fns:
+            for fn in sorted(page_fns):
+                fn = os.path.basename(fn)
+                page_fns_base.add(fn) 
+                if fn in ("pack_top.jpg", "pack_btm.jpg"):
+                    continue
+                out += f"{{{{:{wiki_page}:{fn}?300|}}}}\n"
+                out += "\n"
 
-    out += "<code>\n"
-    out += "</code>\n"
+        out += "<code>\n"
+        out += "</code>\n"
 
     for fn in map_fns:
         fnbase, vendor_this, chipid_this, flavor = parse_image_name(fn)

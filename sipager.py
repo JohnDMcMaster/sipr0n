@@ -43,25 +43,7 @@ def get_user_page(user):
     return simapper.WIKI_NS_DIR + "/" + user + "/sipager.txt"
 
 def log_sipager_update(entry):
-    """
-    Update user page w/ URL
-    """
-    page = get_user_page(entry["user"])
-
-    page_dir = os.path.dirname(page)
-    if not os.path.exists(page_dir):
-        print("mkdir " + page_dir)
-        os.mkdir(page_dir)
-
-    print("Adding link to " + page)
-    f = open(page, "a")
-    try:
-        # Double new line to put links on individual lines
-        f.write("\n")
-        f.write("[[" + entry["wiki"] + "]]\n")
-        f.flush()
-    finally:
-        f.close()
+    simapper.log_simapper_update(entry, page=get_user_page(entry["user"]))
 
 def process(entry):
     print("")
@@ -141,9 +123,9 @@ def scrape_upload_dir(once=False, verbose=False):
     However might want to allow slower uploads such as through sftp
     Consider verifying the file size is stable (say over 1 second)
     """
-    verbose = True
     verbose and print("")
     verbose and print("Scraping upload dir")
+    change = False
     for scrape_dir in simapper.LO_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
             if user_dir in tried_upload_files:
@@ -171,12 +153,15 @@ def scrape_upload_dir(once=False, verbose=False):
                     print_log_break()
                     print("Found fn: " + user_fn)
                     process(mk_entry(user=user, local_fn=user_fn))
+                    change = True
             except Exception as e:
                 print("WARNING: exception scraping user dir: %s" % (e, ))
                 if once:
                     raise
                 else:
                     traceback.print_exc()
+    if change:
+        simapper.reindex_all()
 
 
 def run(once=False, dev=False, remote=False, verbose=False):
@@ -226,7 +211,7 @@ def main():
                         help='Verbose')
     args = parser.parse_args()
 
-    run(dev=args.dev, remote=args.remote, once=args.once)
+    run(dev=args.dev, remote=args.remote, once=args.once, verbose=args.verbose)
 
 
 if __name__ == "__main__":

@@ -151,12 +151,20 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     # subprocess.check_call("chgrp www-data %s" % page, shell=True)
     # subprocess.check_call("chown www-data %s" % page, shell=True)
 
-def log_simapper_update(entry):
+def log_simapper_update(entry, page=None):
     """
     Update user page w/ URL
     """
-    page = get_user_page(entry["user"])
+    if page is None:
+        page = get_user_page(entry["user"])
+
     print("Adding link to " + page)
+
+    page_dir = os.path.dirname(page)
+    if not os.path.exists(page_dir):
+        print("mkdir " + page_dir)
+        os.mkdir(page_dir)
+
     f = open(page, "a")
     try:
         # Double new line to put links on individual lines
@@ -165,6 +173,17 @@ def log_simapper_update(entry):
         f.flush()
     finally:
         f.close()
+
+    # Force cache update
+    # Works from chrome but not wget
+    # subprocess.check_call(["wget", "-O", "/dev/null", entry["wiki"]])
+
+def reindex_all():
+    print("Running reindex all")
+    # subprocess.check_call("sudo -u www-data php /var/www/archive/bin/indexer.php", shell=True)
+    # Already running as www-data
+    subprocess.check_output("php /var/www/archive/bin/indexer.php", shell=True)
+    print("Reindex complete")
 
 def shift_done(entry):
     done_dir = os.path.dirname(entry["local_fn"]) + "/done"
@@ -254,7 +273,7 @@ def process(entry):
 
         # Sanity check its image file / multimedia
         # Mostly intended for failing faster on HTML in non-direct link
-        print(subprocess.check_output(["identify", single_fn]))
+        subprocess.check_call(["identify", single_fn])
         print("Sanity check OK")
 
         print("Converting...")
@@ -326,6 +345,7 @@ def scrape_wiki_page():
 
     if changed:
         update_page(WIKI_PAGE, header, entries)
+        reindex_all()
 
 def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
     assert user
@@ -355,6 +375,7 @@ def scrape_upload_dir(once=False, verbose=False):
     # verbose = True
     verbose and print("")
     verbose and print("Scraping upload dir")
+    change = False
     for scrape_dir in HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
             if user_dir in tried_upload_files:
@@ -380,13 +401,15 @@ def scrape_upload_dir(once=False, verbose=False):
                     print_log_break()
                     print("Found fn: " + im_fn)
                     process(mk_entry(user=user, local_fn=im_fn))
+                    change = True
             except Exception as e:
                 print("WARNING: exception scraping user dir: %s" % (e, ))
                 if once:
                     raise
                 else:
                     traceback.print_exc()
-
+    if change:
+        reindex_all()
 
 def run(once=False, dev=False, remote=False):
     setup_env(dev=dev, remote=remote)
