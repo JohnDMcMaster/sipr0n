@@ -76,6 +76,7 @@ def setup_env(dev=False, remote=False):
     print("  MAP_DIR: ", MAP_DIR)
     print("  WIKI_PAGE: ", WIKI_PAGE)
     print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
+    print("  LO_SCRAPE_DIRS: ", LO_SCRAPE_DIRS)
 
 def get_user_page(user):
     return WIKI_NS_DIR + "/" + user + ".txt"
@@ -372,7 +373,7 @@ def scrape_upload_dir(once=False, verbose=False):
                         verbose and print("Already tried: " + im_fn)
                         continue
                     tried_upload_files.add(im_fn)
-                    # Ignore upload dir
+                    # Ignore done dir
                     if not os.path.isfile(im_fn):
                         verbose and print("Not a file " + im_fn)
                         continue

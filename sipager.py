@@ -17,8 +17,8 @@ import os
 
 import img2doku
 from img2doku import parse_vendor_chipid_name, validate_username
-from simapper import LO_SCRAPE_DIRS, WWW_DIR, WIKI_NS_DIR, STATUS_DONE, WIKI_DIR
-from simapper import print_log_break, setup_env
+import simapper
+from simapper import print_log_break, setup_env, STATUS_DONE
 
 def shift_done(entry):
     done_dir = os.path.dirname(entry["local_fn"]) + "/done"
@@ -37,16 +37,22 @@ def find_txt(entry):
     return open(txts[0], "r").read()
 
 def find_lo_fns(entry):
-    return list([glob.glob(entry["local_fn"] + "/*.jpg")])
+    return list(glob.glob(entry["local_fn"] + "/*.jpg"))
 
 def get_user_page(user):
-    return WIKI_NS_DIR + "/" + user + ":sipager.txt"
+    return simapper.WIKI_NS_DIR + "/" + user + "/sipager.txt"
 
 def log_sipager_update(entry):
     """
     Update user page w/ URL
     """
     page = get_user_page(entry["user"])
+
+    page_dir = os.path.dirname(page)
+    if not os.path.exists(page_dir):
+        print("mkdir " + page_dir)
+        os.mkdir(page_dir)
+
     print("Adding link to " + page)
     f = open(page, "a")
     try:
@@ -78,12 +84,13 @@ def process(entry):
     code_txt = find_txt(entry)
 
     try:
-        for src_fn in find_lo_fns(entry):
+        page_fns = find_lo_fns(entry)
+        for src_fn in page_fns:
             bn = os.path.basename(src_fn)
             print("Importing " + bn)
             if bn not in ("die.jpg", "pack_top.jpg", "pack_btm.jpg"):
                 raise Exception("FIXME: non-standard import file name: " % bn)
-            vendor_dir = WIKI_DIR + "/data/media/" + entry["user"] + "/" + vendor
+            vendor_dir = simapper.WIKI_DIR + "/data/media/" + entry["user"] + "/" + vendor
             if not os.path.exists(vendor_dir):
                 print("mkdir " + vendor_dir)
                 os.mkdir(vendor_dir)
@@ -99,8 +106,8 @@ def process(entry):
 
         _out_txt, wiki_page, wiki_url, _map_chipid_url, wrote, exists = img2doku.run(
             hi_fns=[], collect=entry["user"], write=True, write_lazy=True,
-            www_dir=WWW_DIR, code_txt=code_txt,
-            vendor=vendor, chipid=chipid)
+            www_dir=simapper.WWW_DIR, code_txt=code_txt,
+            vendor=vendor, chipid=chipid, page_fns=page_fns)
         print("wiki_page: " + wiki_page)
         print("wiki_url: " + wiki_url)
         print("wrote: " + str(wrote))
@@ -134,10 +141,10 @@ def scrape_upload_dir(once=False, verbose=False):
     However might want to allow slower uploads such as through sftp
     Consider verifying the file size is stable (say over 1 second)
     """
-    # verbose = True
+    verbose = True
     verbose and print("")
     verbose and print("Scraping upload dir")
-    for scrape_dir in LO_SCRAPE_DIRS:
+    for scrape_dir in simapper.LO_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
             if user_dir in tried_upload_files:
                 verbose and print("Ignoring tried: " + user_dir)
@@ -155,9 +162,11 @@ def scrape_upload_dir(once=False, verbose=False):
                         verbose and print("Already tried: " + user_fn)
                         continue
                     tried_upload_files.add(user_fn)
-                    # Ignore upload dir
-                    if not os.path.isfile(user_fn):
-                        verbose and print("Not a file " + user_fn)
+                    if os.path.basename(user_fn) == "done":
+                        continue
+                    # TODO: consider single fn or tarball support
+                    if not os.path.isdir(user_fn):
+                        verbose and print("Not a dir " + user_fn)
                         continue
                     print_log_break()
                     print("Found fn: " + user_fn)
@@ -170,7 +179,7 @@ def scrape_upload_dir(once=False, verbose=False):
                     traceback.print_exc()
 
 
-def run(once=False, dev=False, remote=False):
+def run(once=False, dev=False, remote=False, verbose=False):
     setup_env(dev=dev, remote=remote)
 
     # assert getpass.getuser() == "www-data"
@@ -190,7 +199,7 @@ def run(once=False, dev=False, remote=False):
             time.sleep(3)
 
         try:
-            scrape_upload_dir(once=once)
+            scrape_upload_dir(once=once, verbose=verbose)
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
             if once:
@@ -212,6 +221,9 @@ def main():
     parser.add_argument('--once',
                         action="store_true",
                         help='Test once and exit')
+    parser.add_argument('--verbose',
+                        action="store_true",
+                        help='Verbose')
     args = parser.parse_args()
 
     run(dev=args.dev, remote=args.remote, once=args.once)

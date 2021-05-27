@@ -52,9 +52,6 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
 
 ====== Die ======
 
-<code>
-</code>
-
 """
     return ret
 
@@ -109,12 +106,13 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
         print_pack=True, write=False, overwrite=False, write_lazy=False, print_=True,
         www_dir="/var/www", code_txt=None, header_txt=None,
         # Auto guess if given hi_fn
-        vendor=None, chipid=None):
+        vendor=None, chipid=None, page_fns=[], map_fns = []):
     if len(hi_fns):
         map_fns, page_fns, vendor, chipid = process_fns(hi_fns)
     else:
         assert vendor
         assert chipid
+        
 
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
     wiki_url = f"{host}/archive/doku.php?id={wiki_page}" 
@@ -147,6 +145,9 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
                 continue
             out += f"{{{{:{wiki_page}:{fn}?300|}}}}\n"
             out += "\n"
+
+    out += "<code>\n"
+    out += "</code>\n"
 
     for fn in map_fns:
         fnbase, vendor_this, chipid_this, flavor = parse_image_name(fn)
