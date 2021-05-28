@@ -286,7 +286,7 @@ def process(entry):
             return
 
         _out_txt, wiki_page, wiki_url, map_chipid_url, wrote, exists = img2doku.run(
-            fns=[single_fn], collect=entry["user"], write=True, write_lazy=True,
+            hi_fns=[single_fn], collect=entry["user"], write=True, write_lazy=True,
             www_dir=WWW_DIR)
         print("wiki_page: " + wiki_page)
         print("wiki_url: " + wiki_url)
