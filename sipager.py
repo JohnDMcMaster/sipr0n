@@ -21,23 +21,21 @@ import simapper
 from simapper import print_log_break, setup_env, STATUS_DONE
 
 def shift_done(entry):
-    done_dir = os.path.dirname(entry["local_fn"]) + "/done"
+    src_fn = entry.get("im_fn", None) or entry.get("dir_fn", None)
+    done_dir = os.path.dirname(src_fn) + "/done"
     if not os.path.exists(done_dir):
         os.mkdir(done_dir)
-    dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
-    print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
-    shutil.move(entry["local_fn"], dst_fn)
+    dst_fn = done_dir + "/" + os.path.basename(src_fn)
+    print("Archiving local file %s => %s" % (src_fn, dst_fn))
+    shutil.move(src_fn, dst_fn)
 
 def find_txt(entry):
-    txts = glob.glob(entry["local_fn"] + "/*.txt")
+    txts = glob.glob(entry["dir_fn"] + "/*.txt")
     if len(txts) == 0:
         return None
     if len(txts) > 1:
         raise Exception("Too many .txt files")
     return open(txts[0], "r").read()
-
-def find_lo_fns(entry):
-    return list(glob.glob(entry["local_fn"] + "/*.jpg"))
 
 def get_user_page(user):
     return simapper.WIKI_NS_DIR + "/" + user + "/sipager.txt"
@@ -48,10 +46,12 @@ def log_sipager_update(entry):
 def process(entry):
     print("")
     print(entry)
-    if not os.path.isdir(entry["local_fn"]):
+    im_fn = entry.get("im_fn", None)
+    dir_fn = entry.get("dir_fn", None)
+    if dir_fn and not os.path.isdir(dir_fn):
         raise Exception("Only dir import supported at this time")
 
-    url_check = entry["local_fn"]
+    url_check = dir_fn or im_fn
     url_check = url_check.lower()
     # Just validate, don't actually need?
     _fnbase, vendor, chipid = parse_vendor_chipid_name(url_check)
@@ -63,15 +63,26 @@ def process(entry):
     # Optional
     # Output as code text for now
     # maybe allow "wiki.txt" for direct wiki text input without code escape
-    code_txt = find_txt(entry)
+    if dir_fn:
+        code_txt = find_txt(entry)
+    else:
+        code_txt = None
 
     try:
-        page_fns = find_lo_fns(entry)
+        if dir_fn:
+            page_fns = list(glob.glob(entry["dir_fn"] + "/*.jpg"))
+        else:
+            page_fns = [im_fn]
+
         for src_fn in page_fns:
-            bn = os.path.basename(src_fn)
-            print("Importing " + bn)
-            if bn not in ("die.jpg", "pack_top.jpg", "pack_btm.jpg"):
-                raise Exception("FIXME: non-standard import file name: " % bn)
+            bn_src = os.path.basename(src_fn)
+            print("Importing " + bn_src)
+            if dir_fn:
+                bn_dst = bn_src
+            else:
+                bn_dst = "die.jpg"
+            if bn_dst not in ("die.jpg", "pack_top.jpg", "pack_btm.jpg"):
+                raise Exception("FIXME: non-standard import file name: " % bn_dst)
             vendor_dir = simapper.WIKI_DIR + "/data/media/" + entry["user"] + "/" + vendor
             if not os.path.exists(vendor_dir):
                 print("mkdir " + vendor_dir)
@@ -80,7 +91,7 @@ def process(entry):
             if not os.path.exists(chipid_dir):
                 print("mkdir " + chipid_dir)
                 os.mkdir(chipid_dir)
-            dst_fn = chipid_dir + "/" + bn
+            dst_fn = chipid_dir + "/" + bn_dst
             print("cp: " + src_fn + " => " + dst_fn)
             if os.path.exists(dst_fn):
                 print("WARNING: overwriting file")
@@ -106,12 +117,15 @@ def process(entry):
             # cleanup()
 
 
-def mk_entry(status="", user=None, local_fn=None):
+def mk_entry(status="", user=None, im_fn=None, dir_fn=None):
     assert user
-    assert local_fn
-    ret = {"user": user, "local_fn": local_fn}
+    ret = {"user": user}
     if status:
         ret["status"] = status
+    if im_fn:
+        ret["im_fn"] = im_fn
+    if dir_fn:
+        ret["dir_fn"] = dir_fn
     return ret
 
 tried_upload_files = set()
@@ -147,13 +161,19 @@ def scrape_upload_dir(once=False, verbose=False):
                     if os.path.basename(user_fn) == "done":
                         continue
                     # TODO: consider single fn or tarball support
-                    if not os.path.isdir(user_fn):
+                    if os.path.isdir(user_fn):
+                        print_log_break()
+                        print("Found dir fn: " + user_fn)
+                        process(mk_entry(user=user, dir_fn=user_fn))
+                        change = True
+                    elif '.jpg' in user_fn:
+                        print_log_break()
+                        print("Found im fn: " + user_fn)
+                        process(mk_entry(user=user, im_fn=user_fn))
+                        change = True
+                    else:
                         verbose and print("Not a dir " + user_fn)
                         continue
-                    print_log_break()
-                    print("Found fn: " + user_fn)
-                    process(mk_entry(user=user, local_fn=user_fn))
-                    change = True
             except Exception as e:
                 print("WARNING: exception scraping user dir: %s" % (e, ))
                 if once:
