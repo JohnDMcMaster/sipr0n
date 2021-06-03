@@ -67,9 +67,12 @@ def parse_image_name(fn):
     flavor = m.group(3)
     return (fnbase, vendor, chipid, flavor)
 
-def parse_vendor_chipid_name(fn):
+def parse_vendor_chipid_name(fn, strict=False):
     fnbase = os.path.basename(fn)
-    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)', fnbase)
+    if strict:
+        m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)[.]jpg', fnbase)
+    else:
+        m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)', fnbase)
     if not m:
         raise Exception("Non-confirming file name (need vendor_chipid): %s" % (fn,))
     vendor = m.group(1)
@@ -171,11 +174,12 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
         vendor_dir = os.path.dirname(page_path)
         # There should at least be a user landing page
         # Leave this off for now
-        # user_dir = os.path.dirname(vendor_dir)
-        # if not os.path.exists(user_dir):
-        #    os.mkdir(user_dir)
+        user_dir = os.path.dirname(vendor_dir)
+        if not os.path.exists(user_dir):
+            write_lazy and print("mkdir " + user_dir)
+            os.mkdir(user_dir)
         if not os.path.exists(vendor_dir):
-            write_lazy and print("Making vendor dir " + vendor_dir)
+            write_lazy and print("mkdir " + vendor_dir)
             os.mkdir(vendor_dir)
         open(page_path, "a").write(out)
         write_lazy and print("Wrote to " + page_path)

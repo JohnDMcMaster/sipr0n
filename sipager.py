@@ -54,7 +54,7 @@ def process(entry):
     url_check = dir_fn or im_fn
     url_check = url_check.lower()
     # Just validate, don't actually need?
-    _fnbase, vendor, chipid = parse_vendor_chipid_name(url_check)
+    _fnbase, vendor, chipid = parse_vendor_chipid_name(url_check, strict=im_fn)
 
     if not validate_username(entry["user"]):
         print("Invalid user name: %s" % entry["user"])
@@ -71,19 +71,28 @@ def process(entry):
     try:
         if dir_fn:
             page_fns = list(glob.glob(entry["dir_fn"] + "/*.jpg"))
+        elif im_fn:
+            page_fns = ["die.jpg"]
         else:
-            page_fns = [im_fn]
+            assert 0, "Bad mode"
 
-        for src_fn in page_fns:
-            bn_src = os.path.basename(src_fn)
-            print("Importing " + bn_src)
+        for page_fn in page_fns:
+            bn_dst = os.path.basename(page_fn)
             if dir_fn:
-                bn_dst = bn_src
+                src_fn = page_fn
+            elif im_fn:
+                src_fn = im_fn
             else:
-                bn_dst = "die.jpg"
+                assert 0, "Bad mode"
+            print("Importing " + src_fn + " as " + page_fn)
+
             if bn_dst not in ("die.jpg", "pack_top.jpg", "pack_btm.jpg"):
                 raise Exception("FIXME: non-standard import file name: " % bn_dst)
-            vendor_dir = simapper.WIKI_DIR + "/data/media/" + entry["user"] + "/" + vendor
+            user_dir = simapper.WIKI_DIR + "/data/media/" + entry["user"] 
+            if not os.path.exists(user_dir):
+                print("mkdir " + user_dir)
+                os.mkdir(user_dir)
+            vendor_dir = user_dir + "/" + vendor
             if not os.path.exists(vendor_dir):
                 print("mkdir " + vendor_dir)
                 os.mkdir(vendor_dir)
