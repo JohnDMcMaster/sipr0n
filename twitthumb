@@ -10,6 +10,11 @@ mkdir -p /tmp/screenshot
 #outdir=.
 for fn in "$@" ; do
     base=$(basename $fn)
+
+    fn_out="$outdir/jpg_${day}_${base}.jpg"
+    echo "$fn => $fn_out"
+    convert  -limit memory 12000mb  $fn $fn_out
+
     fn_out="$outdir/twit_${day}_${base}.jpg"
     echo "$fn => $fn_out"
     convert  -limit memory 12000mb  $fn -resize 1200x675 -background black -gravity center -extent 1200x675 $fn_out
