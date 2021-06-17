@@ -22,7 +22,6 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
 
     ret += f"""
 ====== Package ======
-
 """
 
     if print_pack:
@@ -33,6 +32,7 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
             pack_btm = "pack_btm.jpg" in page_fns_base
         if pack_top:
             ret += f"""\
+
 {{{{:{wiki_page}:pack_top.jpg?300|}}}}
 
 <code>
@@ -40,6 +40,7 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
 """
         if pack_btm:
             ret += f"""\
+
 {{{{:{wiki_page}:pack_btm.jpg?300|}}}}
 
 <code>
