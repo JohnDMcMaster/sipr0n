@@ -430,6 +430,8 @@ def run(once=False, dev=False, remote=False):
         if iters > 1:
             time.sleep(3)
 
+        # This method hasn't been used in a long time
+        """
         try:
             scrape_wiki_page()
         except Exception as e:
@@ -438,6 +440,7 @@ def run(once=False, dev=False, remote=False):
                 raise
             else:
                 traceback.print_exc()
+        """
 
         try:
             scrape_upload_dir(once=once)
