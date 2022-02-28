@@ -15,19 +15,18 @@ GALLERY_IMAGES = 20
 
 ALLOWED_ENDINGS = ["png", "jpg", "jpeg"]
 
-
 MAP_DIR = "/var/www/map"
 if not os.path.exists(MAP_DIR):
     MAP_DIR = "map"
     print("WARNING: dev mode")
 assert os.path.exists(MAP_DIR)
 
-
 THUMBFILELIST = "gallery.txt"
 
 SMALL_MAX_WIDTH = SMALL_MAX_HEIGHT = 300
 
 FORCE_REGEN = False
+
 
 def thumb(path):
 
@@ -52,20 +51,25 @@ def thumb(path):
     img.thumbnail((SMALL_MAX_WIDTH, SMALL_MAX_HEIGHT), Image.ANTIALIAS)
     img.save(smallthumbpath)
 
+
 def thumbfilelist():
-    print("Generating "+THUMBFILELIST)
+    print("Generating " + THUMBFILELIST)
 
     thumbpaths = glob(MAP_DIR + "/**/single/*.thumb.*", recursive=True)
 
     result = []
 
-    for path in sorted(thumbpaths, key=lambda path:os.path.getmtime(path), reverse=True)[:GALLERY_IMAGES]:
+    for path in sorted(thumbpaths,
+                       key=lambda path: os.path.getmtime(path),
+                       reverse=True)[:GALLERY_IMAGES]:
         parentdir = os.path.dirname(os.path.dirname(path))
 
-        tilemappath = MAP_DIR + "/" + os.path.sep.join(os.path.basename(path).split(".", 1)[0].split("_", 2))
+        tilemappath = MAP_DIR + "/" + os.path.sep.join(
+            os.path.basename(path).split(".", 1)[0].split("_", 2))
 
         if not os.path.isdir(tilemappath):
-            print("WARNING: tilemap %s doesn't exist for thumb %s" % (tilemappath, path))
+            print("WARNING: tilemap %s doesn't exist for thumb %s" %
+                  (tilemappath, path))
             continue
 
         bigpath = path.replace(".thumb", "")
@@ -87,6 +91,7 @@ def thumbfilelist():
         f.write("\n".join(result))
     print("Shifting tmp into final file")
     shutil.move(tmp_fn, THUMBFILELIST)
+
 
 class event_handler:
     @staticmethod
@@ -111,11 +116,12 @@ def mode_observe():
         observer.stop()
         observer.join()
 
+
 def mode_manual():
     print("Manual mode: scanning")
     paths = []
     for ending in ALLOWED_ENDINGS:
-        paths += glob(MAP_DIR + "/**/single/*."+ending, recursive=True)
+        paths += glob(MAP_DIR + "/**/single/*." + ending, recursive=True)
 
     print("Manual mode: generating thumbnails from %u files" % len(paths))
     for path in paths:
@@ -124,11 +130,24 @@ def mode_manual():
     print("Manual mode: generating gallery.txt")
     thumbfilelist()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("generate image thumbnails and info")
-    parser.add_argument("--watch", dest="mode", action="store_const", const=mode_observe, default=mode_manual, help="watch")
-    parser.add_argument("--force", dest="force", action="store_const", const=True, default=False, help="Force regeneration of existing thumbnails")
-    parser.add_argument("--gallery-txt", default="/var/www/gallery.txt", help="Output gallery file name")
+    parser.add_argument("--watch",
+                        dest="mode",
+                        action="store_const",
+                        const=mode_observe,
+                        default=mode_manual,
+                        help="watch")
+    parser.add_argument("--force",
+                        dest="force",
+                        action="store_const",
+                        const=True,
+                        default=False,
+                        help="Force regeneration of existing thumbnails")
+    parser.add_argument("--gallery-txt",
+                        default="/var/www/gallery.txt",
+                        help="Output gallery file name")
 
     args = parser.parse_args()
     THUMBFILELIST = args.gallery_txt

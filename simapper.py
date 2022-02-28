@@ -28,6 +28,7 @@ SIPAGER_DIRS = None
 WIKI_NS_DIR = None
 WIKI_DIR = None
 
+
 def setup_env(dev=False, remote=False):
     global WWW_DIR
     # Directory containing high resolution maps
@@ -78,8 +79,10 @@ def setup_env(dev=False, remote=False):
     print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
     print("  SIPAGER_DIRS: ", SIPAGER_DIRS)
 
+
 def get_user_page(user):
     return WIKI_NS_DIR + "/" + user + ".txt"
+
 
 def parse_page(page):
     header = ""
@@ -100,10 +103,13 @@ def parse_page(page):
         l = l.strip()
         if not l:
             continue
-        if re.match(r"\^ *User *\^ *URL *\^ *Force name *\^ *Status *\^ *Map *\^ *Wiki *\^ *Notes *\^", l):
+        if re.match(
+                r"\^ *User *\^ *URL *\^ *Force name *\^ *Status *\^ *Map *\^ *Wiki *\^ *Notes *\^",
+                l):
             continue
         try:
-            _a, user, url, force_name, status, map_, wiki, notes, _b = l.split("|")
+            _a, user, url, force_name, status, map_, wiki, notes, _b = l.split(
+                "|")
         except:
             print("Bad: %s" % l)
             raise
@@ -139,10 +145,9 @@ See also: https://siliconpr0n.org/lib/simapper.txt
 ^ User ^ URL ^ Force name ^ Status ^ Map ^ Wiki ^ Notes ^
 """
     for entry in entries:
-        buff += "| %s | %s | %s | %s | %s | %s | %s |\n" % (entry["user"], entry["url"],
-                                             entry["force_name"],
-                                             entry["status"], entry["map"],
-                                             entry["wiki"], entry["notes"])
+        buff += "| %s | %s | %s | %s | %s | %s | %s |\n" % (
+            entry["user"], entry["url"], entry["force_name"], entry["status"],
+            entry["map"], entry["wiki"], entry["notes"])
     f = open(page + ".tmp", "w")
     f.write(buff)
     f.flush()
@@ -150,6 +155,7 @@ See also: https://siliconpr0n.org/lib/simapper.txt
     shutil.move(page + ".tmp", page)
     # subprocess.check_call("chgrp www-data %s" % page, shell=True)
     # subprocess.check_call("chown www-data %s" % page, shell=True)
+
 
 def log_simapper_update(entry, page=None):
     """
@@ -178,12 +184,14 @@ def log_simapper_update(entry, page=None):
     # Works from chrome but not wget
     # subprocess.check_call(["wget", "-O", "/dev/null", entry["wiki"]])
 
+
 def reindex_all():
     print("Running reindex all")
     # subprocess.check_call("sudo -u www-data php /var/www/archive/bin/indexer.php", shell=True)
     # Already running as www-data
     subprocess.check_output("php /var/www/archive/bin/indexer.php", shell=True)
     print("Reindex complete")
+
 
 def shift_done(entry):
     done_dir = os.path.dirname(entry["local_fn"]) + "/done"
@@ -193,18 +201,19 @@ def shift_done(entry):
     print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
     shutil.move(entry["local_fn"], dst_fn)
 
+
 def process(entry):
     print("")
     print(entry)
     print("Validating URL file name...")
     source_fn = entry.get("local_fn") or entry["url"]
     url_check = entry.get("force_name") or source_fn
-    print("Parsing raw URL: %s" % (url_check,))
+    print("Parsing raw URL: %s" % (url_check, ))
     # Patch up case errors server side
     url_check = url_check.lower()
     # Allow query strings at end (ex: for filebin)
     url_check = url_check.split("?")[0]
-    print("Parsing simplified URL: %s" % (url_check,))
+    print("Parsing simplified URL: %s" % (url_check, ))
     fnbase, vendor, chipid, flavor = parse_image_name(url_check)
 
     if not validate_username(entry["user"]):
@@ -278,7 +287,9 @@ def process(entry):
 
         print("Converting...")
         try:
-            map_user.run(user=entry["user"], files=[single_fn], run_img2doku=False)
+            map_user.run(user=entry["user"],
+                         files=[single_fn],
+                         run_img2doku=False)
         except:
             print("Conversion failed")
             traceback.print_exc()
@@ -286,7 +297,10 @@ def process(entry):
             return
 
         _out_txt, wiki_page, wiki_url, map_chipid_url, wrote, exists = img2doku.run(
-            hi_fns=[single_fn], collect=entry["user"], write=True, write_lazy=True,
+            hi_fns=[single_fn],
+            collect=entry["user"],
+            write=True,
+            write_lazy=True,
             www_dir=WWW_DIR)
         print("wiki_page: " + wiki_page)
         print("wiki_url: " + wiki_url)
@@ -308,6 +322,7 @@ def process(entry):
 
 warned_wiki_page = set()
 
+
 def scrape_wiki_page():
     changed = False
     try:
@@ -326,8 +341,7 @@ def scrape_wiki_page():
     # Spams log too much
     # print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
     for entry in entries:
-        if not (entry["status"] == ""
-                or entry["status"] == STATUS_PENDING):
+        if not (entry["status"] == "" or entry["status"] == STATUS_PENDING):
             continue
         print_log_break()
         changed = True
@@ -347,23 +361,27 @@ def scrape_wiki_page():
         update_page(WIKI_PAGE, header, entries)
         reindex_all()
 
+
 def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
     assert user
     ret = {"user": user, "status": status}
     if force_name:
         ret["force_name"] = force_name
-    if  url:
+    if url:
         ret["url"] = url
     if local_fn:
         ret["local_fn"] = local_fn
     return ret
+
 
 def print_log_break():
     for _ in range(6):
         print("")
     print("*" * 78)
 
+
 tried_upload_files = set()
+
 
 def scrape_upload_dir(once=False, verbose=False):
     """
@@ -411,6 +429,7 @@ def scrape_upload_dir(once=False, verbose=False):
     if change:
         reindex_all()
 
+
 def run(once=False, dev=False, remote=False):
     setup_env(dev=dev, remote=remote)
 
@@ -451,17 +470,14 @@ def run(once=False, dev=False, remote=False):
             else:
                 traceback.print_exc()
 
+
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(
         description='Monitor for sipr0n map imports')
-    parser.add_argument('--dev',
-                        action="store_true",
-                        help='Local test')
-    parser.add_argument('--remote',
-                        action="store_true",
-                        help='Remote test')
+    parser.add_argument('--dev', action="store_true", help='Local test')
+    parser.add_argument('--remote', action="store_true", help='Remote test')
     parser.add_argument('--once',
                         action="store_true",
                         help='Test once and exit')

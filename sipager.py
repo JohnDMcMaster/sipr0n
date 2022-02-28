@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 sipager is for rapidly creating pages from image collections
 
@@ -66,6 +65,7 @@ from img2doku import parse_vendor_chipid_name, validate_username, parse_user_ven
 import simapper
 from simapper import print_log_break, setup_env, STATUS_DONE
 
+
 def shift_done(page):
     def archive_images(images):
         for src_fn in images.keys():
@@ -78,7 +78,7 @@ def shift_done(page):
 
     archive_images(page["images"]["header"])
     archive_images(page["images"]["package"])
-    archive_images(page["images"]["die"])    
+    archive_images(page["images"]["die"])
 
 
 def get_user_page(user):
@@ -111,6 +111,7 @@ def import_images(page_fns, page):
             print("WARNING: overwriting file")
         shutil.copy(src_fn, dst_fn)
 
+
 def process(page):
     print("")
     print(page)
@@ -132,12 +133,17 @@ def process(page):
         }
 
     _out_txt, wiki_page, wiki_url, _map_chipid_url, wrote, exists = img2doku.run(
-        hi_fns=[], collect=page["user"], write=True, write_lazy=True,
+        hi_fns=[],
+        collect=page["user"],
+        write=True,
+        write_lazy=True,
         www_dir=simapper.WWW_DIR,
-        vendor=page["vendor"], chipid=page["chipid"], page_fns=None,
+        vendor=page["vendor"],
+        chipid=page["chipid"],
+        page_fns=None,
         force_tags=page["tags"],
         force_fns=page_fns(),
-        )
+    )
     print("wiki_page: " + wiki_page)
     print("wiki_url: " + wiki_url)
     print("wrote: " + str(wrote))
@@ -149,6 +155,7 @@ def process(page):
 
 tried_upload_files = set()
 
+
 def extract_archives(scrape_dir):
     """
     Extract archives into current dir
@@ -158,6 +165,7 @@ def extract_archives(scrape_dir):
     -File paths ignored
     """
     pass
+
 
 def bucket_image_dir(scrape_dir, verbose=False):
     """
@@ -194,7 +202,7 @@ def bucket_image_dir(scrape_dir, verbose=False):
         try:
             parsed = parse_user_vendor_chipid_flavor(fn_can)
         except ParseError:
-            print("Bad file name: %s" % (fn_can,))
+            print("Bad file name: %s" % (fn_can, ))
             tried_upload_files.add(fn_can)
             continue
         basename, user, vendor, chipid, _flavor, _ext = parsed
@@ -231,10 +239,14 @@ def parse_image_dir(scrape_dir, verbose=False):
     }
     """
     ret = {}
-    for page_name, images in bucket_image_dir(scrape_dir, verbose=verbose).items():
+    for page_name, images in bucket_image_dir(scrape_dir,
+                                              verbose=verbose).items():
         user, vendor, chipid = page_name.split(":")
         entry = {
-            "tags": ["collection_" + user, "vendor_" + vendor, "type_unknown", "year_unknown", "foundry_unknown"],
+            "tags": [
+                "collection_" + user, "vendor_" + vendor, "type_unknown",
+                "year_unknown", "foundry_unknown"
+            ],
             "images": {
                 "header": {},
                 "package": {},
@@ -261,6 +273,7 @@ def parse_image_dir(scrape_dir, verbose=False):
         ret[page_name] = entry
     return ret
 
+
 def scrape_upload_dir(once=False, verbose=False):
     """
     TODO: consider implementing upload timeout
@@ -279,7 +292,7 @@ def scrape_upload_dir(once=False, verbose=False):
             extract_archives(scrape_dir)
             pages = parse_image_dir(scrape_dir, verbose=verbose)
             print_log_break()
-            
+
             for page in pages.values():
                 process(page)
                 change = True
@@ -322,23 +335,18 @@ def run(once=False, dev=False, remote=False, verbose=False):
             else:
                 traceback.print_exc()
 
+
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(
         description='Monitor for sipr0n map imports')
-    parser.add_argument('--dev',
-                        action="store_true",
-                        help='Local test')
-    parser.add_argument('--remote',
-                        action="store_true",
-                        help='Remote test')
+    parser.add_argument('--dev', action="store_true", help='Local test')
+    parser.add_argument('--remote', action="store_true", help='Remote test')
     parser.add_argument('--once',
                         action="store_true",
                         help='Test once and exit')
-    parser.add_argument('--verbose',
-                        action="store_true",
-                        help='Verbose')
+    parser.add_argument('--verbose', action="store_true", help='Verbose')
     args = parser.parse_args()
 
     run(dev=args.dev, remote=args.remote, once=args.once, verbose=args.verbose)

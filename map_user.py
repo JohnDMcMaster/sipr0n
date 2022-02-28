@@ -78,7 +78,10 @@ def main():
                         help='Copyright release base')
     parser.add_argument('files', nargs="+", help='Images to map')
     args = parser.parse_args()
-    run(user=args.user, copyright=args.copyright, files=args.files, run_img2doku=True)
+    run(user=args.user,
+        copyright=args.copyright,
+        files=args.files,
+        run_img2doku=True)
 
 
 if __name__ == "__main__":
