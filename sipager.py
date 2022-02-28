@@ -44,37 +44,23 @@ extract them in dir?
 weird corner cases like extracting to onelself should be concerned with?
 """
 
-import re
-import os
 import os.path
 import glob
-import urllib
-import urllib.request
-import tempfile
 import shutil
-import subprocess
 import time
-import datetime
 import traceback
-import sys
-import map_user
-import os
+import tarfile
 
 import img2doku
-from img2doku import parse_vendor_chipid_name, validate_username, parse_user_vendor_chipid_flavor, ParseError
+from img2doku import parse_user_vendor_chipid_flavor, ParseError
 import simapper
-from simapper import print_log_break, setup_env, STATUS_DONE
+from simapper import print_log_break, setup_env
 
 
 def shift_done(page):
     def archive_images(images):
         for src_fn in images.keys():
-            done_dir = os.path.dirname(src_fn) + "/done"
-            if not os.path.exists(done_dir):
-                os.mkdir(done_dir)
-            dst_fn = done_dir + "/" + os.path.basename(src_fn)
-            print("Archiving local file %s => %s" % (src_fn, dst_fn))
-            shutil.move(src_fn, dst_fn)
+            file_completed(src_fn)
 
     archive_images(page["images"]["header"])
     archive_images(page["images"]["package"])
@@ -156,15 +142,56 @@ def process(page):
 tried_upload_files = set()
 
 
+def file_completed(src_fn):
+    """
+    Archive a file that was completed
+    """
+
+    done_dir = os.path.dirname(src_fn) + "/done"
+    if not os.path.exists(done_dir):
+        os.mkdir(done_dir)
+    dst_fn = done_dir + "/" + os.path.basename(src_fn)
+    print("Archiving local file %s => %s" % (src_fn, dst_fn))
+    shutil.move(src_fn, dst_fn)
+
+
 def extract_archives(scrape_dir):
     """
     Extract archives into current dir
 
     Rules:
-    -Only approved image extensions
-    -File paths ignored
+    -File paths ignored / flattened
+    -Only approved image extensions?
     """
-    pass
+    def conforming_name(fn):
+        try:
+            parsed = parse_user_vendor_chipid_flavor(fn)
+        except ParseError:
+            return False
+        return True
+
+    for fn_glob in glob.glob(scrape_dir + "/*.tar"):
+        tar = tarfile.open(fn_glob, "r")
+        try:
+            for tarinfo in tar:
+                if not tarinfo.isreg():
+                    if not tarinfo.isdir():
+                        print("WARNING: unrecognized tar element: %s" %
+                              (str(tarinfo), ))
+                    continue
+
+                basename = os.path.basename(tarinfo.name).lower()
+                if not conforming_name(basename):
+                    print("WARNING: bad file name: %s" % (tarinfo.name, ))
+                    continue
+
+                open(scrape_dir + "/" + basename,
+                     "wb").write(tar.extractfile(tarinfo).read())
+
+            # Extracted: trash it
+            file_completed(fn_glob)
+        finally:
+            tar.close()
 
 
 def bucket_image_dir(scrape_dir, verbose=False):
