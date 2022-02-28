@@ -282,7 +282,7 @@ def parse_image_dir(scrape_dir, verbose=False):
         }
         entry["page"] = page_name
         entry["user"] = user
-        entry["vendor"] = user
+        entry["vendor"] = vendor
         entry["chipid"] = chipid
         for src_image_can, parsed in images.items():
             _basename, parsed_user, parsed_vendor, parsed_chipid, flavor, ext = parsed
