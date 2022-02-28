@@ -24,7 +24,7 @@ STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
 WWW_DIR = None
-LO_SCRAPE_DIRS = None
+SIPAGER_DIRS = None
 WIKI_NS_DIR = None
 WIKI_DIR = None
 
@@ -40,7 +40,7 @@ def setup_env(dev=False, remote=False):
     # List of directories to look for high resolution images
     # Must be in a sub-directory with the user that wants to import it
     global HI_SCRAPE_DIRS
-    global LO_SCRAPE_DIRS
+    global SIPAGER_DIRS
 
     # Production
     WWW_DIR = "/var/www"
@@ -64,7 +64,7 @@ def setup_env(dev=False, remote=False):
     HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
     for d in HI_SCRAPE_DIRS:
         assert os.path.exists(d), d
-    LO_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/sipager"]
+    SIPAGER_DIRS = [WWW_DIR + "/uploadtmp/sipager"]
     for d in HI_SCRAPE_DIRS:
         assert os.path.exists(d), d
     # TODO: create a way to quickly import low resolution images
@@ -76,7 +76,7 @@ def setup_env(dev=False, remote=False):
     print("  MAP_DIR: ", MAP_DIR)
     print("  WIKI_PAGE: ", WIKI_PAGE)
     print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
-    print("  LO_SCRAPE_DIRS: ", LO_SCRAPE_DIRS)
+    print("  SIPAGER_DIRS: ", SIPAGER_DIRS)
 
 def get_user_page(user):
     return WIKI_NS_DIR + "/" + user + ".txt"

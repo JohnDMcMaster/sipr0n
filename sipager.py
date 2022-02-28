@@ -1,7 +1,53 @@
 #!/usr/bin/env python3
 
+"""
+sipager is for rapidly creating pages from image collections
+
+
+FIXME: MVP doesn't need tar support but needed for reliable operation
+
+
+
+Original design
+dir would contain stuff for page
+
+new design
+images must be canonically named
+this makes mass import, tarball, etc easy
+Images need to be bucketed into pages
+
+If the page already exists:
+Append at end
+
+name images like
+$user_$vendor_$product_$suffix
+for example
+mcmaster_microchip_pic16c57_pack_top.jpg
+mcmaster_microchip_pic16c57_die.jpg
+
+Special cases:
+-Anything starting with pack* goes into pack section
+-Anything starting with die* goes into die section
+-Other images will get put at the top
+    ex: if you have a PCB or other context
+
+
+Where should images be buffered?
+-Global dir: need user prefix
+    more scalable
+    ***start with this
+-User dir: user name assumed
+    more convenient
+
+
+How to treat archives?
+extract them in dir?
+weird corner cases like extracting to onelself should be concerned with?
+"""
+
 import re
 import os
+import os.path
 import glob
 import urllib
 import urllib.request
@@ -16,128 +62,204 @@ import map_user
 import os
 
 import img2doku
-from img2doku import parse_vendor_chipid_name, validate_username
+from img2doku import parse_vendor_chipid_name, validate_username, parse_user_vendor_chipid_flavor, ParseError
 import simapper
 from simapper import print_log_break, setup_env, STATUS_DONE
 
-def shift_done(entry):
-    src_fn = entry.get("im_fn", None) or entry.get("dir_fn", None)
-    done_dir = os.path.dirname(src_fn) + "/done"
-    if not os.path.exists(done_dir):
-        os.mkdir(done_dir)
-    dst_fn = done_dir + "/" + os.path.basename(src_fn)
-    print("Archiving local file %s => %s" % (src_fn, dst_fn))
-    shutil.move(src_fn, dst_fn)
+def shift_done(page):
+    def archive_images(images):
+        for src_fn in images.keys():
+            done_dir = os.path.dirname(src_fn) + "/done"
+            if not os.path.exists(done_dir):
+                os.mkdir(done_dir)
+            dst_fn = done_dir + "/" + os.path.basename(src_fn)
+            print("Archiving local file %s => %s" % (src_fn, dst_fn))
+            shutil.move(src_fn, dst_fn)
 
-def find_txt(entry):
-    txts = glob.glob(entry["dir_fn"] + "/*.txt")
-    if len(txts) == 0:
-        return None
-    if len(txts) > 1:
-        raise Exception("Too many .txt files")
-    return open(txts[0], "r").read()
+    archive_images(page["images"]["header"])
+    archive_images(page["images"]["package"])
+    archive_images(page["images"]["die"])    
+
 
 def get_user_page(user):
     return simapper.WIKI_NS_DIR + "/" + user + "/sipager.txt"
 
-def log_sipager_update(entry):
-    simapper.log_simapper_update(entry, page=get_user_page(entry["user"]))
 
-def process(entry):
+def log_sipager_update(page_name, user):
+    simapper.log_simapper_update({"wiki": page_name}, page=get_user_page(user))
+
+
+def import_images(page_fns, page):
+    for src_fn, page_fn in page_fns.items():
+        print("Importing " + src_fn + " as " + page_fn)
+
+        user_dir = simapper.WIKI_DIR + "/data/media/" + page["user"]
+        if not os.path.exists(user_dir):
+            print("mkdir " + user_dir)
+            os.mkdir(user_dir)
+        vendor_dir = user_dir + "/" + page["vendor"]
+        if not os.path.exists(vendor_dir):
+            print("mkdir " + vendor_dir)
+            os.mkdir(vendor_dir)
+        chipid_dir = vendor_dir + "/" + page["chipid"]
+        if not os.path.exists(chipid_dir):
+            print("mkdir " + chipid_dir)
+            os.mkdir(chipid_dir)
+        dst_fn = chipid_dir + "/" + page_fn
+        print("cp: " + src_fn + " => " + dst_fn)
+        if os.path.exists(dst_fn):
+            print("WARNING: overwriting file")
+        shutil.copy(src_fn, dst_fn)
+
+def process(page):
     print("")
-    print(entry)
-    im_fn = entry.get("im_fn", None)
-    dir_fn = entry.get("dir_fn", None)
-    if dir_fn and not os.path.isdir(dir_fn):
-        raise Exception("Only dir import supported at this time")
+    print(page)
 
-    url_check = dir_fn or im_fn
-    url_check = url_check.lower()
-    # Just validate, don't actually need?
-    _fnbase, vendor, chipid = parse_vendor_chipid_name(url_check, strict=im_fn)
+    import_images(page["images"]["header"], page)
+    import_images(page["images"]["package"], page)
+    import_images(page["images"]["die"], page)
 
-    if not validate_username(entry["user"]):
-        print("Invalid user name: %s" % entry["user"])
-        return
+    def page_fns():
+        """
+        convert canonical.jpg: wiki.jpg to just wiki.jpg
 
-    # Optional
-    # Output as code text for now
-    # maybe allow "wiki.txt" for direct wiki text input without code escape
-    if dir_fn:
-        code_txt = find_txt(entry)
-    else:
-        code_txt = None
+        Also should consider ordering pack_top.jpg before pack_btm.jpg
+        """
+        return {
+            "header": list(page["images"]["header"].values()),
+            "package": list(page["images"]["package"].values()),
+            "die": list(page["images"]["die"].values()),
+        }
 
-    try:
-        if dir_fn:
-            page_fns = list(glob.glob(entry["dir_fn"] + "/*.jpg"))
-        elif im_fn:
-            page_fns = ["die.jpg"]
-        else:
-            assert 0, "Bad mode"
+    _out_txt, wiki_page, wiki_url, _map_chipid_url, wrote, exists = img2doku.run(
+        hi_fns=[], collect=page["user"], write=True, write_lazy=True,
+        www_dir=simapper.WWW_DIR,
+        vendor=page["vendor"], chipid=page["chipid"], page_fns=None,
+        force_tags=page["tags"],
+        force_fns=page_fns(),
+        )
+    print("wiki_page: " + wiki_page)
+    print("wiki_url: " + wiki_url)
+    print("wrote: " + str(wrote))
+    print("exists: " + str(exists))
+    log_sipager_update(wiki_url, page["user"])
 
-        for page_fn in page_fns:
-            bn_dst = os.path.basename(page_fn)
-            if dir_fn:
-                src_fn = page_fn
-            elif im_fn:
-                src_fn = im_fn
-            else:
-                assert 0, "Bad mode"
-            print("Importing " + src_fn + " as " + page_fn)
+    shift_done(page)
 
-            if bn_dst not in ("die.jpg", "pack_top.jpg", "pack_btm.jpg"):
-                raise Exception("FIXME: non-standard import file name: " % bn_dst)
-            user_dir = simapper.WIKI_DIR + "/data/media/" + entry["user"] 
-            if not os.path.exists(user_dir):
-                print("mkdir " + user_dir)
-                os.mkdir(user_dir)
-            vendor_dir = user_dir + "/" + vendor
-            if not os.path.exists(vendor_dir):
-                print("mkdir " + vendor_dir)
-                os.mkdir(vendor_dir)
-            chipid_dir = vendor_dir + "/" + chipid
-            if not os.path.exists(chipid_dir):
-                print("mkdir " + chipid_dir)
-                os.mkdir(chipid_dir)
-            dst_fn = chipid_dir + "/" + bn_dst
-            print("cp: " + src_fn + " => " + dst_fn)
-            if os.path.exists(dst_fn):
-                print("WARNING: overwriting file")
-            shutil.copy(src_fn, dst_fn)
-
-        _out_txt, wiki_page, wiki_url, _map_chipid_url, wrote, exists = img2doku.run(
-            hi_fns=[], collect=entry["user"], write=True, write_lazy=True,
-            www_dir=simapper.WWW_DIR, code_txt=code_txt,
-            vendor=vendor, chipid=chipid, page_fns=page_fns)
-        print("wiki_page: " + wiki_page)
-        print("wiki_url: " + wiki_url)
-        print("wrote: " + str(wrote))
-        print("exists: " + str(exists))
-        entry["wiki"] = wiki_url
-        log_sipager_update(entry)
-
-        shift_done(entry)
-        entry["status"] = STATUS_DONE
-    finally:
-        if entry.get("status") != STATUS_DONE:
-            print("Cleaning up on non-sucess")
-            # Hmm difficult to delete the page if we mess up
-            # cleanup()
-
-
-def mk_entry(status="", user=None, im_fn=None, dir_fn=None):
-    assert user
-    ret = {"user": user}
-    if status:
-        ret["status"] = status
-    if im_fn:
-        ret["im_fn"] = im_fn
-    if dir_fn:
-        ret["dir_fn"] = dir_fn
-    return ret
 
 tried_upload_files = set()
+
+def extract_archives(scrape_dir):
+    """
+    Extract archives into current dir
+
+    Rules:
+    -Only approved image extensions
+    -File paths ignored
+    """
+    pass
+
+def bucket_image_dir(scrape_dir, verbose=False):
+    """
+    Find all images in dir
+    Group them together with images going into the same page 
+
+
+    {
+        "mcmaster:atmel:328p": [
+            "/foo/bar/mcmaster_atmel_at328p_die.jpg",
+            "/foo/bar/mcmaster_atmel_at328p_pack_top.jpg"
+        ]
+    }
+
+
+    or maybe since they are already parsed?
+
+    {
+        "mcmaster:atmel:328p": {
+            "/foo/bar/mcmaster_atmel_at328p_die.jpg": (parsed...),
+            "/foo/bar/mcmaster_atmel_at328p_pack_top.jpg": (parsed...),
+        }
+    }
+    
+    """
+
+    ret = {}
+    for fn_glob in glob.glob(scrape_dir + "/*"):
+        fn_can = os.path.realpath(fn_glob)
+        basename = os.path.basename(fn_can)
+        if basename == "done" or basename == "tmp":
+            continue
+        verbose and print("Checking file " + fn_can)
+        try:
+            parsed = parse_user_vendor_chipid_flavor(fn_can)
+        except ParseError:
+            print("Bad file name: %s" % (fn_can,))
+            tried_upload_files.add(fn_can)
+            continue
+        basename, user, vendor, chipid, _flavor, _ext = parsed
+        k = "%s:%s:%s" % (user, vendor, chipid)
+        images = ret.setdefault(k, {})
+        images[fn_can] = parsed
+    return ret
+
+
+def parse_image_dir(scrape_dir, verbose=False):
+    """
+    Return dict
+    {
+        "mcmaster:atmel:at328p": {
+            "user": "mcmaster",
+            "vendor": "atmel",
+            "chipid": "at328p",
+            "tags": set(
+                "collection_mcmaster",
+                "vendor_atmel"
+            ),
+            "images": {
+                "header": {
+                },
+                "package": {
+                },
+                "die": {
+                    //src:dst within page namespace
+                    //Canonical paths
+                    "/foo/bar/mcmaster_atmel_at328p_die.jpg": "die.jpg"
+                }
+            }
+        }
+    }
+    """
+    ret = {}
+    for page_name, images in bucket_image_dir(scrape_dir, verbose=verbose).items():
+        user, vendor, chipid = page_name.split(":")
+        entry = {
+            "tags": ["collection_" + user, "vendor_" + vendor, "type_unknown", "year_unknown", "foundry_unknown"],
+            "images": {
+                "header": {},
+                "package": {},
+                "die": {},
+            }
+        }
+        entry["page"] = page_name
+        entry["user"] = user
+        entry["vendor"] = user
+        entry["chipid"] = chipid
+        for src_image_can, parsed in images.items():
+            _basename, parsed_user, parsed_vendor, parsed_chipid, flavor, ext = parsed
+            assert parsed_user == user
+            assert parsed_vendor == vendor
+            assert parsed_chipid == chipid
+            dst_basename = flavor + "." + ext
+            # Try to guess the section the image should go under
+            if flavor.find("die") == 0:
+                entry["images"]["die"][src_image_can] = dst_basename
+            elif flavor.find("pack") == 0:
+                entry["images"]["package"][src_image_can] = dst_basename
+            else:
+                entry["images"]["header"][src_image_can] = dst_basename
+        ret[page_name] = entry
+    return ret
 
 def scrape_upload_dir(once=False, verbose=False):
     """
@@ -149,46 +271,25 @@ def scrape_upload_dir(once=False, verbose=False):
     verbose and print("")
     verbose and print("Scraping upload dir")
     change = False
-    for scrape_dir in simapper.LO_SCRAPE_DIRS:
-        for user_dir in glob.glob(scrape_dir + "/*"):
-            if user_dir in tried_upload_files:
-                verbose and print("Ignoring tried: " + user_dir)
-                continue
+    try:
+        for scrape_dir in simapper.SIPAGER_DIRS:
+            #tmp_dir = os.path.join(scrape_dir, "tmp")
+            #shutil.rmtree(tmp_dir)
+            #os.mkdir(tmp_dir)
+            extract_archives(scrape_dir)
+            pages = parse_image_dir(scrape_dir, verbose=verbose)
+            print_log_break()
+            
+            for page in pages.values():
+                process(page)
+                change = True
 
-            try:
-                if not os.path.isdir(user_dir):
-                    verbose and print("Ignoring not a dir: " + user_dir)
-                    tried_upload_files.add(user_dir)
-                    raise Exception("unexpected file " + user_dir)
-                user = os.path.basename(user_dir)
-                verbose and print("Checking user dir " + user_dir)
-                for user_fn in glob.glob(user_dir + "/*"):
-                    if user_fn in tried_upload_files:
-                        verbose and print("Already tried: " + user_fn)
-                        continue
-                    tried_upload_files.add(user_fn)
-                    if os.path.basename(user_fn) == "done":
-                        continue
-                    # TODO: consider single fn or tarball support
-                    if os.path.isdir(user_fn):
-                        print_log_break()
-                        print("Found dir fn: " + user_fn)
-                        process(mk_entry(user=user, dir_fn=user_fn))
-                        change = True
-                    elif '.jpg' in user_fn:
-                        print_log_break()
-                        print("Found im fn: " + user_fn)
-                        process(mk_entry(user=user, im_fn=user_fn))
-                        change = True
-                    else:
-                        verbose and print("Not a dir " + user_fn)
-                        continue
-            except Exception as e:
-                print("WARNING: exception scraping user dir: %s" % (e, ))
-                if once:
-                    raise
-                else:
-                    traceback.print_exc()
+    except Exception as e:
+        print("WARNING: exception scraping user dir: %s" % (e, ))
+        if once:
+            raise
+        else:
+            traceback.print_exc()
     if change:
         simapper.reindex_all()
 

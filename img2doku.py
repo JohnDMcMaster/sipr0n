@@ -5,12 +5,37 @@ import re
 import os
 import glob
 
-def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set(), code_txt=None, header_txt=None):
-    ret = ""
-    ret += f"""\
-{{{{tag>collection_{collect} vendor_{vendor} type_unknown year_unknown foundry_unknown}}}}
+class ParseError(Exception):
+    pass
 
+def commented_image(wiki_page, fn, width=300):
+    assert os.path.basename(fn) == fn
+    return f"""\
+
+{{{{:{wiki_page}:{fn}?{width}|}}}}
+
+<code>
+</code>
 """
+
+def simple_image(wiki_page, fn, width=300):
+    assert os.path.basename(fn) == fn
+    return f"""\
+{{{{:{wiki_page}:{fn}?{width}|}}}}
+"""
+
+def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set(), code_txt=None, header_txt=None,
+        force_tags=None,
+        force_fns=None):
+    ret = ""
+    # {{tag>collection_mcmaster vendor_atmel type_ccd year_unknown foundry_unknown tech_unknown}}
+    if force_tags is not None:
+        ret += "{{tag>" + " ".join(force_tags) + "}}\n"
+    else:
+        ret += f"""\
+{{{{tag>collection_{collect} vendor_{vendor} type_unknown year_unknown foundry_unknown}}}}
+"""
+    ret += "\n"
 
     if header_txt:
         ret += header_txt + "\n"
@@ -20,37 +45,35 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
         ret += code_txt + "\n"
         ret += "</code>\n"
 
+    if force_fns is not None:
+        for fn in force_fns.get("header", []):
+            ret += simple_image(wiki_page, fn)
+
     ret += f"""
 ====== Package ======
 """
 
-    if print_pack:
-        pack_top = True
-        pack_btm = True
-        if len(page_fns_base):
-            pack_top = "pack_top.jpg" in page_fns_base
-            pack_btm = "pack_btm.jpg" in page_fns_base
-        if pack_top:
-            ret += f"""\
-
-{{{{:{wiki_page}:pack_top.jpg?300|}}}}
-
-<code>
-</code>
-"""
-        if pack_btm:
-            ret += f"""\
-
-{{{{:{wiki_page}:pack_btm.jpg?300|}}}}
-
-<code>
-</code>
-"""
+    if force_fns is not None:
+        for fn in force_fns.get("package", []):
+            ret += commented_image(wiki_page, fn)
+        if len(force_fns.get("package", [])) == 0:
+            ret += "\nUnknown\n"
     else:
-        ret += "Unknown"
+        if print_pack:
+            pack_top = True
+            pack_btm = True
+            if len(page_fns_base):
+                pack_top = "pack_top.jpg" in page_fns_base
+                pack_btm = "pack_btm.jpg" in page_fns_base
+            if pack_top:
+                ret += commented_image(wiki_page, "pack_top.jpg")
+            if pack_btm:
+                ret += commented_image(wiki_page, "pack_btm.jpg")
+        else:
+            ret += "Unknown\n"
 
+    ret += "\n"
     ret += """
-
 ====== Die ======
 
 """
@@ -59,26 +82,48 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
 
 # Keep pr0nmap/main.py and sipr0n/img2doku.py in sync
 def parse_image_name(fn):
+    """
+    As used in /map
+    vendor_chipid_flavor.jpg
+    """
+
     fnbase = os.path.basename(fn)
     m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).jpg', fnbase)
     if not m:
-        raise Exception("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
+        raise ParseError("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
     vendor = m.group(1)
     chipid = m.group(2)
     flavor = m.group(3)
     return (fnbase, vendor, chipid, flavor)
 
 def parse_vendor_chipid_name(fn, strict=False):
+    """
+    Used for directories named like
+    vendor_chipid
+    """
+
     fnbase = os.path.basename(fn)
     if strict:
         m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)[.]jpg', fnbase)
     else:
         m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)', fnbase)
     if not m:
-        raise Exception("Non-confirming file name (need vendor_chipid): %s" % (fn,))
+        raise ParseError("Non-confirming file name (need vendor_chipid): %s" % (fn,))
     vendor = m.group(1)
     chipid = m.group(2)
     return (fnbase, vendor, chipid)
+
+def parse_user_vendor_chipid_flavor(fn):
+    fnbase = os.path.basename(fn)
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)', fnbase)
+    if not m:
+        raise ParseError("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
+    user = m.group(1)
+    vendor = m.group(2)
+    chipid = m.group(3)
+    flavor = m.group(4)
+    ext = m.group(5)
+    return (fnbase, user, vendor, chipid, flavor, ext)
 
 def validate_username(username):
     return re.match("[a-z]+", username)
@@ -106,11 +151,43 @@ def process_fns(fns):
     _fnbase, vendor, chipid, _flavor = parse_image_name(map_fns[0])
     return map_fns, page_fns, vendor, chipid
 
+def add_maps(map_fns, vendor, chipid, map_chipid_url):
+    out = ""
+    for fn in map_fns:
+        fnbase, vendor_this, chipid_this, flavor = parse_image_name(fn)
+        assert vendor == vendor_this
+        assert chipid == chipid_this
+        
+        # vendor_chpiid_flavor.jpg JPEG 1158x750 1158x750+0+0 8-bit sRGB 313940B 0.000u 0:00.000
+        identify = subprocess.check_output(f"identify {fn}", shell=True, text=True)
+        wh = identify.split(" ")[2]
+        size = identify.split(" ")[6]
+        out += f"""\
+[[{map_chipid_url}/{flavor}/|{flavor}]]
+
+  * [[{map_chipid_url}/single/{fnbase}|Single]] ({wh}, {size})
+
+"""
+    return out
+
 def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map", host="https://siliconpr0n.org",
         print_pack=True, write=False, overwrite=False, write_lazy=False, print_=True,
         www_dir="/var/www", code_txt=None, header_txt=None,
         # Auto guess if given hi_fn
-        vendor=None, chipid=None, page_fns=[], map_fns = []):
+        vendor=None, chipid=None, page_fns=[], map_fns = [],
+        force_tags=None,
+        force_fns=None):
+    """
+    hi_fns: to turn into /map entries under "die"
+    print_links: debug output
+    nspre: namespace prefix for protected namespace
+    
+    page_fns: untagged files. Will try to guess what they are for
+    force_header_fns: if given add these images to the heaer
+    force_pack_fns: if given add these images to the pack section and don't try to guess
+    force_die_fns: if given add these images to the die section and don't try to guess
+    """
+
     if len(hi_fns):
         map_fns, page_fns, vendor, chipid = process_fns(hi_fns)
     else:
@@ -133,13 +210,18 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
         print("")
         print("")
 
-    page_fns_base = set()
-    for fn in sorted(page_fns):
-        page_fns_base.add(os.path.basename(fn)) 
+    if page_fns:
+        page_fns_base = set()
+        for fn in sorted(page_fns):
+            page_fns_base.add(os.path.basename(fn)) 
+    else:
+        page_fns_base = None
 
     out = ""
     if not exists:
-        out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base, code_txt=code_txt, header_txt=header_txt)
+        out += header_pack(wiki_page=wiki_page, collect=collect, vendor=vendor, print_pack=print_pack, page_fns_base=page_fns_base, code_txt=code_txt, header_txt=header_txt,
+                        force_tags=force_tags,
+                        force_fns=force_fns)
 
         if page_fns:
             for fn in sorted(page_fns):
@@ -150,24 +232,26 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
                 out += f"{{{{:{wiki_page}:{fn}?300|}}}}\n"
                 out += "\n"
 
+        if force_fns is not None:
+            for fn in force_fns.get("die", []):
+                out += simple_image(wiki_page, fn)
+            if len(force_fns.get("die", [])):
+                out += "\n"
+
         out += "<code>\n"
         out += "</code>\n"
 
-    for fn in map_fns:
-        fnbase, vendor_this, chipid_this, flavor = parse_image_name(fn)
-        assert vendor == vendor_this
-        assert chipid == chipid_this
-        
-        # vendor_chpiid_flavor.jpg JPEG 1158x750 1158x750+0+0 8-bit sRGB 313940B 0.000u 0:00.000
-        identify = subprocess.check_output(f"identify {fn}", shell=True, text=True)
-        wh = identify.split(" ")[2]
-        size = identify.split(" ")[6]
-        out += f"""\
-[[{map_chipid_url}/{flavor}/|{flavor}]]
 
-  * [[{map_chipid_url}/single/{fnbase}|Single]] ({wh}, {size})
+    out += add_maps(map_fns, vendor, chipid, map_chipid_url)
 
-"""
+    if exists and force_fns:
+        new_fns = []
+        for image_set in force_fns.values():
+            new_fns += image_set
+        for fn in sorted(new_fns):
+            simple_image(wiki_page, fn)
+
+
     def try_write():
         if exists and not write_lazy and not overwrite:
             raise Exception(f"Refusing to overwrite existing page {page_path}")
