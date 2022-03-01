@@ -52,9 +52,10 @@ import traceback
 import tarfile
 
 import img2doku
-from img2doku import parse_user_vendor_chipid_flavor, ParseError
+from img2doku import parse_vendor_chipid_flavor, parse_user_vendor_chipid_flavor, ParseError
 import simapper
 from simapper import print_log_break, setup_env
+from img2doku import validate_username
 
 
 def shift_done(page):
@@ -139,7 +140,7 @@ def process(page):
     shift_done(page)
 
 
-tried_upload_files = set()
+failed_upload_files = set()
 
 
 def file_completed(src_fn):
@@ -165,7 +166,7 @@ def extract_archives(scrape_dir):
     """
     def conforming_name(fn):
         try:
-            parsed = parse_user_vendor_chipid_flavor(fn)
+            _parsed = parse_assume_user(fn, assume_user=None)
         except ParseError:
             return False
         return True
@@ -182,7 +183,7 @@ def extract_archives(scrape_dir):
 
                 basename = os.path.basename(tarinfo.name).lower()
                 if not conforming_name(basename):
-                    print("WARNING: bad file name: %s" % (tarinfo.name, ))
+                    print("WARNING: bad image file name within archive: %s" % (tarinfo.name, ))
                     continue
 
                 open(scrape_dir + "/" + basename,
@@ -194,7 +195,18 @@ def extract_archives(scrape_dir):
             tar.close()
 
 
-def bucket_image_dir(scrape_dir, verbose=False):
+def parse_assume_user(fn_can, assume_user):
+    if assume_user:
+        parsed = parse_vendor_chipid_flavor(fn_can)
+        basename, vendor, chipid, flavor, ext = parsed
+        user = assume_user
+    else:
+        parsed = parse_user_vendor_chipid_flavor(fn_can)
+        basename, user, vendor, chipid, flavor, ext = parsed
+    return (basename, user, vendor, chipid, flavor, ext)
+
+
+def bucket_image_dir(scrape_dir, assume_user=None, verbose=False):
     """
     Find all images in dir
     Group them together with images going into the same page 
@@ -223,23 +235,23 @@ def bucket_image_dir(scrape_dir, verbose=False):
     for fn_glob in glob.glob(scrape_dir + "/*"):
         fn_can = os.path.realpath(fn_glob)
         basename = os.path.basename(fn_can)
-        if basename == "done" or basename == "tmp":
+        if basename == "done" or os.path.isdir(fn_can):
             continue
         verbose and print("Checking file " + fn_can)
         try:
-            parsed = parse_user_vendor_chipid_flavor(fn_can)
+            basename, user, vendor, chipid, flavor, ext = parse_assume_user(fn_can, assume_user)
         except ParseError:
-            print("Bad file name: %s" % (fn_can, ))
-            tried_upload_files.add(fn_can)
+            print("Bad image file name: %s" % (fn_can, ))
+            failed_upload_files.add(fn_can)
             continue
-        basename, user, vendor, chipid, _flavor, _ext = parsed
         k = "%s:%s:%s" % (user, vendor, chipid)
+        print("Parsed %s => %s" % (fn_can, k))
         images = ret.setdefault(k, {})
-        images[fn_can] = parsed
+        images[fn_can] = (basename, user, vendor, chipid, flavor, ext)
     return ret
 
 
-def parse_image_dir(scrape_dir, verbose=False):
+def parse_image_dir(scrape_dir, assume_user=None, verbose=False):
     """
     Return dict
     {
@@ -267,6 +279,7 @@ def parse_image_dir(scrape_dir, verbose=False):
     """
     ret = {}
     for page_name, images in bucket_image_dir(scrape_dir,
+                                              assume_user=assume_user,
                                               verbose=verbose).items():
         user, vendor, chipid = page_name.split(":")
         entry = {
@@ -301,7 +314,21 @@ def parse_image_dir(scrape_dir, verbose=False):
     return ret
 
 
-def scrape_upload_dir(once=False, verbose=False, dev=False):
+def scrape_upload_dir_inner(scrape_dir, assume_user=None, verbose=False):
+    change = False
+    # don't assume_user here or will double stack against dir name
+    extract_archives(scrape_dir)
+    pages = parse_image_dir(scrape_dir, assume_user=assume_user, verbose=verbose)
+    print_log_break()
+
+    for page in pages.values():
+        process(page)
+        change = True
+        
+    return change
+
+
+def scrape_upload_dir_outer(verbose=False, dev=False):
     """
     TODO: consider implementing upload timeout
     As currently implemented dokuwiki buffers files and writes them instantly
@@ -311,25 +338,28 @@ def scrape_upload_dir(once=False, verbose=False, dev=False):
     verbose and print("")
     verbose and print("Scraping upload dir")
     change = False
-    try:
-        for scrape_dir in simapper.SIPAGER_DIRS:
-            #tmp_dir = os.path.join(scrape_dir, "tmp")
-            #shutil.rmtree(tmp_dir)
-            #os.mkdir(tmp_dir)
-            extract_archives(scrape_dir)
-            pages = parse_image_dir(scrape_dir, verbose=verbose)
-            print_log_break()
+    for scrape_dir in simapper.SIPAGER_DIRS:
+        # Check main dir with username prefix
+        scrape_upload_dir_inner(scrape_dir, verbose=verbose)
 
-            for page in pages.values():
-                process(page)
-                change = True
+        # Check user dirs
+        for glob_dir in glob.glob(scrape_dir + "/*"):
+            fn_can = os.path.realpath(glob_dir)
+            if not os.path.isdir(fn_can):
+                continue
+            if fn_can in failed_upload_files:
+                continue
+            basename = os.path.basename(fn_can)
+            if basename == "done":
+                continue
+            user = basename
 
-    except Exception as e:
-        print("WARNING: exception scraping user dir: %s" % (e, ))
-        if once:
-            raise
-        else:
-            traceback.print_exc()
+            if not validate_username(user):
+                failed_upload_files.add(fn_can)
+                print("Invalid user name: %s" % user)
+                continue
+            scrape_upload_dir_inner(glob_dir, verbose=verbose, assume_user=user)
+
     if change:
         simapper.reindex_all(dev=dev)
 
@@ -354,7 +384,7 @@ def run(once=False, dev=False, remote=False, verbose=False):
             time.sleep(3)
 
         try:
-            scrape_upload_dir(once=once, verbose=verbose, dev=dev)
+            scrape_upload_dir_outer(verbose=verbose, dev=dev)
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
             if once:

@@ -31,8 +31,8 @@ def setup_wiki():
     os.makedirs("dev/archive/data/media", exist_ok=True)
     os.makedirs("dev/archive/data/pages/simapper", exist_ok=True)
     os.makedirs("dev/archive/data/pages/protected", exist_ok=True)
-    os.makedirs("dev/uploadtmp/sipager", exist_ok=True)
-    os.makedirs("dev/uploadtmp/simapper", exist_ok=True)
+    os.makedirs("dev/uploadtmp/sipager/mcmaster", exist_ok=True)
+    os.makedirs("dev/uploadtmp/simapper/mcmaster", exist_ok=True)
     shutil.copy("test/copyright.txt", "dev/archive/data/pages/protected/")
     open("dev/archive/data/pages/simapper/start.txt", "w").close()
 
@@ -51,7 +51,7 @@ class TestCase(unittest.TestCase):
         """Call after every test case."""
         # cleanup()
 
-    def test_sipager_jpg(self):
+    def test_sipager_jpg_root(self):
         setup_wiki()
         shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
                     "dev/uploadtmp/sipager/")
@@ -59,16 +59,31 @@ class TestCase(unittest.TestCase):
         assert os.path.exists(
             "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
 
-    def test_sipager_tar(self):
+    def test_sipager_jpg_user(self):
         setup_wiki()
-        shutil.copy("test/sipager/mcchipz.tar", "dev/uploadtmp/sipager/")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/sipager/mcmaster/atmel_at328p_die.jpg")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+    def test_sipager_tar_root(self):
+        setup_wiki()
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar", "dev/uploadtmp/sipager/")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+    def test_sipager_tar_user(self):
+        setup_wiki()
+        shutil.copy("test/sipager/atmel_at328p_packs.tar", "dev/uploadtmp/sipager/mcmaster/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
             "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
 
     def test_sipager_tar_jpg(self):
         setup_wiki()
-        shutil.copy("test/sipager/mcchipz.tar", "dev/uploadtmp/sipager/")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar", "dev/uploadtmp/sipager/")
         shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
                     "dev/uploadtmp/sipager/")
         sipager.run(dev=True, once=True, verbose=self.verbose)

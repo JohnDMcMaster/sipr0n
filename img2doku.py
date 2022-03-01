@@ -113,6 +113,17 @@ def parse_vendor_chipid_name(fn, strict=False):
     chipid = m.group(2)
     return (fnbase, vendor, chipid)
 
+def parse_vendor_chipid_flavor(fn):
+    fnbase = os.path.basename(fn)
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)', fnbase)
+    if not m:
+        raise ParseError("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
+    vendor = m.group(1)
+    chipid = m.group(2)
+    flavor = m.group(3)
+    ext = m.group(4)
+    return (fnbase, vendor, chipid, flavor, ext)
+
 def parse_user_vendor_chipid_flavor(fn):
     fnbase = os.path.basename(fn)
     m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)', fnbase)
