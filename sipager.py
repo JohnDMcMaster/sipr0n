@@ -188,8 +188,8 @@ def extract_archives(scrape_dir):
                           (tarinfo.name, ))
                     continue
 
-                open(scrape_dir + "/" + basename,
-                     "wb").write(tar.extractfile(tarinfo).read())
+                with open(scrape_dir + "/" + basename, "wb") as f:
+                    f.write(tar.extractfile(tarinfo).read())
 
             # Extracted: trash it
             file_completed(fn_glob)

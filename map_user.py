@@ -17,18 +17,21 @@ def default_copyright(user):
     | mcmaster | John McMaster, CC-BY |  |
     """
     f = open(env.COPYRIGHT_TXT, "r")
-    f.readline()
-    for l in f:
-        l = l.strip()
-        if not l:
-            continue
-        _prefix, this_user, copyright, _notes, _postfix = l.split("|")
-        this_user = this_user.strip()
-        copyright = copyright.strip()
-        if user == this_user:
-            return copyright
-    else:
-        raise Exception("Failed to find copyright for " + user)
+    try:
+        f.readline()
+        for l in f:
+            l = l.strip()
+            if not l:
+                continue
+            _prefix, this_user, copyright, _notes, _postfix = l.split("|")
+            this_user = this_user.strip()
+            copyright = copyright.strip()
+            if user == this_user:
+                return copyright
+        else:
+            raise Exception("Failed to find copyright for " + user)
+    finally:
+        f.close()
 
 
 def run(user, copyright=None, files=[], run_img2doku=True):

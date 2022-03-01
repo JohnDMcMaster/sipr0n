@@ -282,7 +282,8 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
         if not os.path.exists(vendor_dir):
             write_lazy and print("mkdir " + vendor_dir)
             os.mkdir(vendor_dir)
-        open(page_path, "a").write(out)
+        with open(page_path, "a") as f:
+            f.write(out)
         write_lazy and print("Wrote to " + page_path)
         # subprocess.run(f"sudo chown www-data:www-data {page_path}", shell=True)
         return True

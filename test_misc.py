@@ -44,6 +44,10 @@ def cleanup():
 class TestCase(unittest.TestCase):
     def setUp(self):
         """Call before every test case."""
+        print("")
+        print("")
+        print("")
+        print("Start " + self._testMethodName)
         self.verbose = os.getenv("VERBOSE", "N") == "Y"
         cleanup()
 
@@ -113,9 +117,11 @@ class TestCase(unittest.TestCase):
     def test_simapper_user(self):
         setup_wiki()
         shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz.jpg")
+                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz3.jpg")
+        assert os.path.exists(
+            "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz3.jpg")
         simapper.run(dev=True, once=True, verbose=self.verbose)
-        assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
+        assert os.path.exists("./dev/map/atmel/at328p/mz3/index.html")
 
     def test_simapper_append(self):
         setup_wiki()
@@ -129,6 +135,7 @@ class TestCase(unittest.TestCase):
                     "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz2.jpg")
         simapper.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
+
 
 if __name__ == "__main__":
     unittest.main()  # run all tests
