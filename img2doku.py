@@ -252,6 +252,7 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
 
         out += "<code>\n"
         out += "</code>\n"
+        out += "\n"
 
 
     out += add_maps(map_fns, vendor, chipid, map_chipid_url)
