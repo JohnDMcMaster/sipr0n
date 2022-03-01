@@ -48,6 +48,7 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
     if force_fns is not None:
         for fn in force_fns.get("header", []):
             ret += simple_image(wiki_page, fn)
+            ret += "\n"
 
     ret += f"""
 ====== Package ======
@@ -247,7 +248,6 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
         if force_fns is not None:
             for fn in force_fns.get("die", []):
                 out += simple_image(wiki_page, fn)
-            if len(force_fns.get("die", [])):
                 out += "\n"
 
         out += "<code>\n"
@@ -258,11 +258,14 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
     out += add_maps(map_fns, vendor, chipid, map_chipid_url)
 
     if exists and force_fns:
+        # Instead of placing images in specific places
+        # just place them all at the end
         new_fns = []
         for image_set in force_fns.values():
             new_fns += image_set
         for fn in sorted(new_fns):
-            simple_image(wiki_page, fn)
+            out += simple_image(wiki_page, fn)
+            out += "\n"
 
 
     def try_write():

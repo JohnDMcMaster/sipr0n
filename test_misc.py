@@ -93,13 +93,42 @@ class TestCase(unittest.TestCase):
         assert os.path.exists(
             "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
 
-    def test_simapper_jpg_user(self):
+    def test_sipager_append(self):
+        setup_wiki()
+
+        print("pass 1")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/sipager/mcmaster_atmel_at328p_die.jpg")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+        print("pass 2")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/sipager/mcmaster_atmel_at328p_die2.jpg")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+    def test_simapper_user(self):
         setup_wiki()
         shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
                     "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz.jpg")
         simapper.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
 
+    def test_simapper_append(self):
+        setup_wiki()
+
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz.jpg")
+        simapper.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
+
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz2.jpg")
+        simapper.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
 
 if __name__ == "__main__":
     unittest.main()  # run all tests
