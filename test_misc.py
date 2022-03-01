@@ -4,7 +4,7 @@ import unittest
 import os
 import shutil
 import sipager
-import os
+import simapper
 
 
 def rm_f(fn):
@@ -33,7 +33,7 @@ def setup_wiki():
     os.makedirs("dev/archive/data/pages/protected", exist_ok=True)
     os.makedirs("dev/uploadtmp/sipager/mcmaster", exist_ok=True)
     os.makedirs("dev/uploadtmp/simapper/mcmaster", exist_ok=True)
-    shutil.copy("test/copyright.txt", "dev/archive/data/pages/protected/")
+    shutil.copy("test/copyright.txt", "dev/archive/data/pages/simapper/")
     open("dev/archive/data/pages/simapper/start.txt", "w").close()
 
 
@@ -69,26 +69,36 @@ class TestCase(unittest.TestCase):
 
     def test_sipager_tar_root(self):
         setup_wiki()
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar", "dev/uploadtmp/sipager/")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar",
+                    "dev/uploadtmp/sipager/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
             "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
 
     def test_sipager_tar_user(self):
         setup_wiki()
-        shutil.copy("test/sipager/atmel_at328p_packs.tar", "dev/uploadtmp/sipager/mcmaster/")
+        shutil.copy("test/sipager/atmel_at328p_packs.tar",
+                    "dev/uploadtmp/sipager/mcmaster/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
             "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
 
     def test_sipager_tar_jpg(self):
         setup_wiki()
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar", "dev/uploadtmp/sipager/")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar",
+                    "dev/uploadtmp/sipager/")
         shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
                     "dev/uploadtmp/sipager/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
             "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+    def test_simapper_jpg_user(self):
+        setup_wiki()
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz.jpg")
+        simapper.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
 
 
 if __name__ == "__main__":

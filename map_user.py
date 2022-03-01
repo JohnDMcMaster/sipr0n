@@ -7,12 +7,7 @@ import subprocess
 import datetime
 import img2doku
 import shutil
-
-# TODO: move to setup_env() in util.py
-# but good enough right now
-COPYRIGHT_TXT = "/var/www/archive/data/pages/simapper/copyright.txt"
-if os.path.exists("/mnt/si"):
-    COPYRIGHT_TXT = "/mnt/si" + COPYRIGHT_TXT
+import env
 
 
 def default_copyright(user):
@@ -21,7 +16,7 @@ def default_copyright(user):
     ^ User ^ Copyright ^ Note ^
     | mcmaster | John McMaster, CC-BY |  |
     """
-    f = open(COPYRIGHT_TXT, "r")
+    f = open(env.COPYRIGHT_TXT, "r")
     f.readline()
     for l in f:
         l = l.strip()

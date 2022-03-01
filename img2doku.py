@@ -62,6 +62,7 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
         if print_pack:
             pack_top = True
             pack_btm = True
+            assert page_fns_base is not None
             if len(page_fns_base):
                 pack_top = "pack_top.jpg" in page_fns_base
                 pack_btm = "pack_btm.jpg" in page_fns_base
@@ -221,7 +222,7 @@ def run(hi_fns=[], print_links=True, collect="mcmaster", nspre="", mappre="map",
         print("")
         print("")
 
-    if page_fns:
+    if page_fns is not None:
         page_fns_base = set()
         for fn in sorted(page_fns):
             page_fns_base.add(os.path.basename(fn)) 

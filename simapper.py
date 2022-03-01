@@ -14,6 +14,7 @@ import traceback
 import sys
 import map_user
 import os
+import env
 
 import img2doku
 from img2doku import parse_image_name, validate_username
@@ -23,65 +24,9 @@ STATUS_PENDING = "Pending"
 STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
 
-WWW_DIR = None
-SIPAGER_DIRS = None
-WIKI_NS_DIR = None
-WIKI_DIR = None
-
-
-def setup_env(dev=False, remote=False):
-    global WWW_DIR
-    # Directory containing high resolution maps
-    global MAP_DIR
-    global WIKI_DIR
-    # Directory containing simapper pages
-    global WIKI_NS_DIR
-    # File holding manual import table
-    global WIKI_PAGE
-    # List of directories to look for high resolution images
-    # Must be in a sub-directory with the user that wants to import it
-    global HI_SCRAPE_DIRS
-    global SIPAGER_DIRS
-
-    # Production
-    WWW_DIR = "/var/www"
-    # Production debugged remotely
-    # discouraged, used for intiial testing mostly
-    if remote:
-        WWW_DIR = "/mnt/si/var/www"
-    # Local development
-    if dev:
-        WWW_DIR = os.getcwd() + "/dev"
-    assert os.path.exists(WWW_DIR), "Failed to find " + WWW_DIR
-
-    MAP_DIR = WWW_DIR + "/map"
-    assert os.path.exists(MAP_DIR), MAP_DIR
-    WIKI_DIR = WWW_DIR + "/archive"
-    WIKI_NS_DIR = WWW_DIR + "/archive/data/pages/simapper"
-    assert os.path.exists(WIKI_NS_DIR), WIKI_NS_DIR
-    WIKI_PAGE = WIKI_NS_DIR + "/start.txt"
-    assert os.path.exists(WIKI_PAGE), WIKI_PAGE
-    # TODO: consider SFTP bridge
-    HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
-    for d in HI_SCRAPE_DIRS:
-        assert os.path.exists(d), d
-    SIPAGER_DIRS = [WWW_DIR + "/uploadtmp/sipager"]
-    for d in HI_SCRAPE_DIRS:
-        assert os.path.exists(d), d
-    # TODO: create a way to quickly import low resolution images
-    # Add the image directly to the page
-
-    print_log_break()
-    print("Environment:")
-    print("  WWW_DIR: ", WWW_DIR)
-    print("  MAP_DIR: ", MAP_DIR)
-    print("  WIKI_PAGE: ", WIKI_PAGE)
-    print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
-    print("  SIPAGER_DIRS: ", SIPAGER_DIRS)
-
 
 def get_user_page(user):
-    return WIKI_NS_DIR + "/" + user + ".txt"
+    return env.WIKI_NS_DIR + "/" + user + ".txt"
 
 
 def parse_page(page):
@@ -234,13 +179,13 @@ def process(entry):
 
     print("Checking if exists..")
     vendor_dir = "%s/%s/" % (
-        MAP_DIR,
+        env.MAP_DIR,
         vendor,
     )
-    chipid_dir = MAP_DIR + "/" + vendor + "/" + chipid
-    single_dir = MAP_DIR + "/" + vendor + "/" + chipid + "/single"
-    single_fn = MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + fnbase
-    map_fn = MAP_DIR + "/%s/%s/%s" % (vendor, chipid, flavor)
+    chipid_dir = env.MAP_DIR + "/" + vendor + "/" + chipid
+    single_dir = env.MAP_DIR + "/" + vendor + "/" + chipid + "/single"
+    single_fn = env.MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + fnbase
+    map_fn = env.MAP_DIR + "/%s/%s/%s" % (vendor, chipid, flavor)
     print("Checking %s...." % single_fn)
     if os.path.exists(single_fn):
         print("Collision (single): %s" % single_fn)
@@ -305,7 +250,7 @@ def process(entry):
             collect=entry["user"],
             write=True,
             write_lazy=True,
-            www_dir=WWW_DIR)
+            www_dir=env.WWW_DIR)
         print("wiki_page: " + wiki_page)
         print("wiki_url: " + wiki_url)
         print("map_chipid_url: " + map_chipid_url)
@@ -327,16 +272,16 @@ def process(entry):
 warned_wiki_page = set()
 
 
-def scrape_wiki_page():
+def scrape_wiki_page(dev=False):
     changed = False
     try:
-        header, entries = parse_page(WIKI_PAGE)
+        header, entries = parse_page(env.WIKI_PAGE)
     except:
         print("")
         print("")
         print("")
         print("Failed to parse")
-        print(open(WIKI_PAGE, "r").read())
+        print(open(env.WIKI_PAGE, "r").read())
         print("")
         print("")
         print("")
@@ -350,7 +295,7 @@ def scrape_wiki_page():
         print_log_break()
         changed = True
         entry["status"] = STATUS_PENDING
-        update_page(WIKI_PAGE, header, entries)
+        update_page(env.WIKI_PAGE, header, entries)
         try:
             process(entry)
         except Exception as e:
@@ -358,12 +303,12 @@ def scrape_wiki_page():
                 print("WARNING: exception: %s" % (e, ))
                 traceback.print_exc()
             entry["status"] = STATUS_ERROR
-            update_page(WIKI_PAGE, header, entries)
+            update_page(env.WIKI_PAGE, header, entries)
             warned_wiki_page.add(user_dir)
 
     if changed:
-        update_page(WIKI_PAGE, header, entries)
-        reindex_all()
+        update_page(env.WIKI_PAGE, header, entries)
+        reindex_all(dev=dev)
 
 
 def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
@@ -387,7 +332,7 @@ def print_log_break():
 tried_upload_files = set()
 
 
-def scrape_upload_dir(once=False, verbose=False):
+def scrape_upload_dir(once=False, dev=False, verbose=False):
     """
     TODO: consider implementing upload timeout
     As currently implemented dokuwiki buffers files and writes them instantly
@@ -398,7 +343,7 @@ def scrape_upload_dir(once=False, verbose=False):
     verbose and print("")
     verbose and print("Scraping upload dir")
     change = False
-    for scrape_dir in HI_SCRAPE_DIRS:
+    for scrape_dir in env.HI_SCRAPE_DIRS:
         for user_dir in glob.glob(scrape_dir + "/*"):
             if user_dir in tried_upload_files:
                 verbose and print("Ignoring tried: " + user_dir)
@@ -431,11 +376,15 @@ def scrape_upload_dir(once=False, verbose=False):
                 else:
                     traceback.print_exc()
     if change:
-        reindex_all()
+        reindex_all(dev=dev)
 
 
-def run(once=False, dev=False, remote=False):
-    setup_env(dev=dev, remote=remote)
+def run(once=False,
+        dev=False,
+        remote=False,
+        should_scrape_wiki_page=False,
+        verbose=False):
+    env.setup_env(dev=dev, remote=remote)
 
     # assert getpass.getuser() == "www-data"
 
@@ -453,20 +402,19 @@ def run(once=False, dev=False, remote=False):
         if iters > 1:
             time.sleep(3)
 
-        # This method hasn't been used in a long time
-        """
+        # XXX: remove this entirely?
         try:
-            scrape_wiki_page()
+            if should_scrape_wiki_page:
+                scrape_wiki_page(dev=dev)
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
             if once:
                 raise
             else:
                 traceback.print_exc()
-        """
 
         try:
-            scrape_upload_dir(once=once)
+            scrape_upload_dir(once=once, dev=dev)
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
             if once:

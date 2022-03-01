@@ -54,8 +54,9 @@ import tarfile
 import img2doku
 from img2doku import parse_vendor_chipid_flavor, parse_user_vendor_chipid_flavor, ParseError
 import simapper
-from simapper import print_log_break, setup_env
+from simapper import print_log_break
 from img2doku import validate_username
+import env
 
 
 def shift_done(page):
@@ -69,7 +70,7 @@ def shift_done(page):
 
 
 def get_user_page(user):
-    return simapper.WIKI_NS_DIR + "/" + user + "/sipager.txt"
+    return env.WIKI_NS_DIR + "/" + user + "/sipager.txt"
 
 
 def log_sipager_update(page_name, user):
@@ -80,7 +81,7 @@ def import_images(page_fns, page):
     for src_fn, page_fn in page_fns.items():
         print("Importing " + src_fn + " as " + page_fn)
 
-        user_dir = simapper.WIKI_DIR + "/data/media/" + page["user"]
+        user_dir = env.WIKI_DIR + "/data/media/" + page["user"]
         if not os.path.exists(user_dir):
             print("mkdir " + user_dir)
             os.mkdir(user_dir)
@@ -124,7 +125,7 @@ def process(page):
         collect=page["user"],
         write=True,
         write_lazy=True,
-        www_dir=simapper.WWW_DIR,
+        www_dir=env.WWW_DIR,
         vendor=page["vendor"],
         chipid=page["chipid"],
         page_fns=None,
@@ -183,7 +184,8 @@ def extract_archives(scrape_dir):
 
                 basename = os.path.basename(tarinfo.name).lower()
                 if not conforming_name(basename):
-                    print("WARNING: bad image file name within archive: %s" % (tarinfo.name, ))
+                    print("WARNING: bad image file name within archive: %s" %
+                          (tarinfo.name, ))
                     continue
 
                 open(scrape_dir + "/" + basename,
@@ -239,7 +241,8 @@ def bucket_image_dir(scrape_dir, assume_user=None, verbose=False):
             continue
         verbose and print("Checking file " + fn_can)
         try:
-            basename, user, vendor, chipid, flavor, ext = parse_assume_user(fn_can, assume_user)
+            basename, user, vendor, chipid, flavor, ext = parse_assume_user(
+                fn_can, assume_user)
         except ParseError:
             print("Bad image file name: %s" % (fn_can, ))
             failed_upload_files.add(fn_can)
@@ -318,13 +321,15 @@ def scrape_upload_dir_inner(scrape_dir, assume_user=None, verbose=False):
     change = False
     # don't assume_user here or will double stack against dir name
     extract_archives(scrape_dir)
-    pages = parse_image_dir(scrape_dir, assume_user=assume_user, verbose=verbose)
+    pages = parse_image_dir(scrape_dir,
+                            assume_user=assume_user,
+                            verbose=verbose)
     print_log_break()
 
     for page in pages.values():
         process(page)
         change = True
-        
+
     return change
 
 
@@ -338,7 +343,7 @@ def scrape_upload_dir_outer(verbose=False, dev=False):
     verbose and print("")
     verbose and print("Scraping upload dir")
     change = False
-    for scrape_dir in simapper.SIPAGER_DIRS:
+    for scrape_dir in env.SIPAGER_DIRS:
         # Check main dir with username prefix
         scrape_upload_dir_inner(scrape_dir, verbose=verbose)
 
@@ -358,14 +363,16 @@ def scrape_upload_dir_outer(verbose=False, dev=False):
                 failed_upload_files.add(fn_can)
                 print("Invalid user name: %s" % user)
                 continue
-            scrape_upload_dir_inner(glob_dir, verbose=verbose, assume_user=user)
+            scrape_upload_dir_inner(glob_dir,
+                                    verbose=verbose,
+                                    assume_user=user)
 
     if change:
         simapper.reindex_all(dev=dev)
 
 
 def run(once=False, dev=False, remote=False, verbose=False):
-    setup_env(dev=dev, remote=remote)
+    env.setup_env(dev=dev, remote=remote)
 
     # assert getpass.getuser() == "www-data"
 
