@@ -301,7 +301,7 @@ def parse_image_dir(scrape_dir, verbose=False):
     return ret
 
 
-def scrape_upload_dir(once=False, verbose=False):
+def scrape_upload_dir(once=False, verbose=False, dev=False):
     """
     TODO: consider implementing upload timeout
     As currently implemented dokuwiki buffers files and writes them instantly
@@ -331,7 +331,7 @@ def scrape_upload_dir(once=False, verbose=False):
         else:
             traceback.print_exc()
     if change:
-        simapper.reindex_all()
+        simapper.reindex_all(dev=dev)
 
 
 def run(once=False, dev=False, remote=False, verbose=False):
@@ -354,7 +354,7 @@ def run(once=False, dev=False, remote=False, verbose=False):
             time.sleep(3)
 
         try:
-            scrape_upload_dir(once=once, verbose=verbose)
+            scrape_upload_dir(once=once, verbose=verbose, dev=dev)
         except Exception as e:
             print("WARNING: exception: %s" % (e, ))
             if once:

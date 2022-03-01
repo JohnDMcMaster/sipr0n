@@ -1,0 +1,3 @@
+^ User       ^ Copyright                                ^ Note  ^
+| mcmaster   | John McMaster, CC-BY                     |       |
+| anonymous  | Anonymous, CC0                           |       |

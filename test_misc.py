@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+import unittest
+import os
+import shutil
+import sipager
+import os
+
+
+def rm_f(fn):
+    try:
+        os.unlink(fn)
+    except FileNotFoundError:
+        pass
+
+
+def rm_rf(fn):
+    shutil.rmtree(fn, ignore_errors=True)
+
+
+def cp(src, dst):
+    shutil.copy(src, dst)
+
+
+def cp_r(src, dst):
+    shutil.copytree(src, dst)
+
+
+def setup_wiki():
+    os.makedirs("dev/map", exist_ok=True)
+    os.makedirs("dev/archive/data/media", exist_ok=True)
+    os.makedirs("dev/archive/data/pages/simapper", exist_ok=True)
+    os.makedirs("dev/archive/data/pages/protected", exist_ok=True)
+    os.makedirs("dev/uploadtmp/sipager", exist_ok=True)
+    os.makedirs("dev/uploadtmp/simapper", exist_ok=True)
+    shutil.copy("test/copyright.txt", "dev/archive/data/pages/protected/")
+    open("dev/archive/data/pages/simapper/start.txt", "w").close()
+
+
+def cleanup():
+    rm_rf("dev")
+
+
+class TestCase(unittest.TestCase):
+    def setUp(self):
+        """Call before every test case."""
+        self.verbose = os.getenv("VERBOSE", "N") == "Y"
+        cleanup()
+
+    def tearDown(self):
+        """Call after every test case."""
+        # cleanup()
+
+    def test_sipager_jpg(self):
+        setup_wiki()
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/sipager/")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+    def test_sipager_tar(self):
+        setup_wiki()
+        shutil.copy("test/sipager/mcchipz.tar", "dev/uploadtmp/sipager/")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+    def test_sipager_tar_jpg(self):
+        setup_wiki()
+        shutil.copy("test/sipager/mcchipz.tar", "dev/uploadtmp/sipager/")
+        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+                    "dev/uploadtmp/sipager/")
+        sipager.run(dev=True, once=True, verbose=self.verbose)
+        assert os.path.exists(
+            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+
+
+if __name__ == "__main__":
+    unittest.main()  # run all tests
