@@ -107,18 +107,25 @@ def process(page):
     import_images(page["images"]["header"], page)
     import_images(page["images"]["package"], page)
     import_images(page["images"]["die"], page)
+    """
+    convert canonical.jpg: wiki.jpg to just wiki.jpg
 
-    def page_fns():
-        """
-        convert canonical.jpg: wiki.jpg to just wiki.jpg
+    Also should consider ordering pack_top.jpg before pack_btm.jpg
+    """
+    package_images = sorted(list(page["images"]["package"].values()))
+    # If "pack_top." is found push to front
+    # "pack_btm." should be second
+    # XXX: only solve trivial case right now of two images
+    # swap if we don't like the order
+    if len(package_images) > 1 and package_images[1] == "pack_top.jpg":
+        package_images[0], package_images[1] = package_images[
+            1], package_images[0]
 
-        Also should consider ordering pack_top.jpg before pack_btm.jpg
-        """
-        return {
-            "header": list(page["images"]["header"].values()),
-            "package": list(page["images"]["package"].values()),
-            "die": list(page["images"]["die"].values()),
-        }
+    force_fns = {
+        "header": sorted(list(page["images"]["header"].values())),
+        "package": package_images,
+        "die": sorted(list(page["images"]["die"].values())),
+    }
 
     _out_txt, wiki_page, wiki_url, _map_chipid_url, wrote, exists = img2doku.run(
         hi_fns=[],
@@ -130,7 +137,7 @@ def process(page):
         chipid=page["chipid"],
         page_fns=None,
         force_tags=page["tags"],
-        force_fns=page_fns(),
+        force_fns=force_fns,
     )
     print("wiki_page: " + wiki_page)
     print("wiki_url: " + wiki_url)
