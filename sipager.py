@@ -101,7 +101,7 @@ def import_images(page_fns, page):
 
 
 def process(page):
-    print("")
+    print_log_break()
     print(page)
 
     import_images(page["images"]["header"], page)
@@ -331,7 +331,7 @@ def scrape_upload_dir_inner(scrape_dir, assume_user=None, verbose=False):
     pages = parse_image_dir(scrape_dir,
                             assume_user=assume_user,
                             verbose=verbose)
-    print_log_break()
+    verbose and print_log_break()
 
     for page in pages.values():
         process(page)
