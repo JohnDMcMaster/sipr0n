@@ -70,7 +70,7 @@ def shift_done(page):
 
 
 def get_user_page(user):
-    return env.WIKI_NS_DIR + "/" + user + "/sipager.txt"
+    return env.SIPAGER_USER_DIR + "/" + user + ".txt"
 
 
 def log_sipager_update(page_name, user):
@@ -81,7 +81,7 @@ def import_images(page_fns, page):
     for src_fn, page_fn in page_fns.items():
         print("Importing " + src_fn + " as " + page_fn)
 
-        user_dir = env.WIKI_DIR + "/data/media/" + page["user"]
+        user_dir = env.ARCHIVE_WIKI_DIR + "/data/media/" + page["user"]
         if not os.path.exists(user_dir):
             print("mkdir " + user_dir)
             os.mkdir(user_dir)
@@ -350,29 +350,26 @@ def scrape_upload_dir_outer(verbose=False, dev=False):
     verbose and print("")
     verbose and print("Scraping upload dir")
     change = False
-    for scrape_dir in env.SIPAGER_DIRS:
-        # Check main dir with username prefix
-        scrape_upload_dir_inner(scrape_dir, verbose=verbose)
+    # Check main dir with username prefix
+    scrape_upload_dir_inner(env.SIPAGER_DIR, verbose=verbose)
 
-        # Check user dirs
-        for glob_dir in glob.glob(scrape_dir + "/*"):
-            fn_can = os.path.realpath(glob_dir)
-            if not os.path.isdir(fn_can):
-                continue
-            if fn_can in failed_upload_files:
-                continue
-            basename = os.path.basename(fn_can)
-            if basename == "done":
-                continue
-            user = basename
+    # Check user dirs
+    for glob_dir in glob.glob(env.SIPAGER_DIR + "/*"):
+        fn_can = os.path.realpath(glob_dir)
+        if not os.path.isdir(fn_can):
+            continue
+        if fn_can in failed_upload_files:
+            continue
+        basename = os.path.basename(fn_can)
+        if basename == "done":
+            continue
+        user = basename
 
-            if not validate_username(user):
-                failed_upload_files.add(fn_can)
-                print("Invalid user name: %s" % user)
-                continue
-            scrape_upload_dir_inner(glob_dir,
-                                    verbose=verbose,
-                                    assume_user=user)
+        if not validate_username(user):
+            failed_upload_files.add(fn_can)
+            print("Invalid user name: %s" % user)
+            continue
+        scrape_upload_dir_inner(glob_dir, verbose=verbose, assume_user=user)
 
     if change:
         simapper.reindex_all(dev=dev)

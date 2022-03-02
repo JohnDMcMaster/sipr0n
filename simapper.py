@@ -26,7 +26,7 @@ STATUS_COLLISION = "Collision"
 
 
 def get_user_page(user):
-    return env.WIKI_NS_DIR + "/" + user + ".txt"
+    return env.SIMAPPER_USER_DIR + "/" + user + ".txt"
 
 
 def log_simapper_update(entry, page=None):
@@ -198,6 +198,7 @@ def process(entry):
 
 warned_wiki_page = set()
 
+
 def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
     assert user
     ret = {"user": user, "status": status}
@@ -230,46 +231,42 @@ def scrape_upload_dir(once=False, dev=False, verbose=False):
     verbose and print("")
     verbose and print("Scraping upload dir")
     change = False
-    for scrape_dir in env.HI_SCRAPE_DIRS:
-        for user_dir in glob.glob(scrape_dir + "/*"):
-            if user_dir in tried_upload_files:
-                verbose and print("Ignoring tried: " + user_dir)
-                continue
+    for user_dir in glob.glob(env.SIMAPPER_DIR + "/*"):
+        if user_dir in tried_upload_files:
+            verbose and print("Ignoring tried: " + user_dir)
+            continue
 
-            try:
-                if not os.path.isdir(user_dir):
-                    verbose and print("Ignoring not a dir: " + user_dir)
-                    tried_upload_files.add(user_dir)
-                    raise Exception("unexpected file " + user_dir)
-                user = os.path.basename(user_dir)
-                verbose and print("Checking user dir " + user_dir)
-                for im_fn in glob.glob(user_dir + "/*"):
-                    if im_fn in tried_upload_files:
-                        verbose and print("Already tried: " + im_fn)
-                        continue
-                    tried_upload_files.add(im_fn)
-                    # Ignore done dir
-                    if not os.path.isfile(im_fn):
-                        verbose and print("Not a file " + im_fn)
-                        continue
-                    print_log_break()
-                    print("Found fn: " + im_fn)
-                    process(mk_entry(user=user, local_fn=im_fn))
-                    change = True
-            except Exception as e:
-                print("WARNING: exception scraping user dir: %s" % (e, ))
-                if once:
-                    raise
-                else:
-                    traceback.print_exc()
+        try:
+            if not os.path.isdir(user_dir):
+                verbose and print("Ignoring not a dir: " + user_dir)
+                tried_upload_files.add(user_dir)
+                raise Exception("unexpected file " + user_dir)
+            user = os.path.basename(user_dir)
+            verbose and print("Checking user dir " + user_dir)
+            for im_fn in glob.glob(user_dir + "/*"):
+                if im_fn in tried_upload_files:
+                    verbose and print("Already tried: " + im_fn)
+                    continue
+                tried_upload_files.add(im_fn)
+                # Ignore done dir
+                if not os.path.isfile(im_fn):
+                    verbose and print("Not a file " + im_fn)
+                    continue
+                print_log_break()
+                print("Found fn: " + im_fn)
+                process(mk_entry(user=user, local_fn=im_fn))
+                change = True
+        except Exception as e:
+            print("WARNING: exception scraping user dir: %s" % (e, ))
+            if once:
+                raise
+            else:
+                traceback.print_exc()
     if change:
         reindex_all(dev=dev)
 
 
-def run(once=False,
-        dev=False,
-        remote=False,
-        verbose=False):
+def run(once=False, dev=False, remote=False, verbose=False):
     env.setup_env(dev=dev, remote=remote)
 
     # assert getpass.getuser() == "www-data"

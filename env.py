@@ -1,30 +1,30 @@
 import os
 
 WWW_DIR = None
-SIPAGER_DIRS = None
-WIKI_NS_DIR = None
-WIKI_DIR = None
+# Directory containing high resolution maps
+# ex: /var/www/map
 MAP_DIR = None
-HI_SCRAPE_DIRS = None
-# simapper wiki page
-WIKI_PAGE = None
+# List of directories to ingest into simapper service
+SIMAPPER_DIR = None
+# List of directories to ingest into sipager service
+SIPAGER_DIR = None
 COPYRIGHT_TXT = None
+ARCHIVE_WIKI_DIR = None
+ARCHIVE_TOOL_DIR = None
+SIMAPPER_USER_DIR = None
+SIPAGER_USER_DIR = None
 
 
 def setup_env(dev=False, remote=False):
     global WWW_DIR
-    # Directory containing high resolution maps
     global MAP_DIR
-    global WIKI_DIR
-    # Directory containing simapper pages
-    global WIKI_NS_DIR
-    # File holding manual import table
-    global WIKI_PAGE
-    # List of directories to look for high resolution images
-    # Must be in a sub-directory with the user that wants to import it
-    global HI_SCRAPE_DIRS
-    global SIPAGER_DIRS
+    global ARCHIVE_WIKI_DIR
+    global SIMAPPER_DIR
+    global SIPAGER_DIR
     global COPYRIGHT_TXT
+    global WIKI_TOOL_DIR
+    global SIMAPPER_USER_DIR
+    global SIPAGER_USER_DIR
 
     # XXX: consider removing this now that have unit test
     assert not remote
@@ -40,30 +40,28 @@ def setup_env(dev=False, remote=False):
         WWW_DIR = os.getcwd() + "/dev"
     assert os.path.exists(WWW_DIR), "Failed to find " + WWW_DIR
 
+    # simapper
     MAP_DIR = WWW_DIR + "/map"
+    # tmp dirs
     assert os.path.exists(MAP_DIR), MAP_DIR
-    WIKI_DIR = WWW_DIR + "/archive"
-    WIKI_NS_DIR = WWW_DIR + "/archive/data/pages/simapper"
-    assert os.path.exists(WIKI_NS_DIR), WIKI_NS_DIR
-    WIKI_PAGE = WIKI_NS_DIR + "/start.txt"
-    assert os.path.exists(WIKI_PAGE), WIKI_PAGE
-    # TODO: consider SFTP bridge
-    HI_SCRAPE_DIRS = [WWW_DIR + "/uploadtmp/simapper"]
-    for d in HI_SCRAPE_DIRS:
-        assert os.path.exists(d), d
-    SIPAGER_DIRS = [WWW_DIR + "/uploadtmp/sipager"]
-    for d in HI_SCRAPE_DIRS:
-        assert os.path.exists(d), d
-    # TODO: create a way to quickly import low resolution images
-    # Add the image directly to the page
+    SIMAPPER_DIR = WWW_DIR + "/uploadtmp/simapper"
+    assert os.path.exists(SIMAPPER_DIR), SIMAPPER_DIR
+    SIPAGER_DIR = WWW_DIR + "/uploadtmp/sipager"
+    assert os.path.exists(SIPAGER_DIR), SIPAGER_DIR
 
+    # shared archive folders
+    ARCHIVE_WIKI_DIR = WWW_DIR + "/archive"
+    ARCHIVE_TOOL_DIR = WWW_DIR + "/archive/data/pages/tool"
+    assert os.path.exists(ARCHIVE_TOOL_DIR), ARCHIVE_TOOL_DIR
+    SIMAPPER_USER_DIR = WWW_DIR + "/archive/data/pages/tool/simapper"
+    assert os.path.exists(SIMAPPER_USER_DIR), SIMAPPER_USER_DIR
+    SIPAGER_USER_DIR = WWW_DIR + "/archive/data/pages/tool/sipager"
+    assert os.path.exists(SIPAGER_USER_DIR), SIPAGER_USER_DIR
     # but good enough right now
-    COPYRIGHT_TXT = WWW_DIR + "/archive/data/pages/simapper/copyright.txt"
+    COPYRIGHT_TXT = WWW_DIR + "/archive/data/pages/tool/copyright.txt"
 
-    # print_log_break()
     print("Environment:")
     print("  WWW_DIR: ", WWW_DIR)
     print("  MAP_DIR: ", MAP_DIR)
-    print("  WIKI_PAGE: ", WIKI_PAGE)
-    print("  HI_SCRAPE_DIRS: ", HI_SCRAPE_DIRS)
-    print("  SIPAGER_DIRS: ", SIPAGER_DIRS)
+    print("  SIMAPPER_DIR: ", SIMAPPER_DIR)
+    print("  SIPAGER_DIR: ", SIPAGER_DIR)
