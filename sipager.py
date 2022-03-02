@@ -77,36 +77,39 @@ def log_sipager_update(page_name, user):
     simapper.log_simapper_update({"wiki": page_name}, page=get_user_page(user))
 
 
-def import_images(page_fns, page):
-    for src_fn, page_fn in page_fns.items():
-        print("Importing " + src_fn + " as " + page_fn)
+def import_images(page):
+    print("Importing images...")
 
-        user_dir = env.ARCHIVE_WIKI_DIR + "/data/media/" + page["user"]
-        if not os.path.exists(user_dir):
-            print("mkdir " + user_dir)
-            os.mkdir(user_dir)
-        vendor_dir = user_dir + "/" + page["vendor"]
-        if not os.path.exists(vendor_dir):
-            print("mkdir " + vendor_dir)
-            os.mkdir(vendor_dir)
-        chipid_dir = vendor_dir + "/" + page["chipid"]
-        if not os.path.exists(chipid_dir):
-            print("mkdir " + chipid_dir)
-            os.mkdir(chipid_dir)
-        dst_fn = chipid_dir + "/" + page_fn
-        print("cp: " + src_fn + " => " + dst_fn)
-        if os.path.exists(dst_fn):
-            print("WARNING: overwriting file")
-        shutil.copy(src_fn, dst_fn)
+    for imagek in ("header", "package", "die"):
+        print("Set %s: %u items" % (imagek, len(page["images"][imagek])))
+        for src_fn, page_fn in page["images"][imagek].items():
+            print("  " + src_fn + " => " + page_fn)
+
+            user_dir = env.ARCHIVE_WIKI_DIR + "/data/media/" + page["user"]
+            if not os.path.exists(user_dir):
+                print("    mkdir " + user_dir)
+                os.mkdir(user_dir)
+            vendor_dir = user_dir + "/" + page["vendor"]
+            if not os.path.exists(vendor_dir):
+                print("    mkdir " + vendor_dir)
+                os.mkdir(vendor_dir)
+            chipid_dir = vendor_dir + "/" + page["chipid"]
+            if not os.path.exists(chipid_dir):
+                print("    mkdir " + chipid_dir)
+                os.mkdir(chipid_dir)
+            dst_fn = chipid_dir + "/" + page_fn
+            print("    cp: " + src_fn + " => " + dst_fn)
+            if os.path.exists(dst_fn):
+                print("    WARNING: overwriting file")
+            shutil.copy(src_fn, dst_fn)
+    print("")
 
 
 def process(page):
     print_log_break()
-    print(page)
+    print("Generating %s" % (page["page"], ))
 
-    import_images(page["images"]["header"], page)
-    import_images(page["images"]["package"], page)
-    import_images(page["images"]["die"], page)
+    import_images(page)
     """
     convert canonical.jpg: wiki.jpg to just wiki.jpg
 
@@ -164,7 +167,7 @@ def file_completed(src_fn):
     shutil.move(src_fn, dst_fn)
 
 
-def extract_archives(scrape_dir):
+def extract_archives(scrape_dir, assume_user):
     """
     Extract archives into current dir
 
@@ -174,28 +177,31 @@ def extract_archives(scrape_dir):
     """
     def conforming_name(fn):
         try:
-            _parsed = parse_assume_user(fn, assume_user=None)
+            _parsed = parse_assume_user(fn, assume_user=assume_user)
         except ParseError:
             return False
         return True
 
     for fn_glob in glob.glob(scrape_dir + "/*.tar"):
         tar = tarfile.open(fn_glob, "r")
+        print("tar: examining %s" % (fn_glob, ))
         try:
             for tarinfo in tar:
                 if not tarinfo.isreg():
                     if not tarinfo.isdir():
-                        print("WARNING: unrecognized tar element: %s" %
+                        print("  WARNING: unrecognized tar element: %s" %
                               (str(tarinfo), ))
                     continue
 
                 basename = os.path.basename(tarinfo.name).lower()
                 if not conforming_name(basename):
-                    print("WARNING: bad image file name within archive: %s" %
+                    print("  WARNING: bad image file name within archive: %s" %
                           (tarinfo.name, ))
                     continue
 
-                with open(scrape_dir + "/" + basename, "wb") as f:
+                fn_out = scrape_dir + "/" + basename
+                with open(fn_out, "wb") as f:
+                    print("  writing %s" % (fn_out))
                     f.write(tar.extractfile(tarinfo).read())
 
             # Extracted: trash it
@@ -327,7 +333,7 @@ def parse_image_dir(scrape_dir, assume_user=None, verbose=False):
 def scrape_upload_dir_inner(scrape_dir, assume_user=None, verbose=False):
     change = False
     # don't assume_user here or will double stack against dir name
-    extract_archives(scrape_dir)
+    extract_archives(scrape_dir, assume_user=assume_user)
     pages = parse_image_dir(scrape_dir,
                             assume_user=assume_user,
                             verbose=verbose)
