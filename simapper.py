@@ -29,79 +29,6 @@ def get_user_page(user):
     return env.WIKI_NS_DIR + "/" + user + ".txt"
 
 
-def parse_page(page):
-    header = ""
-    entries = []
-
-    f = open(page)
-
-    # Find table entry
-    for l in f:
-        if l.strip() == "====== Table ======":
-            break
-        header += l
-    else:
-        raise ValueError("Failed to find table sync")
-
-    # Check table entries
-    for l in f:
-        l = l.strip()
-        if not l:
-            continue
-        if re.match(
-                r"\^ *User *\^ *URL *\^ *Force name *\^ *Status *\^ *Map *\^ *Wiki *\^ *Notes *\^",
-                l):
-            continue
-        try:
-            _a, user, url, force_name, status, map_, wiki, notes, _b = l.split(
-                "|")
-        except:
-            print("Bad: %s" % l)
-            raise
-        entries.append({
-            "user": user.strip(),
-            "url": url.strip(),
-            "force_name": force_name.strip(),
-            "status": status.strip(),
-            "map": map_.strip(),
-            "wiki": wiki.strip(),
-            "notes": notes.strip(),
-        })
-
-    return header, entries
-
-
-def update_page(page, header, entries=[]):
-    buff = ""
-
-    if not header:
-        header = """
-This page is used to import images into https://siliconpr0n.org/map/
-
-For now only .jpg is supported
-
-See also: https://siliconpr0n.org/lib/simapper.txt
-"""
-    buff += header
-
-    buff += """\
-====== Table ======
-
-^ User ^ URL ^ Force name ^ Status ^ Map ^ Wiki ^ Notes ^
-"""
-    for entry in entries:
-        buff += "| %s | %s | %s | %s | %s | %s | %s |\n" % (
-            entry["user"], entry["url"], entry["force_name"], entry["status"],
-            entry["map"], entry["wiki"], entry["notes"])
-    f = open(page + ".tmp", "w")
-    f.write(buff)
-    f.flush()
-    f.close()
-    shutil.move(page + ".tmp", page)
-    # subprocess.check_call("chgrp www-data %s" % page, shell=True)
-    # subprocess.check_call("chown www-data %s" % page, shell=True)
-
-
 def log_simapper_update(entry, page=None):
     """
     Update user page w/ URL
@@ -271,46 +198,6 @@ def process(entry):
 
 warned_wiki_page = set()
 
-
-def scrape_wiki_page(dev=False):
-    changed = False
-    try:
-        header, entries = parse_page(env.WIKI_PAGE)
-    except:
-        print("")
-        print("")
-        print("")
-        print("Failed to parse")
-        print(open(env.WIKI_PAGE, "r").read())
-        print("")
-        print("")
-        print("")
-        raise
-
-    # Spams log too much
-    # print("Parsed @ %s" % (datetime.datetime.utcnow().isoformat(), ))
-    for entry in entries:
-        if not (entry["status"] == "" or entry["status"] == STATUS_PENDING):
-            continue
-        print_log_break()
-        changed = True
-        entry["status"] = STATUS_PENDING
-        update_page(env.WIKI_PAGE, header, entries)
-        try:
-            process(entry)
-        except Exception as e:
-            if not user_dir in warned_wiki_page:
-                print("WARNING: exception: %s" % (e, ))
-                traceback.print_exc()
-            entry["status"] = STATUS_ERROR
-            update_page(env.WIKI_PAGE, header, entries)
-            warned_wiki_page.add(user_dir)
-
-    if changed:
-        update_page(env.WIKI_PAGE, header, entries)
-        reindex_all(dev=dev)
-
-
 def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
     assert user
     ret = {"user": user, "status": status}
@@ -382,7 +269,6 @@ def scrape_upload_dir(once=False, dev=False, verbose=False):
 def run(once=False,
         dev=False,
         remote=False,
-        should_scrape_wiki_page=False,
         verbose=False):
     env.setup_env(dev=dev, remote=remote)
 
@@ -401,17 +287,6 @@ def run(once=False,
         # Consider select() / notify instead
         if iters > 1:
             time.sleep(3)
-
-        # XXX: remove this entirely?
-        try:
-            if should_scrape_wiki_page:
-                scrape_wiki_page(dev=dev)
-        except Exception as e:
-            print("WARNING: exception: %s" % (e, ))
-            if once:
-                raise
-            else:
-                traceback.print_exc()
 
         try:
             scrape_upload_dir(once=once, dev=dev)
