@@ -61,54 +61,54 @@ class TestCase(unittest.TestCase):
         """
         Canonical file names should work in root dir
         """
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
                     "dev/uploadtmp/sipager/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
     def test_sipager_jpg_user(self):
         """
         User directories can be used to assume file prefix
         """
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/sipager/mcmaster/atmel_at328p_die.jpg")
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
+                    "dev/uploadtmp/sipager/mcmaster/signetics_25120_die.jpg")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
     def test_sipager_tar_canonical(self):
         """
         Should be able to upload multiple files at once using a tar
         """
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar",
+        shutil.copy("test/sipager/mcmaster_signetics_25120.tar",
                     "dev/uploadtmp/sipager/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
     def test_sipager_tar_user(self):
         """
         Should be able to upload multiple files at once using a tar
         """
-        shutil.copy("test/sipager/atmel_at328p_packs.tar",
+        shutil.copy("test/sipager/signetics_25120.tar",
                     "dev/uploadtmp/sipager/mcmaster/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
     def test_sipager_tar_jpg_mixed(self):
         """
         Mixing jpgs and tar should be fine
         (although probably rarely used in practice)
         """
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_packs.tar",
+        shutil.copy("test/sipager/mcmaster_signetics_25120.tar",
                     "dev/uploadtmp/sipager/")
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
                     "dev/uploadtmp/sipager/")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
     def test_sipager_append(self):
         """
@@ -116,26 +116,26 @@ class TestCase(unittest.TestCase):
         """
 
         print("pass 1")
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/sipager/mcmaster_atmel_at328p_die.jpg")
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
+                    "dev/uploadtmp/sipager/mcmaster_signetics_25120_die.jpg")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
         print("pass 2")
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/sipager/mcmaster_atmel_at328p_die2.jpg")
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
+                    "dev/uploadtmp/sipager/mcmaster_signetics_25120_die2.jpg")
         sipager.run(dev=True, once=True, verbose=self.verbose)
         assert os.path.exists(
-            "./dev/archive/data/pages/mcmaster/atmel/at328p.txt")
+            "./dev/archive/data/pages/mcmaster/signetics/25120.txt")
 
     def test_simapper_user(self):
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz3.jpg")
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
+                    "dev/uploadtmp/simapper/mcmaster/signetics_25120_mz3.jpg")
         assert os.path.exists(
-            "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz3.jpg")
+            "dev/uploadtmp/simapper/mcmaster/signetics_25120_mz3.jpg")
         simapper.run(dev=True, once=True, verbose=self.verbose)
-        assert os.path.exists("./dev/map/atmel/at328p/mz3/index.html")
+        assert os.path.exists("./dev/map/signetics/25120/mz3/index.html")
         # logged?
         assert os.path.exists(
             "./dev/archive/data/pages/tool/simapper/mcmaster.txt")
@@ -144,15 +144,15 @@ class TestCase(unittest.TestCase):
         """
         Existing page should just append
         """
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz.jpg")
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
+                    "dev/uploadtmp/simapper/mcmaster/signetics_25120_mz.jpg")
         simapper.run(dev=True, once=True, verbose=self.verbose)
-        assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
+        assert os.path.exists("./dev/map/signetics/25120/mz/index.html")
 
-        shutil.copy("test/sipager/mcmaster_atmel_at328p_die.jpg",
-                    "dev/uploadtmp/simapper/mcmaster/atmel_at328p_mz2.jpg")
+        shutil.copy("test/sipager/mcmaster_signetics_25120_die.jpg",
+                    "dev/uploadtmp/simapper/mcmaster/signetics_25120_mz2.jpg")
         simapper.run(dev=True, once=True, verbose=self.verbose)
-        assert os.path.exists("./dev/map/atmel/at328p/mz/index.html")
+        assert os.path.exists("./dev/map/signetics/25120/mz/index.html")
 
 
 if __name__ == "__main__":
