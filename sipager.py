@@ -255,7 +255,7 @@ def bucket_image_dir(scrape_dir, assume_user=None, verbose=False):
         verbose and print("Checking file " + fn_can)
         try:
             basename, user, vendor, chipid, flavor, ext = parse_assume_user(
-                fn_can, assume_user)
+                fn_can.lower(), assume_user)
         except ParseError:
             print("Bad image file name: %s" % (fn_can, ))
             failed_upload_files.add(fn_can)
