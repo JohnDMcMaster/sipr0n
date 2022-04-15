@@ -49,7 +49,7 @@ def extract_html_meta(fn):
 
 
 def img2j(img_fn):
-    tmp_dir = "img2j_tmp"
+    tmp_dir = "/tmp/img2j"
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
 
@@ -91,9 +91,18 @@ def run(map_dir, dry=False, verbose=False):
     It's better to look at images to dirs
     Doesn't always go the other way
     """
+    print("")
+    print("")
+    print("")
+    print("")
+    print("")
+    print("")
     for img_fn in glob.glob(map_dir + "/single/*.jpg"):
         if ".thumb.jpg" in img_fn:
             continue
+        print("")
+        print("")
+        print("")
         print("Checking %s" % img_fn)
         _fnbase, _vendor, _chipid, flavor = img2doku.parse_image_name(img_fn)
         html_fn = map_dir + "/" + flavor + "/index.html"
