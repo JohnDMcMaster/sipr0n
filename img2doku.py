@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
+from util import parse_image_name
+
 import subprocess
-import re
 import os
 import glob
 
-class ParseError(Exception):
-    pass
 
 def commented_image(wiki_page, fn, width=300):
     assert os.path.basename(fn) == fn
@@ -81,65 +80,6 @@ def header_pack(wiki_page, collect, vendor, print_pack=True, page_fns_base=set()
 """
     return ret
 
-
-# Keep pr0nmap/main.py and sipr0n/img2doku.py in sync
-def parse_image_name(fn):
-    """
-    As used in /map
-    vendor_chipid_flavor.jpg
-    """
-
-    fnbase = os.path.basename(fn)
-    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).jpg', fnbase)
-    if not m:
-        raise ParseError("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
-    vendor = m.group(1)
-    chipid = m.group(2)
-    flavor = m.group(3)
-    return (fnbase, vendor, chipid, flavor)
-
-def parse_vendor_chipid_name(fn, strict=False):
-    """
-    Used for directories named like
-    vendor_chipid
-    """
-
-    fnbase = os.path.basename(fn)
-    if strict:
-        m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)[.]jpg', fnbase)
-    else:
-        m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)', fnbase)
-    if not m:
-        raise ParseError("Non-confirming file name (need vendor_chipid): %s" % (fn,))
-    vendor = m.group(1)
-    chipid = m.group(2)
-    return (fnbase, vendor, chipid)
-
-def parse_vendor_chipid_flavor(fn):
-    fnbase = os.path.basename(fn)
-    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)', fnbase)
-    if not m:
-        raise ParseError("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
-    vendor = m.group(1)
-    chipid = m.group(2)
-    flavor = m.group(3)
-    ext = m.group(4)
-    return (fnbase, vendor, chipid, flavor, ext)
-
-def parse_user_vendor_chipid_flavor(fn):
-    fnbase = os.path.basename(fn)
-    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)', fnbase)
-    if not m:
-        raise ParseError("Non-confirming file name (need vendor_chipid_flavor.jpg): %s" % (fn,))
-    user = m.group(1)
-    vendor = m.group(2)
-    chipid = m.group(3)
-    flavor = m.group(4)
-    ext = m.group(5)
-    return (fnbase, user, vendor, chipid, flavor, ext)
-
-def validate_username(username):
-    return re.match("[a-z]+", username)
 
 def process_fns(fns):
     """

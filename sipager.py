@@ -52,10 +52,10 @@ import traceback
 import tarfile
 
 import img2doku
-from img2doku import parse_vendor_chipid_flavor, parse_user_vendor_chipid_flavor, ParseError
+from util import parse_vendor_chipid_flavor, parse_user_vendor_chipid_flavor, ParseError
 import simapper
 from simapper import print_log_break
-from img2doku import validate_username
+from util import validate_username
 import env
 
 

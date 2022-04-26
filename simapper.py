@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
 
-import re
 import os
 import glob
-import urllib
 import urllib.request
-import tempfile
 import shutil
 import subprocess
 import time
-import datetime
 import traceback
-import sys
 import map_user
-import os
 import env
 
 import img2doku
-from img2doku import parse_image_name, validate_username
+from util import parse_image_name, validate_username
 
 STATUS_DONE = "Done"
 STATUS_PENDING = "Pending"
