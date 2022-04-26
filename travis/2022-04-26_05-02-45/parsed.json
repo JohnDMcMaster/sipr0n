@@ -1,0 +1,402 @@
+{
+    "atmel/t44c080c/romtop50x/top50.tif": {
+        "chipid": "t44c080c",
+        "flavor": "mz_rom_50x",
+        "sha1sum": "fce7d7b8f91c14485a4e9aded9c555f59e008f5e",
+        "single_fn": "atmel_t44c080c_mz_rom_50x.jpg",
+        "src_image": "atmel/t44c080c/romtop50x/top50.tif",
+        "vendor": "atmel"
+    },
+    "atmel/t44c080c/top10x/top10x.tif": {
+        "chipid": "t44c080c",
+        "flavor": "mz_10x",
+        "sha1sum": "1fe93b8fe42f37917a9103a6f774af8af51cd041",
+        "single_fn": "atmel_t44c080c_mz_10x.jpg",
+        "src_image": "atmel/t44c080c/top10x/top10x.tif",
+        "vendor": "atmel"
+    },
+    "casio/casio3208/casio3208_blended_fused.tif": {
+        "chipid": "casio3208",
+        "flavor": "unk",
+        "sha1sum": "cf14483ef93a9c429eaf90402d47cb8ca61fb3a8",
+        "single_fn": "casio_casio3208_unk.jpg",
+        "src_image": "casio/casio3208/casio3208_blended_fused.tif",
+        "vendor": "casio"
+    },
+    "casio/fx82ms/fx82ms-top_blended_fused.tif": {
+        "chipid": "fx82ms",
+        "flavor": "unk",
+        "sha1sum": "4039934228d0ad640e1350b03dba057e0a695ea4",
+        "single_fn": "casio_fx82ms_unk.jpg",
+        "src_image": "casio/fx82ms/fx82ms-top_blended_fused.tif",
+        "vendor": "casio"
+    },
+    "generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif": {
+        "chipid": "gplb52x-tamagotchi",
+        "flavor": "5x",
+        "sha1sum": "75e569697c77cf6954c2cf375938e01dbbd7d65b",
+        "single_fn": "generalplus_gplb52x-tamagotchi_5x.jpg",
+        "src_image": "generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif",
+        "vendor": "generalplus"
+    },
+    "generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif": {
+        "chipid": "gplb52x-tamagotchi",
+        "flavor": "mz_rom_50x",
+        "sha1sum": "a7815b2b2e95145af22bc6c488870032d948287d",
+        "single_fn": "generalplus_gplb52x-tamagotchi_mz_rom_50x.jpg",
+        "src_image": "generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif",
+        "vendor": "generalplus"
+    },
+    "gigadevice/gd32f130/package5x/package5x.tif": {
+        "chipid": "gd32f130",
+        "flavor": "package5x",
+        "sha1sum": "ac5da1cdcd1b54a87e44cfb7df2637e80a52a661",
+        "single_fn": "gigadevice_gd32f130_package5x.jpg",
+        "src_image": "gigadevice/gd32f130/package5x/package5x.tif",
+        "vendor": "gigadevice"
+    },
+    "gigadevice/gd32f130/top5x/top5x.tif": {
+        "chipid": "gd32f130",
+        "flavor": "mz_5x",
+        "sha1sum": "0af57d3707e9bfab738c812990093c4d5b3b7d8a",
+        "single_fn": "gigadevice_gd32f130_mz_5x.jpg",
+        "src_image": "gigadevice/gd32f130/top5x/top5x.tif",
+        "vendor": "gigadevice"
+    },
+    "holtek/unknownmcu/top10x/top10x.tif": {
+        "chipid": "unknownmcu",
+        "flavor": "mz_10x",
+        "sha1sum": "476ff94905384ece0e77e55f5a06d33e81530df5",
+        "single_fn": "holtek_unknownmcu_mz_10x.jpg",
+        "src_image": "holtek/unknownmcu/top10x/top10x.tif",
+        "vendor": "holtek"
+    },
+    "hr/c5000/top5x/c5000-top5x.tif": {
+        "chipid": "c5000",
+        "flavor": "mz_5x",
+        "sha1sum": "862d4e6c7a3234e6ae333fcf801542b17720d6f9",
+        "single_fn": "hr_c5000_mz_5x.jpg",
+        "src_image": "hr/c5000/top5x/c5000-top5x.tif",
+        "vendor": "hr"
+    },
+    "lapis/610q112/10x/top/top.tif": {
+        "chipid": "610q112",
+        "flavor": "mz_10x",
+        "sha1sum": "39344590c056c685b6e7d43b2fe72949ee957d84",
+        "single_fn": "lapis_610q112_mz_10x.jpg",
+        "src_image": "lapis/610q112/10x/top/top.tif",
+        "vendor": "lapis"
+    },
+    "lapis/ml610q102/top10x/top10x.tif": {
+        "chipid": "ml610q102",
+        "flavor": "mz_10x",
+        "sha1sum": "39a895fb702a46fcb0c57b2bc5af73a26b64f484",
+        "single_fn": "lapis_ml610q102_mz_10x.jpg",
+        "src_image": "lapis/ml610q102/top10x/top10x.tif",
+        "vendor": "lapis"
+    },
+    "microchip/pic16c57/clean/pic16c57_blended_fused.tif": {
+        "chipid": "pic16c57",
+        "flavor": "clean",
+        "sha1sum": "ee35bb13b78f7af63749e8db8d59b88b3a04991d",
+        "single_fn": "microchip_pic16c57_clean.jpg",
+        "src_image": "microchip/pic16c57/clean/pic16c57_blended_fused.tif",
+        "vendor": "microchip"
+    },
+    "microchip/pic16c57/dirty/pic16c57_blended_fused.tif": {
+        "chipid": "pic16c57",
+        "flavor": "dirty",
+        "sha1sum": "ef1aec0dffd615112b515cc96ad7a6b2e04a0702",
+        "single_fn": "microchip_pic16c57_dirty.jpg",
+        "src_image": "microchip/pic16c57/dirty/pic16c57_blended_fused.tif",
+        "vendor": "microchip"
+    },
+    "microchip/pic16f84-10/top5x/top5x.tif": {
+        "chipid": "pic16f84-10",
+        "flavor": "mz_5x",
+        "sha1sum": "2cc19443f99f1c03141e8ec898cde9a1d1e32e21",
+        "single_fn": "microchip_pic16f84-10_mz_5x.jpg",
+        "src_image": "microchip/pic16f84-10/top5x/top5x.tif",
+        "vendor": "microchip"
+    },
+    "microchip/pic18f452/top5x/top5x_blended_fused.tif": {
+        "chipid": "pic18f452",
+        "flavor": "mz_5x",
+        "sha1sum": "23cd6c2edc8a28e9d5cf422a02e20fb50d120c0a",
+        "single_fn": "microchip_pic18f452_mz_5x.jpg",
+        "src_image": "microchip/pic18f452/top5x/top5x_blended_fused.tif",
+        "vendor": "microchip"
+    },
+    "mifare/classic/50x/top50x.tif": {
+        "chipid": "classic",
+        "flavor": "50x",
+        "sha1sum": "7e6b5976f1b125c40b5605b68c23284c6fef0ab5",
+        "single_fn": "mifare_classic_50x.jpg",
+        "src_image": "mifare/classic/50x/top50x.tif",
+        "vendor": "mifare"
+    },
+    "nintendo/cicnes6113b1/nescic_blended_fused.tif": {
+        "chipid": "cicnes6113b1",
+        "flavor": "unk",
+        "sha1sum": "f41b0e91fd0d6085744ef217a42a7d246a0c0a30",
+        "single_fn": "nintendo_cicnes6113b1_unk.jpg",
+        "src_image": "nintendo/cicnes6113b1/nescic_blended_fused.tif",
+        "vendor": "nintendo"
+    },
+    "nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif": {
+        "chipid": "cicnus6102",
+        "flavor": "lowres",
+        "sha1sum": "0a6620e291dad5449a4434dac5028d221effef72",
+        "single_fn": "nintendo_cicnus6102_lowres.jpg",
+        "src_image": "nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif",
+        "vendor": "nintendo"
+    },
+    "nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif": {
+        "chipid": "dmg-01-cpu",
+        "flavor": "mz_5x",
+        "sha1sum": "a203bb5418969087ae8b64df622d76714d93d178",
+        "single_fn": "nintendo_dmg-01-cpu_mz_5x.jpg",
+        "src_image": "nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif",
+        "vendor": "nintendo"
+    },
+    "nxp/lpc111x/top5x/top5x_blended_fused.tif": {
+        "chipid": "lpc111x",
+        "flavor": "mz_5x",
+        "sha1sum": "8bdb583e8587b22b59d3e05668ef90bf873b4d75",
+        "single_fn": "nxp_lpc111x_mz_5x.jpg",
+        "src_image": "nxp/lpc111x/top5x/top5x_blended_fused.tif",
+        "vendor": "nxp"
+    },
+    "nxp/lpc1343/top10x/top10x.tif": {
+        "chipid": "lpc1343",
+        "flavor": "mz_10x",
+        "sha1sum": "527de54ce8fe8ba064f0bf7dfb60e5c8bcb8248c",
+        "single_fn": "nxp_lpc1343_mz_10x.jpg",
+        "src_image": "nxp/lpc1343/top10x/top10x.tif",
+        "vendor": "nxp"
+    },
+    "nxp/tF1371C/top10x/tF1371C_blended_fused.tif": {
+        "chipid": "tf1371c",
+        "flavor": "mz_10x",
+        "sha1sum": "f7080282e11b052938a1baf52e923fffcabac91b",
+        "single_fn": "nxp_tf1371c_mz_10x.jpg",
+        "src_image": "nxp/tF1371C/top10x/tF1371C_blended_fused.tif",
+        "vendor": "nxp"
+    },
+    "raspberrypi/rp2b0-2020/top10x/top10x.tif": {
+        "chipid": "rp2b0-2020",
+        "flavor": "mz_10x",
+        "sha1sum": "9cec95ca91934b18958ff141c62344c8559d7f07",
+        "single_fn": "raspberrypi_rp2b0-2020_mz_10x.jpg",
+        "src_image": "raspberrypi/rp2b0-2020/top10x/top10x.tif",
+        "vendor": "raspberrypi"
+    },
+    "stmicro/stm32f217/top5x/stm32f217-top5x.tif": {
+        "chipid": "stm32f217",
+        "flavor": "mz_5x",
+        "sha1sum": "d43bbf649d51be1e799298fcc81e0908dca6c04c",
+        "single_fn": "stmicro_stm32f217_mz_5x.jpg",
+        "src_image": "stmicro/stm32f217/top5x/stm32f217-top5x.tif",
+        "vendor": "stmicro"
+    },
+    "stmicro/stm32f405/top5x/top5x.tif": {
+        "chipid": "stm32f405",
+        "flavor": "mz_5x",
+        "sha1sum": "59c85b5313d82dd6c87d249a095d88db76b92067",
+        "single_fn": "stmicro_stm32f405_mz_5x.jpg",
+        "src_image": "stmicro/stm32f405/top5x/top5x.tif",
+        "vendor": "stmicro"
+    },
+    "stmicro/stm8l152/top10x/stm8l152-top10x.tif": {
+        "chipid": "stm8l152",
+        "flavor": "mz_10x",
+        "sha1sum": "7090aa3abf2611b926b19b263747e92281c79874",
+        "single_fn": "stmicro_stm8l152_mz_10x.jpg",
+        "src_image": "stmicro/stm8l152/top10x/stm8l152-top10x.tif",
+        "vendor": "stmicro"
+    },
+    "tengen/rabbit/low/rabbit-top_blended_fused.tif": {
+        "chipid": "rabbit",
+        "flavor": "low",
+        "sha1sum": "28de6de11ee8e0dd799a4e8cbbd9d4698f592741",
+        "single_fn": "tengen_rabbit_low.jpg",
+        "src_image": "tengen/rabbit/low/rabbit-top_blended_fused.tif",
+        "vendor": "tengen"
+    },
+    "ti/cc430f6137/top5x/top5x.tif": {
+        "chipid": "cc430f6137",
+        "flavor": "mz_5x",
+        "sha1sum": "f19dd590bd2b861b5704be841ccff37ffcec09e7",
+        "single_fn": "ti_cc430f6137_mz_5x.jpg",
+        "src_image": "ti/cc430f6137/top5x/top5x.tif",
+        "vendor": "ti"
+    },
+    "ti/cc430f6147/logo50x/logo50x.tif": {
+        "chipid": "cc430f6147",
+        "flavor": "logo50x",
+        "sha1sum": "ce77cab65df8ec4ac361ad2f34c167c6ce9fd05a",
+        "single_fn": "ti_cc430f6147_logo50x.jpg",
+        "src_image": "ti/cc430f6147/logo50x/logo50x.tif",
+        "vendor": "ti"
+    },
+    "ti/cc430f6147/top10x/top10x.tif": {
+        "chipid": "cc430f6147",
+        "flavor": "mz_10x",
+        "sha1sum": "0895a6c55a1ed1768e401a9e5d7809bf57e72ace",
+        "single_fn": "ti_cc430f6147_mz_10x.jpg",
+        "src_image": "ti/cc430f6147/top10x/top10x.tif",
+        "vendor": "ti"
+    },
+    "ti/msp430f417/lowres/pan_blended_fused.tif": {
+        "chipid": "msp430f417",
+        "flavor": "lowres",
+        "sha1sum": "87ed415189e2e15edb8918d7f903647674577959",
+        "single_fn": "ti_msp430f417_lowres.jpg",
+        "src_image": "ti/msp430f417/lowres/pan_blended_fused.tif",
+        "vendor": "ti"
+    },
+    "ti/msp430f449/logo50x/msp430f449-logo5x.tif": {
+        "chipid": "msp430f449",
+        "flavor": "logo50x",
+        "sha1sum": "874095e04e0e89243e4e60ddd71a4d7638d6eafb",
+        "single_fn": "ti_msp430f449_logo50x.jpg",
+        "src_image": "ti/msp430f449/logo50x/msp430f449-logo5x.tif",
+        "vendor": "ti"
+    },
+    "ti/msp430f449/rom50x/rom50x.tif": {
+        "chipid": "msp430f449",
+        "flavor": "rom50x",
+        "sha1sum": "4f32399d6b6b30c7080bc4b45f4c0977e9915ce6",
+        "single_fn": "ti_msp430f449_rom50x.jpg",
+        "src_image": "ti/msp430f449/rom50x/rom50x.tif",
+        "vendor": "ti"
+    },
+    "ti/msp430f449/top5x/msp430f449-top5x.tif": {
+        "chipid": "msp430f449",
+        "flavor": "mz_5x",
+        "sha1sum": "f0f1ad6e783bdddb59215551ef47ea84d99e97f8",
+        "single_fn": "ti_msp430f449_mz_5x.jpg",
+        "src_image": "ti/msp430f449/top5x/msp430f449-top5x.tif",
+        "vendor": "ti"
+    },
+    "ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif": {
+        "chipid": "rf430frl152",
+        "flavor": "layer1",
+        "sha1sum": "cac959c9741499dee6c2f8d09498b2c54e9fbabe",
+        "single_fn": "ti_rf430frl152_layer1.jpg",
+        "src_image": "ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif",
+        "vendor": "ti"
+    },
+    "ti/rf430frl152/layer2/layer2_blended_fused.tif": {
+        "chipid": "rf430frl152",
+        "flavor": "layer2",
+        "sha1sum": "3f431763cf7b9cbc1237c574a0815822766b667c",
+        "single_fn": "ti_rf430frl152_layer2.jpg",
+        "src_image": "ti/rf430frl152/layer2/layer2_blended_fused.tif",
+        "vendor": "ti"
+    },
+    "ti/rf430frl152/layer3/layer3_blended_fused.tif": {
+        "chipid": "rf430frl152",
+        "flavor": "layer3",
+        "sha1sum": "642b16964181cdec2f545822201e053d03c81f26",
+        "single_fn": "ti_rf430frl152_layer3.jpg",
+        "src_image": "ti/rf430frl152/layer3/layer3_blended_fused.tif",
+        "vendor": "ti"
+    },
+    "ti/rf430tal152/10x/top10_blended_fused.tif": {
+        "chipid": "rf430tal152",
+        "flavor": "10x",
+        "sha1sum": "adbc3d1bae2fbd6dc326baea9fc5fbe4dd4a920e",
+        "single_fn": "ti_rf430tal152_10x.jpg",
+        "src_image": "ti/rf430tal152/10x/top10_blended_fused.tif",
+        "vendor": "ti"
+    },
+    "ti/tms320c10nl/top5x/top5x.tif": {
+        "chipid": "tms320c10nl",
+        "flavor": "mz_5x",
+        "sha1sum": "c07b4713007b68780c12f07c8830d24b006be061",
+        "single_fn": "ti_tms320c10nl_mz_5x.jpg",
+        "src_image": "ti/tms320c10nl/top5x/top5x.tif",
+        "vendor": "ti"
+    },
+    "ti/tms320c25/top-5x/top_blended_fused.tif": {
+        "chipid": "tms320c25",
+        "flavor": "mz_5x",
+        "sha1sum": "1f74908988b2c9d2c439a4643cc97a0a285a5ed0",
+        "single_fn": "ti_tms320c25_mz_5x.jpg",
+        "src_image": "ti/tms320c25/top-5x/top_blended_fused.tif",
+        "vendor": "ti"
+    },
+    "ti/tms320f2810/top5x/top5x.tif": {
+        "chipid": "tms320f2810",
+        "flavor": "mz_5x",
+        "sha1sum": "83debccd8d6cbe06d8ccdf3ef18ebc1d3cc71fe4",
+        "single_fn": "ti_tms320f2810_mz_5x.jpg",
+        "src_image": "ti/tms320f2810/top5x/top5x.tif",
+        "vendor": "ti"
+    },
+    "ti/tms320lc541b/logo/stripe.tif": {
+        "chipid": "tms320lc541b",
+        "flavor": "logo",
+        "sha1sum": "7b63a9d53254d26498de3949ebd11e9b876d6125",
+        "single_fn": "ti_tms320lc541b_logo.jpg",
+        "src_image": "ti/tms320lc541b/logo/stripe.tif",
+        "vendor": "ti"
+    },
+    "ti/tms320lc541b/lowres/stitched.tif": {
+        "chipid": "tms320lc541b",
+        "flavor": "lowres",
+        "sha1sum": "820ec679abb577f2e623082202581af834ca5942",
+        "single_fn": "ti_tms320lc541b_lowres.jpg",
+        "src_image": "ti/tms320lc541b/lowres/stitched.tif",
+        "vendor": "ti"
+    },
+    "waveshare/wsdia1/top10x/top10x.tif": {
+        "chipid": "wsdia1",
+        "flavor": "mz_10x",
+        "sha1sum": "d48ad5609b49e5c39c1ea1574f80ce92d2081fe7",
+        "single_fn": "waveshare_wsdia1_mz_10x.jpg",
+        "src_image": "waveshare/wsdia1/top10x/top10x.tif",
+        "vendor": "waveshare"
+    },
+    "wch/ch32v103/top10x/top10x.tif": {
+        "chipid": "ch32v103",
+        "flavor": "mz_10x",
+        "sha1sum": "c7fe8abb2e201a386ea345846e9c5e744a059cfa",
+        "single_fn": "wch_ch32v103_mz_10x.jpg",
+        "src_image": "wch/ch32v103/top10x/top10x.tif",
+        "vendor": "wch"
+    },
+    "wch/ch32v307/top10x/top10x.tif": {
+        "chipid": "ch32v307",
+        "flavor": "mz_10x",
+        "sha1sum": "a35b4c011b5e39376c52f95d1a5a8465adf5ceac",
+        "single_fn": "wch_ch32v307_mz_10x.jpg",
+        "src_image": "wch/ch32v307/top10x/top10x.tif",
+        "vendor": "wch"
+    },
+    "wch/ch340b/top10x/top10x.tif": {
+        "chipid": "ch340b",
+        "flavor": "mz_10x",
+        "sha1sum": "329ed0f80bb042d7a3b4e1fab42ab989dcc4ce3c",
+        "single_fn": "wch_ch340b_mz_10x.jpg",
+        "src_image": "wch/ch340b/top10x/top10x.tif",
+        "vendor": "wch"
+    },
+    "wch/wch340g/top10x/top10x.tif": {
+        "chipid": "wch340g",
+        "flavor": "mz_10x",
+        "sha1sum": "94f6de3c5b4a108fba757b5da7e09c8085a70e74",
+        "single_fn": "wch_wch340g_mz_10x.jpg",
+        "src_image": "wch/wch340g/top10x/top10x.tif",
+        "vendor": "wch"
+    },
+    "znation/z32h330/batch_blended_fused.tif": {
+        "chipid": "z32h330",
+        "flavor": "unk",
+        "sha1sum": "983e79712b74bdd76df1b11dbd37f9d824b03dbf",
+        "single_fn": "znation_z32h330_unk.jpg",
+        "src_image": "znation/z32h330/batch_blended_fused.tif",
+        "vendor": "znation"
+    }
+}

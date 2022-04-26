@@ -1,0 +1,933 @@
+Writing to travis/2022-04-26_05-02-45
+
+/home/mcmaster/buffer/ic/travis/goodchips2/atmel/t44c080c/romtop50x/romtop50x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/atmel/t44c080c/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/casio/casio3208/casio3208.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/casio/fx82ms/fx82ms.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/gigadevice/gd32f130/package5x/package5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/gigadevice/gd32f130/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/holtek/unknownmcu/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/hr/c5000/top5x/c5000-top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/lapis/610q112/10x/top/top.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/lapis/ml610q102/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic16c57/clean/pic16c57.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic16c57/dirty/pic16c57.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic16f84-10/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic18f452/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/mifare/classic/50x/mifareclassic.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nintendo/cicnes6113b1/nescic.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nintendo/cicnus6102/lowres/cicnus6102-lowres.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nintendo/dmg-01-cpu/top-5x/top5x-allbutdone.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nintendo/dmg-01-cpu/top-5x/top5x-halfway.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nintendo/dmg-01-cpu/top-5x/top5x-halfway2.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nintendo/dmg-01-cpu/top-5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nxp/lpc111x/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nxp/lpc1343/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/nxp/tF1371C/top10x/tF1371C.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/raspberrypi/rp2b0-2020/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/stmicro/stm32f217/top5x/stm32f217-top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/stmicro/stm32f405/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/stmicro/stm8l152/top10x/stm8l152-top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/tengen/rabbit/low/rabbit.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/cc430f6137/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/cc430f6147/logo50x/logo50x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/cc430f6147/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f417/lowres/msp430f417.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f449/logo50x/msp430f449-logo5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f449/rom50x/rom50x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f449/top5x/msp430f449-top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430frl152/layer1/rf430frl152-top.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430frl152/layer2/layer2.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430frl152/layer3/layer3.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430tal152/10x/top10.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320c10nl/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320c25/top-5x/tms32c25-top.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320f2810/top5x/top5x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320lc541b/green/green.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320lc541b/logo/stripe.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320lc541b/lowres/auto-395mm.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/waveshare/wsdia1/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/wch/ch32v103/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/wch/ch32v307/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/wch/ch340b/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/wch/wch340g/top10x/top10x.pto
+
+/home/mcmaster/buffer/ic/travis/goodchips2/znation/z32h330/z32h330.pto
+
+Finished image find loop
+ok: 50
+nok: 0
+
+
+atmel/t44c080c/romtop50x/top50.tif
+parsed: atmel/t44c080c/romtop50x/top50.tif
+  vendor: atmel
+  chipid: t44c080c
+  flavor: mz_rom_50x
+  flagged: False
+
+atmel/t44c080c/top10x/top10x.tif
+parsed: atmel/t44c080c/top10x/top10x.tif
+  vendor: atmel
+  chipid: t44c080c
+  flavor: mz_10x
+  flagged: False
+
+casio/casio3208/casio3208_blended_fused.tif
+parsed: casio/casio3208/casio3208_blended_fused.tif
+  vendor: casio
+  chipid: casio3208
+  flavor: unk
+  flagged: False
+
+casio/fx82ms/fx82ms-top_blended_fused.tif
+parsed: casio/fx82ms/fx82ms-top_blended_fused.tif
+  vendor: casio
+  chipid: fx82ms
+  flavor: unk
+  flagged: False
+
+generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif
+parsed: generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif
+  vendor: generalplus
+  chipid: gplb52x-tamagotchi
+  flavor: 5x
+  flagged: False
+
+generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif
+parsed: generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif
+  vendor: generalplus
+  chipid: gplb52x-tamagotchi
+  flavor: mz_rom_50x
+  flagged: False
+
+gigadevice/gd32f130/package5x/package5x.tif
+parsed: gigadevice/gd32f130/package5x/package5x.tif
+  vendor: gigadevice
+  chipid: gd32f130
+  flavor: package5x
+  flagged: False
+
+gigadevice/gd32f130/top5x/top5x.tif
+parsed: gigadevice/gd32f130/top5x/top5x.tif
+  vendor: gigadevice
+  chipid: gd32f130
+  flavor: mz_5x
+  flagged: False
+
+holtek/unknownmcu/top10x/top10x.tif
+parsed: holtek/unknownmcu/top10x/top10x.tif
+  vendor: holtek
+  chipid: unknownmcu
+  flavor: mz_10x
+  flagged: False
+
+hr/c5000/top5x/c5000-top5x.tif
+parsed: hr/c5000/top5x/c5000-top5x.tif
+  vendor: hr
+  chipid: c5000
+  flavor: mz_5x
+  flagged: False
+
+lapis/610q112/10x/top/top.tif
+parsed: lapis/610q112/10x/top/top.tif
+  vendor: lapis
+  chipid: 610q112
+  flavor: mz_10x
+  flagged: False
+
+lapis/ml610q102/top10x/top10x.tif
+parsed: lapis/ml610q102/top10x/top10x.tif
+  vendor: lapis
+  chipid: ml610q102
+  flavor: mz_10x
+  flagged: False
+
+microchip/pic16c57/clean/pic16c57_blended_fused.tif
+parsed: microchip/pic16c57/clean/pic16c57_blended_fused.tif
+  vendor: microchip
+  chipid: pic16c57
+  flavor: clean
+  flagged: False
+
+microchip/pic16c57/dirty/pic16c57_blended_fused.tif
+parsed: microchip/pic16c57/dirty/pic16c57_blended_fused.tif
+  vendor: microchip
+  chipid: pic16c57
+  flavor: dirty
+  flagged: False
+
+microchip/pic16f84-10/top5x/top5x.tif
+parsed: microchip/pic16f84-10/top5x/top5x.tif
+  vendor: microchip
+  chipid: pic16f84-10
+  flavor: mz_5x
+  flagged: False
+
+microchip/pic18f452/top5x/top5x_blended_fused.tif
+parsed: microchip/pic18f452/top5x/top5x_blended_fused.tif
+  vendor: microchip
+  chipid: pic18f452
+  flavor: mz_5x
+  flagged: False
+
+mifare/classic/50x/top50x.tif
+parsed: mifare/classic/50x/top50x.tif
+  vendor: mifare
+  chipid: classic
+  flavor: 50x
+  flagged: False
+
+nintendo/cicnes6113b1/nescic_blended_fused.tif
+parsed: nintendo/cicnes6113b1/nescic_blended_fused.tif
+  vendor: nintendo
+  chipid: cicnes6113b1
+  flavor: unk
+  flagged: False
+
+nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif
+parsed: nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif
+  vendor: nintendo
+  chipid: cicnus6102
+  flavor: lowres
+  flagged: False
+
+nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif
+parsed: nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif
+  vendor: nintendo
+  chipid: dmg-01-cpu
+  flavor: mz_5x
+  flagged: False
+
+nxp/lpc111x/top5x/top5x_blended_fused.tif
+parsed: nxp/lpc111x/top5x/top5x_blended_fused.tif
+  vendor: nxp
+  chipid: lpc111x
+  flavor: mz_5x
+  flagged: False
+
+nxp/lpc1343/top10x/top10x.tif
+parsed: nxp/lpc1343/top10x/top10x.tif
+  vendor: nxp
+  chipid: lpc1343
+  flavor: mz_10x
+  flagged: False
+
+nxp/tF1371C/top10x/tF1371C_blended_fused.tif
+parsed: nxp/tF1371C/top10x/tF1371C_blended_fused.tif
+  vendor: nxp
+  chipid: tf1371c
+  flavor: mz_10x
+  flagged: False
+
+raspberrypi/rp2b0-2020/top10x/top10x.tif
+parsed: raspberrypi/rp2b0-2020/top10x/top10x.tif
+  vendor: raspberrypi
+  chipid: rp2b0-2020
+  flavor: mz_10x
+  flagged: False
+
+stmicro/stm32f217/top5x/stm32f217-top5x.tif
+parsed: stmicro/stm32f217/top5x/stm32f217-top5x.tif
+  vendor: stmicro
+  chipid: stm32f217
+  flavor: mz_5x
+  flagged: False
+
+stmicro/stm32f405/top5x/top5x.tif
+parsed: stmicro/stm32f405/top5x/top5x.tif
+  vendor: stmicro
+  chipid: stm32f405
+  flavor: mz_5x
+  flagged: False
+
+stmicro/stm8l152/top10x/stm8l152-top10x.tif
+parsed: stmicro/stm8l152/top10x/stm8l152-top10x.tif
+  vendor: stmicro
+  chipid: stm8l152
+  flavor: mz_10x
+  flagged: False
+
+tengen/rabbit/low/rabbit-top_blended_fused.tif
+parsed: tengen/rabbit/low/rabbit-top_blended_fused.tif
+  vendor: tengen
+  chipid: rabbit
+  flavor: low
+  flagged: False
+
+ti/cc430f6137/top5x/top5x.tif
+parsed: ti/cc430f6137/top5x/top5x.tif
+  vendor: ti
+  chipid: cc430f6137
+  flavor: mz_5x
+  flagged: False
+
+ti/cc430f6147/logo50x/logo50x.tif
+parsed: ti/cc430f6147/logo50x/logo50x.tif
+  vendor: ti
+  chipid: cc430f6147
+  flavor: logo50x
+  flagged: False
+
+ti/cc430f6147/top10x/top10x.tif
+parsed: ti/cc430f6147/top10x/top10x.tif
+  vendor: ti
+  chipid: cc430f6147
+  flavor: mz_10x
+  flagged: False
+
+ti/msp430f417/lowres/pan_blended_fused.tif
+parsed: ti/msp430f417/lowres/pan_blended_fused.tif
+  vendor: ti
+  chipid: msp430f417
+  flavor: lowres
+  flagged: False
+
+ti/msp430f449/logo50x/msp430f449-logo5x.tif
+parsed: ti/msp430f449/logo50x/msp430f449-logo5x.tif
+  vendor: ti
+  chipid: msp430f449
+  flavor: logo50x
+  flagged: False
+
+ti/msp430f449/rom50x/rom50x.tif
+parsed: ti/msp430f449/rom50x/rom50x.tif
+  vendor: ti
+  chipid: msp430f449
+  flavor: rom50x
+  flagged: False
+
+ti/msp430f449/top5x/msp430f449-top5x.tif
+parsed: ti/msp430f449/top5x/msp430f449-top5x.tif
+  vendor: ti
+  chipid: msp430f449
+  flavor: mz_5x
+  flagged: False
+
+ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif
+parsed: ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif
+  vendor: ti
+  chipid: rf430frl152
+  flavor: layer1
+  flagged: False
+
+ti/rf430frl152/layer2/layer2_blended_fused.tif
+parsed: ti/rf430frl152/layer2/layer2_blended_fused.tif
+  vendor: ti
+  chipid: rf430frl152
+  flavor: layer2
+  flagged: False
+
+ti/rf430frl152/layer3/layer3_blended_fused.tif
+parsed: ti/rf430frl152/layer3/layer3_blended_fused.tif
+  vendor: ti
+  chipid: rf430frl152
+  flavor: layer3
+  flagged: False
+
+ti/rf430tal152/10x/top10_blended_fused.tif
+parsed: ti/rf430tal152/10x/top10_blended_fused.tif
+  vendor: ti
+  chipid: rf430tal152
+  flavor: 10x
+  flagged: False
+
+ti/tms320c10nl/top5x/top5x.tif
+parsed: ti/tms320c10nl/top5x/top5x.tif
+  vendor: ti
+  chipid: tms320c10nl
+  flavor: mz_5x
+  flagged: False
+
+ti/tms320c25/top-5x/top_blended_fused.tif
+parsed: ti/tms320c25/top-5x/top_blended_fused.tif
+  vendor: ti
+  chipid: tms320c25
+  flavor: mz_5x
+  flagged: False
+
+ti/tms320f2810/top5x/top5x.tif
+parsed: ti/tms320f2810/top5x/top5x.tif
+  vendor: ti
+  chipid: tms320f2810
+  flavor: mz_5x
+  flagged: False
+
+ti/tms320lc541b/logo/stripe.tif
+parsed: ti/tms320lc541b/logo/stripe.tif
+  vendor: ti
+  chipid: tms320lc541b
+  flavor: logo
+  flagged: False
+
+ti/tms320lc541b/lowres/stitched.tif
+parsed: ti/tms320lc541b/lowres/stitched.tif
+  vendor: ti
+  chipid: tms320lc541b
+  flavor: lowres
+  flagged: False
+
+waveshare/wsdia1/top10x/top10x.tif
+parsed: waveshare/wsdia1/top10x/top10x.tif
+  vendor: waveshare
+  chipid: wsdia1
+  flavor: mz_10x
+  flagged: False
+
+wch/ch32v103/top10x/top10x.tif
+parsed: wch/ch32v103/top10x/top10x.tif
+  vendor: wch
+  chipid: ch32v103
+  flavor: mz_10x
+  flagged: False
+
+wch/ch32v307/top10x/top10x.tif
+parsed: wch/ch32v307/top10x/top10x.tif
+  vendor: wch
+  chipid: ch32v307
+  flavor: mz_10x
+  flagged: False
+
+wch/ch340b/top10x/top10x.tif
+parsed: wch/ch340b/top10x/top10x.tif
+  vendor: wch
+  chipid: ch340b
+  flavor: mz_10x
+  flagged: False
+
+wch/wch340g/top10x/top10x.tif
+parsed: wch/wch340g/top10x/top10x.tif
+  vendor: wch
+  chipid: wch340g
+  flavor: mz_10x
+  flagged: False
+
+znation/z32h330/batch_blended_fused.tif
+parsed: znation/z32h330/batch_blended_fused.tif
+  vendor: znation
+  chipid: z32h330
+  flavor: unk
+  flagged: False
+
+Finished name parse loop
+ok: 50
+nok: 0
+
+Calculating atmel/t44c080c/romtop50x/top50.tif...
+Calculating atmel/t44c080c/top10x/top10x.tif...
+Calculating casio/casio3208/casio3208_blended_fused.tif...
+Calculating casio/fx82ms/fx82ms-top_blended_fused.tif...
+Calculating generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif...
+Calculating generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif...
+Calculating gigadevice/gd32f130/package5x/package5x.tif...
+Calculating gigadevice/gd32f130/top5x/top5x.tif...
+Calculating holtek/unknownmcu/top10x/top10x.tif...
+Calculating hr/c5000/top5x/c5000-top5x.tif...
+Calculating lapis/610q112/10x/top/top.tif...
+Calculating lapis/ml610q102/top10x/top10x.tif...
+Calculating microchip/pic16c57/clean/pic16c57_blended_fused.tif...
+Calculating microchip/pic16c57/dirty/pic16c57_blended_fused.tif...
+Calculating microchip/pic16f84-10/top5x/top5x.tif...
+Calculating microchip/pic18f452/top5x/top5x_blended_fused.tif...
+Calculating mifare/classic/50x/top50x.tif...
+Calculating nintendo/cicnes6113b1/nescic_blended_fused.tif...
+Calculating nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif...
+Calculating nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif...
+Calculating nxp/lpc111x/top5x/top5x_blended_fused.tif...
+Calculating nxp/lpc1343/top10x/top10x.tif...
+Calculating nxp/tF1371C/top10x/tF1371C_blended_fused.tif...
+Calculating raspberrypi/rp2b0-2020/top10x/top10x.tif...
+Calculating stmicro/stm32f217/top5x/stm32f217-top5x.tif...
+Calculating stmicro/stm32f405/top5x/top5x.tif...
+Calculating stmicro/stm8l152/top10x/stm8l152-top10x.tif...
+Calculating tengen/rabbit/low/rabbit-top_blended_fused.tif...
+Calculating ti/cc430f6137/top5x/top5x.tif...
+Calculating ti/cc430f6147/logo50x/logo50x.tif...
+Calculating ti/cc430f6147/top10x/top10x.tif...
+Calculating ti/msp430f417/lowres/pan_blended_fused.tif...
+Calculating ti/msp430f449/logo50x/msp430f449-logo5x.tif...
+Calculating ti/msp430f449/rom50x/rom50x.tif...
+Calculating ti/msp430f449/top5x/msp430f449-top5x.tif...
+Calculating ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif...
+Calculating ti/rf430frl152/layer2/layer2_blended_fused.tif...
+Calculating ti/rf430frl152/layer3/layer3_blended_fused.tif...
+Calculating ti/rf430tal152/10x/top10_blended_fused.tif...
+Calculating ti/tms320c10nl/top5x/top5x.tif...
+Calculating ti/tms320c25/top-5x/top_blended_fused.tif...
+Calculating ti/tms320f2810/top5x/top5x.tif...
+Calculating ti/tms320lc541b/logo/stripe.tif...
+Calculating ti/tms320lc541b/lowres/stitched.tif...
+Calculating waveshare/wsdia1/top10x/top10x.tif...
+Calculating wch/ch32v103/top10x/top10x.tif...
+Calculating wch/ch32v307/top10x/top10x.tif...
+Calculating wch/ch340b/top10x/top10x.tif...
+Calculating wch/wch340g/top10x/top10x.tif...
+Calculating znation/z32h330/batch_blended_fused.tif...
+
+
+Checking atmel/t44c080c/romtop50x/top50.tif...
+Checking atmel_t44c080c_mz_rom_50x.jpg...
+Checking https://siliconpr0n.org/map/atmel/t44c080c/mz_rom_50x/...
+ok
+
+Checking atmel/t44c080c/top10x/top10x.tif...
+Checking atmel_t44c080c_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/atmel/t44c080c/mz_10x/...
+ok
+
+Checking casio/casio3208/casio3208_blended_fused.tif...
+Checking casio_casio3208_unk.jpg...
+Checking https://siliconpr0n.org/map/casio/casio3208/unk/...
+ok
+
+Checking casio/fx82ms/fx82ms-top_blended_fused.tif...
+Checking casio_fx82ms_unk.jpg...
+Checking https://siliconpr0n.org/map/casio/fx82ms/unk/...
+ok
+
+Checking generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif...
+Checking generalplus_gplb52x-tamagotchi_5x.jpg...
+Checking https://siliconpr0n.org/map/generalplus/gplb52x-tamagotchi/5x/...
+ok
+
+Checking generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif...
+Checking generalplus_gplb52x-tamagotchi_mz_rom_50x.jpg...
+Checking https://siliconpr0n.org/map/generalplus/gplb52x-tamagotchi/mz_rom_50x/...
+ok
+
+Checking gigadevice/gd32f130/package5x/package5x.tif...
+Checking gigadevice_gd32f130_package5x.jpg...
+Checking https://siliconpr0n.org/map/gigadevice/gd32f130/package5x/...
+ok
+
+Checking gigadevice/gd32f130/top5x/top5x.tif...
+Checking gigadevice_gd32f130_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/gigadevice/gd32f130/mz_5x/...
+ok
+
+Checking holtek/unknownmcu/top10x/top10x.tif...
+Checking holtek_unknownmcu_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/holtek/unknownmcu/mz_10x/...
+ok
+
+Checking hr/c5000/top5x/c5000-top5x.tif...
+Checking hr_c5000_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/hr/c5000/mz_5x/...
+ok
+
+Checking lapis/610q112/10x/top/top.tif...
+Checking lapis_610q112_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/lapis/610q112/mz_10x/...
+ok
+
+Checking lapis/ml610q102/top10x/top10x.tif...
+Checking lapis_ml610q102_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/lapis/ml610q102/mz_10x/...
+ok
+
+Checking microchip/pic16c57/clean/pic16c57_blended_fused.tif...
+Checking microchip_pic16c57_clean.jpg...
+Checking https://siliconpr0n.org/map/microchip/pic16c57/clean/...
+ok
+
+Checking microchip/pic16c57/dirty/pic16c57_blended_fused.tif...
+Checking microchip_pic16c57_dirty.jpg...
+Checking https://siliconpr0n.org/map/microchip/pic16c57/dirty/...
+ok
+
+Checking microchip/pic16f84-10/top5x/top5x.tif...
+Checking microchip_pic16f84-10_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/microchip/pic16f84-10/mz_5x/...
+ok
+
+Checking microchip/pic18f452/top5x/top5x_blended_fused.tif...
+Checking microchip_pic18f452_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/microchip/pic18f452/mz_5x/...
+ok
+
+Checking mifare/classic/50x/top50x.tif...
+Checking mifare_classic_50x.jpg...
+Checking https://siliconpr0n.org/map/mifare/classic/50x/...
+ok
+
+Checking nintendo/cicnes6113b1/nescic_blended_fused.tif...
+Checking nintendo_cicnes6113b1_unk.jpg...
+Checking https://siliconpr0n.org/map/nintendo/cicnes6113b1/unk/...
+ok
+
+Checking nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif...
+Checking nintendo_cicnus6102_lowres.jpg...
+Checking https://siliconpr0n.org/map/nintendo/cicnus6102/lowres/...
+ok
+
+Checking nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif...
+Checking nintendo_dmg-01-cpu_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/nintendo/dmg-01-cpu/mz_5x/...
+ok
+
+Checking nxp/lpc111x/top5x/top5x_blended_fused.tif...
+Checking nxp_lpc111x_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/nxp/lpc111x/mz_5x/...
+ok
+
+Checking nxp/lpc1343/top10x/top10x.tif...
+Checking nxp_lpc1343_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/nxp/lpc1343/mz_10x/...
+ok
+
+Checking nxp/tF1371C/top10x/tF1371C_blended_fused.tif...
+Checking nxp_tf1371c_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/nxp/tf1371c/mz_10x/...
+ok
+
+Checking raspberrypi/rp2b0-2020/top10x/top10x.tif...
+Checking raspberrypi_rp2b0-2020_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/raspberrypi/rp2b0-2020/mz_10x/...
+ok
+
+Checking stmicro/stm32f217/top5x/stm32f217-top5x.tif...
+Checking stmicro_stm32f217_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/stmicro/stm32f217/mz_5x/...
+ok
+
+Checking stmicro/stm32f405/top5x/top5x.tif...
+Checking stmicro_stm32f405_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/stmicro/stm32f405/mz_5x/...
+ok
+
+Checking stmicro/stm8l152/top10x/stm8l152-top10x.tif...
+Checking stmicro_stm8l152_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/stmicro/stm8l152/mz_10x/...
+ok
+
+Checking tengen/rabbit/low/rabbit-top_blended_fused.tif...
+Checking tengen_rabbit_low.jpg...
+Checking https://siliconpr0n.org/map/tengen/rabbit/low/...
+ok
+
+Checking ti/cc430f6137/top5x/top5x.tif...
+Checking ti_cc430f6137_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/ti/cc430f6137/mz_5x/...
+ok
+
+Checking ti/cc430f6147/logo50x/logo50x.tif...
+Checking ti_cc430f6147_logo50x.jpg...
+Checking https://siliconpr0n.org/map/ti/cc430f6147/logo50x/...
+ok
+
+Checking ti/cc430f6147/top10x/top10x.tif...
+Checking ti_cc430f6147_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/ti/cc430f6147/mz_10x/...
+ok
+
+Checking ti/msp430f417/lowres/pan_blended_fused.tif...
+Checking ti_msp430f417_lowres.jpg...
+Checking https://siliconpr0n.org/map/ti/msp430f417/lowres/...
+ok
+
+Checking ti/msp430f449/logo50x/msp430f449-logo5x.tif...
+Checking ti_msp430f449_logo50x.jpg...
+Checking https://siliconpr0n.org/map/ti/msp430f449/logo50x/...
+ok
+
+Checking ti/msp430f449/rom50x/rom50x.tif...
+Checking ti_msp430f449_rom50x.jpg...
+Checking https://siliconpr0n.org/map/ti/msp430f449/rom50x/...
+ok
+
+Checking ti/msp430f449/top5x/msp430f449-top5x.tif...
+Checking ti_msp430f449_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/ti/msp430f449/mz_5x/...
+ok
+
+Checking ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif...
+Checking ti_rf430frl152_layer1.jpg...
+Checking https://siliconpr0n.org/map/ti/rf430frl152/layer1/...
+ok
+
+Checking ti/rf430frl152/layer2/layer2_blended_fused.tif...
+Checking ti_rf430frl152_layer2.jpg...
+Checking https://siliconpr0n.org/map/ti/rf430frl152/layer2/...
+ok
+
+Checking ti/rf430frl152/layer3/layer3_blended_fused.tif...
+Checking ti_rf430frl152_layer3.jpg...
+Checking https://siliconpr0n.org/map/ti/rf430frl152/layer3/...
+ok
+
+Checking ti/rf430tal152/10x/top10_blended_fused.tif...
+Checking ti_rf430tal152_10x.jpg...
+Checking https://siliconpr0n.org/map/ti/rf430tal152/10x/...
+ok
+
+Checking ti/tms320c10nl/top5x/top5x.tif...
+Checking ti_tms320c10nl_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/ti/tms320c10nl/mz_5x/...
+ok
+
+Checking ti/tms320c25/top-5x/top_blended_fused.tif...
+Checking ti_tms320c25_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/ti/tms320c25/mz_5x/...
+ok
+
+Checking ti/tms320f2810/top5x/top5x.tif...
+Checking ti_tms320f2810_mz_5x.jpg...
+Checking https://siliconpr0n.org/map/ti/tms320f2810/mz_5x/...
+ok
+
+Checking ti/tms320lc541b/logo/stripe.tif...
+Checking ti_tms320lc541b_logo.jpg...
+Checking https://siliconpr0n.org/map/ti/tms320lc541b/logo/...
+ok
+
+Checking ti/tms320lc541b/lowres/stitched.tif...
+Checking ti_tms320lc541b_lowres.jpg...
+Checking https://siliconpr0n.org/map/ti/tms320lc541b/lowres/...
+ok
+
+Checking waveshare/wsdia1/top10x/top10x.tif...
+Checking waveshare_wsdia1_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/waveshare/wsdia1/mz_10x/...
+ok
+
+Checking wch/ch32v103/top10x/top10x.tif...
+Checking wch_ch32v103_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/wch/ch32v103/mz_10x/...
+ok
+
+Checking wch/ch32v307/top10x/top10x.tif...
+Checking wch_ch32v307_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/wch/ch32v307/mz_10x/...
+ok
+
+Checking wch/ch340b/top10x/top10x.tif...
+Checking wch_ch340b_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/wch/ch340b/mz_10x/...
+ok
+
+Checking wch/wch340g/top10x/top10x.tif...
+Checking wch_wch340g_mz_10x.jpg...
+Checking https://siliconpr0n.org/map/wch/wch340g/mz_10x/...
+ok
+
+Checking znation/z32h330/batch_blended_fused.tif...
+Checking znation_z32h330_unk.jpg...
+Checking https://siliconpr0n.org/map/znation/z32h330/unk/...
+ok
+
+Finished image find loop
+ok: 50
+nok: 0
+
+Converting atmel/t44c080c/romtop50x/top50.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/atmel/t44c080c/romtop50x/top50.tif travis/2022-04-26_05-02-45/single/atmel_t44c080c_mz_rom_50x.jpg
+
+Converting atmel/t44c080c/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/atmel/t44c080c/top10x/top10x.tif travis/2022-04-26_05-02-45/single/atmel_t44c080c_mz_10x.jpg
+
+Converting casio/casio3208/casio3208_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/casio/casio3208/casio3208_blended_fused.tif travis/2022-04-26_05-02-45/single/casio_casio3208_unk.jpg
+
+Converting casio/fx82ms/fx82ms-top_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/casio/fx82ms/fx82ms-top_blended_fused.tif travis/2022-04-26_05-02-45/single/casio_fx82ms_unk.jpg
+
+Converting generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/generalplus/gplb52x-tamagotchi/5x/gplb52x-tamagotchi-5x.tif travis/2022-04-26_05-02-45/single/generalplus_gplb52x-tamagotchi_5x.jpg
+
+Converting generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/generalplus/gplb52x-tamagotchi/toprom50x/toprom50x.tif travis/2022-04-26_05-02-45/single/generalplus_gplb52x-tamagotchi_mz_rom_50x.jpg
+
+Converting gigadevice/gd32f130/package5x/package5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/gigadevice/gd32f130/package5x/package5x.tif travis/2022-04-26_05-02-45/single/gigadevice_gd32f130_package5x.jpg
+
+Converting gigadevice/gd32f130/top5x/top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/gigadevice/gd32f130/top5x/top5x.tif travis/2022-04-26_05-02-45/single/gigadevice_gd32f130_mz_5x.jpg
+
+Converting holtek/unknownmcu/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/holtek/unknownmcu/top10x/top10x.tif travis/2022-04-26_05-02-45/single/holtek_unknownmcu_mz_10x.jpg
+
+Converting hr/c5000/top5x/c5000-top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/hr/c5000/top5x/c5000-top5x.tif travis/2022-04-26_05-02-45/single/hr_c5000_mz_5x.jpg
+
+Converting lapis/610q112/10x/top/top.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/lapis/610q112/10x/top/top.tif travis/2022-04-26_05-02-45/single/lapis_610q112_mz_10x.jpg
+
+Converting lapis/ml610q102/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/lapis/ml610q102/top10x/top10x.tif travis/2022-04-26_05-02-45/single/lapis_ml610q102_mz_10x.jpg
+
+Converting microchip/pic16c57/clean/pic16c57_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic16c57/clean/pic16c57_blended_fused.tif travis/2022-04-26_05-02-45/single/microchip_pic16c57_clean.jpg
+
+Converting microchip/pic16c57/dirty/pic16c57_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic16c57/dirty/pic16c57_blended_fused.tif travis/2022-04-26_05-02-45/single/microchip_pic16c57_dirty.jpg
+
+Converting microchip/pic16f84-10/top5x/top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic16f84-10/top5x/top5x.tif travis/2022-04-26_05-02-45/single/microchip_pic16f84-10_mz_5x.jpg
+
+Converting microchip/pic18f452/top5x/top5x_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic18f452/top5x/top5x_blended_fused.tif travis/2022-04-26_05-02-45/single/microchip_pic18f452_mz_5x.jpg
+
+Converting mifare/classic/50x/top50x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/mifare/classic/50x/top50x.tif travis/2022-04-26_05-02-45/single/mifare_classic_50x.jpg
+
+Converting nintendo/cicnes6113b1/nescic_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/nintendo/cicnes6113b1/nescic_blended_fused.tif travis/2022-04-26_05-02-45/single/nintendo_cicnes6113b1_unk.jpg
+
+Converting nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/nintendo/cicnus6102/lowres/cicnus6102-lowres_blended_fused.tif travis/2022-04-26_05-02-45/single/nintendo_cicnus6102_lowres.jpg
+
+Converting nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/nintendo/dmg-01-cpu/top-5x/top5x_blended_fused.tif travis/2022-04-26_05-02-45/single/nintendo_dmg-01-cpu_mz_5x.jpg
+
+Converting nxp/lpc111x/top5x/top5x_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/nxp/lpc111x/top5x/top5x_blended_fused.tif travis/2022-04-26_05-02-45/single/nxp_lpc111x_mz_5x.jpg
+
+Converting nxp/lpc1343/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/nxp/lpc1343/top10x/top10x.tif travis/2022-04-26_05-02-45/single/nxp_lpc1343_mz_10x.jpg
+
+Converting nxp/tF1371C/top10x/tF1371C_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/nxp/tF1371C/top10x/tF1371C_blended_fused.tif travis/2022-04-26_05-02-45/single/nxp_tf1371c_mz_10x.jpg
+
+Converting raspberrypi/rp2b0-2020/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/raspberrypi/rp2b0-2020/top10x/top10x.tif travis/2022-04-26_05-02-45/single/raspberrypi_rp2b0-2020_mz_10x.jpg
+
+Converting stmicro/stm32f217/top5x/stm32f217-top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/stmicro/stm32f217/top5x/stm32f217-top5x.tif travis/2022-04-26_05-02-45/single/stmicro_stm32f217_mz_5x.jpg
+
+Converting stmicro/stm32f405/top5x/top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/stmicro/stm32f405/top5x/top5x.tif travis/2022-04-26_05-02-45/single/stmicro_stm32f405_mz_5x.jpg
+
+Converting stmicro/stm8l152/top10x/stm8l152-top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/stmicro/stm8l152/top10x/stm8l152-top10x.tif travis/2022-04-26_05-02-45/single/stmicro_stm8l152_mz_10x.jpg
+
+Converting tengen/rabbit/low/rabbit-top_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/tengen/rabbit/low/rabbit-top_blended_fused.tif travis/2022-04-26_05-02-45/single/tengen_rabbit_low.jpg
+
+Converting ti/cc430f6137/top5x/top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/cc430f6137/top5x/top5x.tif travis/2022-04-26_05-02-45/single/ti_cc430f6137_mz_5x.jpg
+
+Converting ti/cc430f6147/logo50x/logo50x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/cc430f6147/logo50x/logo50x.tif travis/2022-04-26_05-02-45/single/ti_cc430f6147_logo50x.jpg
+
+Converting ti/cc430f6147/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/cc430f6147/top10x/top10x.tif travis/2022-04-26_05-02-45/single/ti_cc430f6147_mz_10x.jpg
+
+Converting ti/msp430f417/lowres/pan_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f417/lowres/pan_blended_fused.tif travis/2022-04-26_05-02-45/single/ti_msp430f417_lowres.jpg
+
+Converting ti/msp430f449/logo50x/msp430f449-logo5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f449/logo50x/msp430f449-logo5x.tif travis/2022-04-26_05-02-45/single/ti_msp430f449_logo50x.jpg
+
+Converting ti/msp430f449/rom50x/rom50x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f449/rom50x/rom50x.tif travis/2022-04-26_05-02-45/single/ti_msp430f449_rom50x.jpg
+
+Converting ti/msp430f449/top5x/msp430f449-top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/msp430f449/top5x/msp430f449-top5x.tif travis/2022-04-26_05-02-45/single/ti_msp430f449_mz_5x.jpg
+
+Converting ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430frl152/layer1/rf430frl152-top_blended_fused.tif travis/2022-04-26_05-02-45/single/ti_rf430frl152_layer1.jpg
+
+Converting ti/rf430frl152/layer2/layer2_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430frl152/layer2/layer2_blended_fused.tif travis/2022-04-26_05-02-45/single/ti_rf430frl152_layer2.jpg
+
+Converting ti/rf430frl152/layer3/layer3_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430frl152/layer3/layer3_blended_fused.tif travis/2022-04-26_05-02-45/single/ti_rf430frl152_layer3.jpg
+
+Converting ti/rf430tal152/10x/top10_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/rf430tal152/10x/top10_blended_fused.tif travis/2022-04-26_05-02-45/single/ti_rf430tal152_10x.jpg
+
+Converting ti/tms320c10nl/top5x/top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320c10nl/top5x/top5x.tif travis/2022-04-26_05-02-45/single/ti_tms320c10nl_mz_5x.jpg
+
+Converting ti/tms320c25/top-5x/top_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320c25/top-5x/top_blended_fused.tif travis/2022-04-26_05-02-45/single/ti_tms320c25_mz_5x.jpg
+
+Converting ti/tms320f2810/top5x/top5x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320f2810/top5x/top5x.tif travis/2022-04-26_05-02-45/single/ti_tms320f2810_mz_5x.jpg
+
+Converting ti/tms320lc541b/logo/stripe.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320lc541b/logo/stripe.tif travis/2022-04-26_05-02-45/single/ti_tms320lc541b_logo.jpg
+
+Converting ti/tms320lc541b/lowres/stitched.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/ti/tms320lc541b/lowres/stitched.tif travis/2022-04-26_05-02-45/single/ti_tms320lc541b_lowres.jpg
+
+Converting waveshare/wsdia1/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/waveshare/wsdia1/top10x/top10x.tif travis/2022-04-26_05-02-45/single/waveshare_wsdia1_mz_10x.jpg
+
+Converting wch/ch32v103/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/wch/ch32v103/top10x/top10x.tif travis/2022-04-26_05-02-45/single/wch_ch32v103_mz_10x.jpg
+
+Converting wch/ch32v307/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/wch/ch32v307/top10x/top10x.tif travis/2022-04-26_05-02-45/single/wch_ch32v307_mz_10x.jpg
+
+Converting wch/ch340b/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/wch/ch340b/top10x/top10x.tif travis/2022-04-26_05-02-45/single/wch_ch340b_mz_10x.jpg
+
+Converting wch/wch340g/top10x/top10x.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/wch/wch340g/top10x/top10x.tif travis/2022-04-26_05-02-45/single/wch_wch340g_mz_10x.jpg
+
+Converting znation/z32h330/batch_blended_fused.tif...
+convert -quality 90 /home/mcmaster/buffer/ic/travis/goodchips2/znation/z32h330/batch_blended_fused.tif travis/2022-04-26_05-02-45/single/znation_z32h330_unk.jpg
+
+
+Glob rejected .ptos: 0
+
+Parse rejected images: 0
+
+Validate rejected images: 0
+
+Images ready: 50
