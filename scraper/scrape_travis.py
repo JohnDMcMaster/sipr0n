@@ -12,8 +12,10 @@ from sipr0n import util
 import subprocess
 import hashlib
 
+
 def load_completed_db():
     return set()
+
 
 def load_patches():
     return {
@@ -43,6 +45,7 @@ def load_patches():
             }
         }
     }
+
 
 def find_images(dir_in, patches, verbose=False):
     """
@@ -102,7 +105,9 @@ def find_images(dir_in, patches, verbose=False):
     # scream if two .ptos in the same dir
     found_dirs = set()
     for pto_path in sorted(Path(dir_in).rglob('*.pto')):
-        if 0 and str(pto_path) != "/home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic18f452/top5x/top5x.pto":
+        if 0 and str(
+                pto_path
+        ) != "/home/mcmaster/buffer/ic/travis/goodchips2/microchip/pic18f452/top5x/top5x.pto":
             continue
         print("")
         print(pto_path)
@@ -130,9 +135,10 @@ def find_images(dir_in, patches, verbose=False):
         else:
             dir_tifs = glob.glob(dir_path + "/*.tif")
             dir_tifs = [
-                x for x in dir_tifs if not os.path.basename(x).find("snap") == 0
+                x for x in dir_tifs
+                if not os.path.basename(x).find("snap") == 0
             ]
-    
+
             # Maybe a blended image?
             # take the blended if possible
             if len(dir_tifs) == 2:
@@ -150,7 +156,7 @@ def find_images(dir_in, patches, verbose=False):
                 # is second fused?
                 elif dir_tifs[1] == a:
                     del dir_tifs[1]
-    
+
             if len(dir_tifs) != 1:
                 fail("nok :( (too many images: %u)" % len(dir_tifs))
                 print(dir_tifs)
@@ -166,6 +172,7 @@ def find_images(dir_in, patches, verbose=False):
     for pto_fn, msg in noks.items():
         print("  %s: %s" % (pto_fn, msg))
     return ret, noks
+
 
 def parse_image(image_path):
     """
@@ -208,14 +215,11 @@ def parse_image(image_path):
         vendor = parts[0]
         chipid = parts[1]
         flavor = "_".join(parts[2:-1])
-
-
     """
     Now munge things like flavor to remove stitching terms if possible
     Also standardize top to mz
     This might result in collisions, so will take some care
     """
-    
     def replace_exact(s, src, dst):
         if s == src:
             return dst
@@ -244,8 +248,10 @@ def parse_images(dir_in, all_images, completed_images):
     ret = OrderedDict()
     ok = 0
     noks = {}
+
     def fail(msg):
         noks[mkrel(src_image)] = msg
+
     for src_image in all_images:
         src_image_rel = mkrel(src_image)
         if src_image_rel in completed_images:
@@ -274,7 +280,7 @@ def parse_images(dir_in, all_images, completed_images):
             "vendor": vendor,
             "chipid": chipid,
             "flavor": flavor,
-            }
+        }
         ok += 1
     print("")
     print("Finished name parse loop")
@@ -283,6 +289,7 @@ def parse_images(dir_in, all_images, completed_images):
     for pto_fn, msg in noks.items():
         print("  %s: %s" % (pto_fn, msg))
     return ret, noks
+
 
 def is_collision(entry):
     """
@@ -297,9 +304,11 @@ def is_collision(entry):
         elif get.status_code == 200:
             return True
         else:
-            raise Exception(f"{url}: is Not reachable, status_code: {get.status_code}")
+            raise Exception(
+                f"{url}: is Not reachable, status_code: {get.status_code}")
     except requests.exceptions.RequestException as e:
         raise Exception(f"{url}: is Not reachable \nErr: {e}")
+
 
 def sig_images(parsed, dir_in):
     """
@@ -313,6 +322,7 @@ def sig_images(parsed, dir_in):
         s = util.tostr(s)
         entry["sha1sum"] = s
 
+
 def validate_images(parsed):
     """
     Ensure images conform before uploading
@@ -322,9 +332,11 @@ def validate_images(parsed):
     noks = {}
     new_singles = set()
     for src_image, entry in parsed.items():
+
         def fail(msg):
             print("fail")
             noks[src_image] = msg
+
         print("")
         print(f"Checking {src_image}...")
         print(f"Checking {entry['single_fn']}...")
@@ -351,6 +363,7 @@ def validate_images(parsed):
         print("  %s: %s" % (pto_fn, msg))
     return noks
 
+
 def copy_images(parsed, dir_in, single_dir):
     for src_image, entry in parsed.items():
         print("")
@@ -362,12 +375,14 @@ def copy_images(parsed, dir_in, single_dir):
         print(cmd)
         subprocess.check_call(cmd, shell=True)
 
+
 def run(dir_in, verbose=False):
     dir_out = "travis"
     if not os.path.exists(dir_out):
         os.mkdir(dir_out)
     # Writing to travis/2022-04-25_18-25-35
-    subdir = datetime.datetime.utcnow().isoformat().replace("T", "_").replace(":", "-").split(".")[0]
+    subdir = datetime.datetime.utcnow().isoformat().replace("T", "_").replace(
+        ":", "-").split(".")[0]
     this_dir = dir_out + "/" + subdir
     os.mkdir(this_dir)
     _logger = util.make_iolog(this_dir + '/out.log')
@@ -379,7 +394,6 @@ def run(dir_in, verbose=False):
     os.mkdir(single_dir)
     os.mkdir(uploaded_dir)
 
-
     completed_images = load_completed_db()
     patches = load_patches()
     all_images, all_images_noks = find_images(dir_in, patches, verbose=verbose)
@@ -390,11 +404,28 @@ def run(dir_in, verbose=False):
     print("")
     validate_noks = validate_images(parsed)
 
-    open(this_dir + "/all_images.json", "w").write(json.dumps(all_images, sort_keys=True, indent=4, separators=(',', ': ')))
-    open(this_dir + "/all_images_noks.json", "w").write(json.dumps(all_images_noks, sort_keys=True, indent=4, separators=(',', ': ')))
-    open(this_dir + "/parsed.json", "w").write(json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': ')))
-    open(this_dir + "/parsed_noks.json", "w").write(json.dumps(parsed_noks, sort_keys=True, indent=4, separators=(',', ': ')))
-    open(this_dir + "/validate_noks.json", "w").write(json.dumps(validate_noks, sort_keys=True, indent=4, separators=(',', ': ')))
+    open(this_dir + "/all_images.json", "w").write(
+        json.dumps(all_images,
+                   sort_keys=True,
+                   indent=4,
+                   separators=(',', ': ')))
+    open(this_dir + "/all_images_noks.json", "w").write(
+        json.dumps(all_images_noks,
+                   sort_keys=True,
+                   indent=4,
+                   separators=(',', ': ')))
+    open(this_dir + "/parsed.json", "w").write(
+        json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': ')))
+    open(this_dir + "/parsed_noks.json", "w").write(
+        json.dumps(parsed_noks,
+                   sort_keys=True,
+                   indent=4,
+                   separators=(',', ': ')))
+    open(this_dir + "/validate_noks.json", "w").write(
+        json.dumps(validate_noks,
+                   sort_keys=True,
+                   indent=4,
+                   separators=(',', ': ')))
 
     copy_images(parsed, dir_in, single_dir)
 

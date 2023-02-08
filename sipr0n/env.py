@@ -13,6 +13,7 @@ ARCHIVE_WIKI_DIR = None
 ARCHIVE_TOOL_DIR = None
 SIMAPPER_USER_DIR = None
 SIPAGER_USER_DIR = None
+SIMAPPER_TMP_DIR = "/tmp/simapper"
 
 
 def setup_env(dev=False, remote=False):

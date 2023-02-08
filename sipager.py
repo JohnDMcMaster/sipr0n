@@ -52,11 +52,34 @@ import traceback
 import tarfile
 
 import img2doku
-from util import parse_vendor_chipid_flavor, parse_user_vendor_chipid_flavor, ParseError
+from sipr0n.util import parse_wiki_image_user_vcufe, ParseError
+from sipr0n.util import validate_username
 import simapper
 from simapper import print_log_break
-from util import validate_username
-import env
+from sipr0n import env
+from test_hash import fn
+from sipr0n.util import FnRetry
+
+DEL_ON_DONE = False
+
+fn_retry = FnRetry()
+
+
+def file_completed(src_fn):
+    """
+    Archive a file that was completed
+    """
+
+    done_dir = os.path.dirname(src_fn) + "/done"
+    if not os.path.exists(done_dir):
+        os.mkdir(done_dir)
+    if DEL_ON_DONE:
+        print("Deleting local file %s => %s" % (src_fn, ))
+        os.unlink(src_fn)
+    else:
+        dst_fn = done_dir + "/" + os.path.basename(src_fn)
+        print("Archiving local file %s => %s" % (src_fn, dst_fn))
+        shutil.move(src_fn, dst_fn)
 
 
 def shift_done(page):
@@ -151,23 +174,7 @@ def process(page):
     shift_done(page)
 
 
-failed_upload_files = set()
-
-
-def file_completed(src_fn):
-    """
-    Archive a file that was completed
-    """
-
-    done_dir = os.path.dirname(src_fn) + "/done"
-    if not os.path.exists(done_dir):
-        os.mkdir(done_dir)
-    dst_fn = done_dir + "/" + os.path.basename(src_fn)
-    print("Archiving local file %s => %s" % (src_fn, dst_fn))
-    shutil.move(src_fn, dst_fn)
-
-
-def extract_archives(scrape_dir, assume_user):
+def extract_archives(scrape_dir, assume_user, verbose=False):
     """
     Extract archives into current dir
 
@@ -177,48 +184,49 @@ def extract_archives(scrape_dir, assume_user):
     """
     def conforming_name(fn):
         try:
-            _parsed = parse_assume_user(fn, assume_user=assume_user)
+            _parsed = parse_wiki_image_user_vcufe(fn, assume_user=assume_user)
         except ParseError:
             return False
         return True
 
     for fn_glob in glob.glob(scrape_dir + "/*.tar"):
-        tar = tarfile.open(fn_glob, "r")
-        print("tar: examining %s" % (fn_glob, ))
+        tar_fn = os.path.realpath(fn_glob)
+        tar = tarfile.open(tar_fn, "r")
+
+        if not fn_retry.try_fn(tar):
+            verbose and print("Ignoring tried: " + tar)
+            continue
+
+        print("tar: examining %s" % (tar_fn, ))
+        fn_cache = set()
         try:
             for tarinfo in tar:
                 if not tarinfo.isreg():
                     if not tarinfo.isdir():
                         print("  WARNING: unrecognized tar element: %s" %
                               (str(tarinfo), ))
-                    continue
+                    raise ParseError()
 
                 basename = os.path.basename(tarinfo.name).lower()
                 if not conforming_name(basename):
                     print("  WARNING: bad image file name within archive: %s" %
                           (tarinfo.name, ))
-                    continue
+                    raise ParseError()
 
                 fn_out = scrape_dir + "/" + basename
+                fn_cache.add(fn_out)
                 with open(fn_out, "wb") as f:
                     print("  writing %s" % (fn_out))
                     f.write(tar.extractfile(tarinfo).read())
 
             # Extracted: trash it
-            file_completed(fn_glob)
+            file_completed(tar_fn)
+        except ParseError:
+            print("WARNING: aborted tar on parse error")
+            for fn in fn_cache:
+                os.unlink(fn)
         finally:
             tar.close()
-
-
-def parse_assume_user(fn_can, assume_user):
-    if assume_user:
-        parsed = parse_vendor_chipid_flavor(fn_can)
-        basename, vendor, chipid, flavor, ext = parsed
-        user = assume_user
-    else:
-        parsed = parse_user_vendor_chipid_flavor(fn_can)
-        basename, user, vendor, chipid, flavor, ext = parsed
-    return (basename, user, vendor, chipid, flavor, ext)
 
 
 def bucket_image_dir(scrape_dir, assume_user=None, verbose=False):
@@ -249,16 +257,18 @@ def bucket_image_dir(scrape_dir, assume_user=None, verbose=False):
     ret = {}
     for fn_glob in glob.glob(scrape_dir + "/*"):
         fn_can = os.path.realpath(fn_glob)
+        if not fn_retry.try_fn(fn):
+            continue
+
         basename = os.path.basename(fn_can)
         if basename == "done" or os.path.isdir(fn_can):
             continue
         verbose and print("Checking file " + fn_can)
         try:
-            basename, user, vendor, chipid, flavor, ext = parse_assume_user(
-                fn_can.lower(), assume_user)
+            vendor, chipid, user, flavor, ext = parse_wiki_image_user_vcufe(
+                fn_can.lower(), assume_user=assume_user)
         except ParseError:
             print("Bad image file name: %s" % (fn_can, ))
-            failed_upload_files.add(fn_can)
             continue
         k = "%s:%s:%s" % (user, vendor, chipid)
         print("Parsed %s => %s" % (fn_can, k))
@@ -364,7 +374,7 @@ def scrape_upload_dir_outer(verbose=False, dev=False):
         fn_can = os.path.realpath(glob_dir)
         if not os.path.isdir(fn_can):
             continue
-        if fn_can in failed_upload_files:
+        if fn_retry.should_try_fn(fn_can):
             continue
         basename = os.path.basename(fn_can)
         if basename == "done":
@@ -372,7 +382,7 @@ def scrape_upload_dir_outer(verbose=False, dev=False):
         user = basename
 
         if not validate_username(user):
-            failed_upload_files.add(fn_can)
+            fn_retry.blacklist_fn(fn_can)
             print("Invalid user name: %s" % user)
             continue
         scrape_upload_dir_inner(glob_dir, verbose=verbose, assume_user=user)

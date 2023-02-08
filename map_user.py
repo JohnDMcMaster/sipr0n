@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-import os
-import re
-import errno
 import subprocess
 import datetime
 import img2doku
-import shutil
-import env
+from sipr0n import env
 
 
 def default_copyright(user):

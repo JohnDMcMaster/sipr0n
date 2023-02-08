@@ -2,21 +2,23 @@
 
 import os
 import glob
-import urllib.request
 import shutil
 import subprocess
 import time
 import traceback
 import map_user
-import env
+from sipr0n import env
+from sipr0n.util import FnRetry
 
 import img2doku
-from util import parse_image_name, validate_username
+from sipr0n.util import parse_map_image_user_vcufe, validate_username, map_image_uvcfe_to_basename
 
 STATUS_DONE = "Done"
 STATUS_PENDING = "Pending"
 STATUS_ERROR = "Error"
 STATUS_COLLISION = "Collision"
+
+fn_retry = FnRetry()
 
 
 def get_user_page(user):
@@ -76,15 +78,10 @@ def process(entry):
     print("")
     print(entry)
     print("Validating URL file name...")
-    source_fn = entry.get("local_fn") or entry["url"]
-    url_check = entry.get("force_name") or source_fn
-    print("Parsing raw URL: %s" % (url_check, ))
-    # Patch up case errors server side
-    url_check = url_check.lower()
-    # Allow query strings at end (ex: for filebin)
-    url_check = url_check.split("?")[0]
-    print("Parsing simplified URL: %s" % (url_check, ))
-    fnbase, vendor, chipid, flavor = parse_image_name(url_check)
+    vendor, chipid, user, flavor, ext = parse_map_image_user_vcufe(
+        entry["local_fn"], assume_user=entry["user"])
+    dst_basename = map_image_uvcfe_to_basename(vendor, chipid, user, flavor,
+                                               ext)
 
     if not validate_username(entry["user"]):
         print("Invalid user name: %s" % entry["user"])
@@ -105,8 +102,8 @@ def process(entry):
     )
     chipid_dir = env.MAP_DIR + "/" + vendor + "/" + chipid
     single_dir = env.MAP_DIR + "/" + vendor + "/" + chipid + "/single"
-    single_fn = env.MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + fnbase
-    map_fn = env.MAP_DIR + "/%s/%s/%s" % (vendor, chipid, flavor)
+    single_fn = env.MAP_DIR + "/" + vendor + "/" + chipid + "/single/" + dst_basename
+    map_fn = env.MAP_DIR + "/%s/%s/%s_%s" % (vendor, chipid, user, flavor)
     print("Checking %s...." % single_fn)
     if os.path.exists(single_fn):
         print("Collision (single): %s" % single_fn)
@@ -139,16 +136,8 @@ def process(entry):
             os.mkdir(single_dir)
 
         print("Fetching file...")
-        if "local_fn" in entry:
-            print("Local copy %s => %s" % (entry["local_fn"], single_fn))
-            shutil.copy(entry["local_fn"], single_fn)
-        else:
-            print("Downloading %s => %s" % (entry["url"], single_fn))
-            with urllib.request.urlopen(entry["url"]) as response:
-                # Note: this fixes case issue as we explicitly set output case lower
-                ftmp = open(single_fn, "wb")
-                shutil.copyfileobj(response, ftmp)
-                ftmp.close()
+        print("Local copy %s => %s" % (entry["local_fn"], single_fn))
+        shutil.copy(entry["local_fn"], single_fn)
 
         # Sanity check its image file / multimedia
         # Mostly intended for failing faster on HTML in non-direct link
@@ -206,12 +195,9 @@ def mk_entry(status="", user=None, force_name=None, url=None, local_fn=None):
 
 
 def print_log_break():
-    for _ in range(6):
+    for _i in range(6):
         print("")
     print("*" * 78)
-
-
-tried_upload_files = set()
 
 
 def scrape_upload_dir(once=False, dev=False, verbose=False):
@@ -226,22 +212,23 @@ def scrape_upload_dir(once=False, dev=False, verbose=False):
     verbose and print("Scraping upload dir")
     change = False
     for user_dir in glob.glob(env.SIMAPPER_DIR + "/*"):
-        if user_dir in tried_upload_files:
+        user_dir = os.path.realpath(user_dir)
+        if not fn_retry.should_try_fn(user_dir):
             verbose and print("Ignoring tried: " + user_dir)
             continue
 
         try:
             if not os.path.isdir(user_dir):
                 verbose and print("Ignoring not a dir: " + user_dir)
-                tried_upload_files.add(user_dir)
+                fn_retry.blacklist_fn(user_dir)
                 raise Exception("unexpected file " + user_dir)
             user = os.path.basename(user_dir)
             verbose and print("Checking user dir " + user_dir)
             for im_fn in glob.glob(user_dir + "/*"):
-                if im_fn in tried_upload_files:
+                im_fn = os.path.realpath(im_fn)
+                if not fn_retry.try_fn(im_fn):
                     verbose and print("Already tried: " + im_fn)
                     continue
-                tried_upload_files.add(im_fn)
                 # Ignore done dir
                 if not os.path.isfile(im_fn):
                     verbose and print("Not a file " + im_fn)
@@ -265,28 +252,31 @@ def run(once=False, dev=False, remote=False, verbose=False):
 
     # assert getpass.getuser() == "www-data"
 
-    # if not os.path.exists(TMP_DIR):
-    #    os.mkdir(TMP_DIR)
+    shutil.rmtree(env.SIMAPPER_TMP_DIR, ignore_errors=True)
+    os.mkdir(env.SIMAPPER_TMP_DIR)
 
-    print("Running")
-    iters = 0
-    while True:
-        iters += 1
-        if iters > 1 and once:
-            print("Break on test mode")
-            break
-        # Consider select() / notify instead
-        if iters > 1:
-            time.sleep(3)
+    try:
+        print("Running")
+        iters = 0
+        while True:
+            iters += 1
+            if iters > 1 and once:
+                print("Break on test mode")
+                break
+            # Consider select() / notify instead
+            if iters > 1:
+                time.sleep(3)
 
-        try:
-            scrape_upload_dir(once=once, dev=dev)
-        except Exception as e:
-            print("WARNING: exception: %s" % (e, ))
-            if once:
-                raise
-            else:
-                traceback.print_exc()
+            try:
+                scrape_upload_dir(once=once, dev=dev)
+            except Exception as e:
+                print("WARNING: exception: %s" % (e, ))
+                if once:
+                    raise
+                else:
+                    traceback.print_exc()
+    finally:
+        shutil.rmtree(env.SIMAPPER_TMP_DIR, ignore_errors=True)
 
 
 def main():
