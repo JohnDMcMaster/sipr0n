@@ -22,7 +22,7 @@ def parse_fn_uvc(fn):
         chipid = m.group(3)
     else:
         # Otherwise just use the username
-        m = re.search(r'data/pages/([a-z0-9\-]+)/', fn)
+        m = re.search(r'data/pages/([_a-z0-9\-]+)/', fn)
         if not m:
             raise Exception("Non-confirming file name: %s" % (fn, ))
         user = m.group(1)
@@ -32,7 +32,7 @@ def parse_fn_uvc(fn):
 
 
 def parse_map_url_vc(url):
-    m = re.search(r'siliconpr0n.org/map/([a-z0-9\-]+)/([a-z0-9\-]+)/', url)
+    m = re.search(r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/', url)
     if not m:
         raise Exception("Non-confirming file name: %s" % (url, ))
     vendor = m.group(1)
@@ -42,7 +42,7 @@ def parse_map_url_vc(url):
 
 def parse_single_url_vc(url):
     m = re.search(
-        r'siliconpr0n.org/map/([a-z0-9\-]+)/([a-z0-9\-]+)/single/([a-z0-9\-]+)_([a-z0-9\-]+)',
+        r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/single/([a-z0-9\-]+)_([a-z0-9\-]+)',
         url)
     if not m:
         raise Exception("Non-confirming file name: %s" % (url, ))
@@ -51,6 +51,10 @@ def parse_single_url_vc(url):
     vendor = m.group(3)
     chipid = m.group(4)
     return (vendor, chipid)
+
+
+class Mismatch(Exception):
+    pass
 
 
 def run_page(fn, dry=False):
@@ -99,27 +103,58 @@ def run_page(fn, dry=False):
         map_vendor, map_chipid = parse_map_url_vc(url)
         if page_vendor and page_chipid:
             if (page_vendor, page_chipid) != (map_vendor, map_chipid):
-                print("Page based:", page_vendor, page_chipid)
-                print("/map based:", map_vendor, map_chipid)
-                raise Exception("Unexpected URL")
+                print("    ERROR: vc mismatch")
+                print("    Page based:")
+                print("       vendor:   ", page_vendor)
+                print("       chipid:   ", page_chipid)
+                print(
+                    f"      https://siliconpr0n.org/archive/doku.php?id={user}:{page_vendor}:{page_chipid}"
+                )
+                print(
+                    f"      cd /var/www/archive/data/pages/{user}/{page_vendor}"
+                )
+                print("    /map based:")
+                print("       vendor:   ", map_vendor)
+                print("       chipid:   ", map_chipid)
+                print(f"      cd /var/www/map/{map_vendor}/{map_chipid}")
+                raise Mismatch("Unexpected URL")
         vendor = map_vendor
         chipid = map_chipid
+        vendor_new = vendor.replace("_", "-")
+        chipid_new = chipid.replace("_", "-")
+        if vendor != vendor_new or chipid != chipid_new:
+            print("    munge old: %s %s" % (vendor, chipid))
+            print("    munge new: %s %s" % (vendor_new, chipid_new))
 
         if "/single/" in url:
             single_vendor, single_chipid = parse_single_url_vc(url)
             if (vendor, chipid) != (single_vendor, single_chipid):
-                print("Page based:   ", vendor, chipid)
-                print("/single based:", single_vendor, single_chipid)
-                raise Exception("Unexpected URL")
+                print("    ERROR: vc mismatch")
+                print("    Page based:")
+                print("       vendor:   ", page_vendor)
+                print("       chipid:   ", page_chipid)
+                print(
+                    f"      https://siliconpr0n.org/archive/doku.php?id={user}:{page_vendor}:{page_chipid}"
+                )
+                print(
+                    f"      cd /var/www/archive/data/pages/{user}/{page_vendor}"
+                )
+                print("    /single based:")
+                print("       vendor:   ", single_vendor)
+                print("       chipid:   ", single_chipid)
+                print(
+                    f"      cd /var/www/map/{single_vendor}/{single_chipid}/single"
+                )
+                raise Mismatch("Unexpected URL")
 
             r1 = f"single/{vendor}_{chipid}"
-            r2 = f"single/{vendor}_{chipid}_{user}"
+            r2 = f"single/{vendor_new}_{chipid_new}_{user}"
             new = url.replace(r1, r2)
         else:
             # should end in /
             assert re.match("https?://siliconpr0n.org/map/.+/", url)
             new = url.replace(f"{vendor}/{chipid}/",
-                              f"{vendor}/{chipid}/{user}_")
+                              f"{vendor_new}/{chipid_new}/{user}_")
         old1 = str(txt)
         print("    Old", url)
         print("    New", new)
@@ -167,15 +202,18 @@ def run(fndir, dry=False, ignore_errors=False):
                 try:
                     npages += 1
                     run_page(path, dry=dry)
-                except:
+                except Exception as e:
                     errors += 1
                     if ignore_errors:
-                        traceback.print_exc()
+                        if type(e) is Mismatch:
+                            pass
+                        else:
+                            traceback.print_exc()
                     else:
                         raise
-            print("Users: %u" % nusers)
-            print("Pages: %u" % npages)
-            print("Errors: %u" % errors)
+        print("Users: %u" % nusers)
+        print("Pages: %u" % npages)
+        print("Errors: %u" % errors)
 
 
 def main():
