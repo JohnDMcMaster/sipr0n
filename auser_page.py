@@ -13,7 +13,10 @@ def parse_fn_uvc(fn):
     Canonical name like
     vendor_chipid_user_flavor.ext
     """
+    if fn.lower() != fn:
+        raise Exception("Found uppercase in fn: %s" % (fn, ))
     # Normalize if a canonical path was given
+    # Suggested but not required schema
     m = re.search(r'data/pages/([a-z0-9\-]+)/([a-z0-9\-]+)/([a-z0-9\-]+).txt',
                   fn)
     if m:
@@ -24,7 +27,7 @@ def parse_fn_uvc(fn):
         # Otherwise just use the username
         m = re.search(r'data/pages/([_a-z0-9\-]+)/', fn)
         if not m:
-            raise Exception("Non-confirming file name: %s" % (fn, ))
+            raise Exception("Non-confirming .txt file name: %s" % (fn, ))
         user = m.group(1)
         vendor = None
         chipid = None
@@ -32,9 +35,11 @@ def parse_fn_uvc(fn):
 
 
 def parse_map_url_vc(url):
+    if url.lower() != url:
+        raise Exception("Found uppercase in URL: %s" % (url, ))
     m = re.search(r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/', url)
     if not m:
-        raise Exception("Non-confirming file name: %s" % (url, ))
+        raise Exception("Non-confirming map URL file name: %s" % (url, ))
     vendor = m.group(1)
     chipid = m.group(2)
     return (vendor, chipid)
@@ -159,7 +164,9 @@ def run_page(fn, dry=False):
         print("    Old", url)
         print("    New", new)
         txt = txt.replace(url, new)
-        assert old1 != txt
+        if old1 == txt:
+            print("    Replace failed :(")
+            raise Exception("Replace failed :(")
 
     if not has_url:
         print("  SKIP: no URLs")
