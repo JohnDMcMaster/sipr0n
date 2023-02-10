@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+annotate .txt files under /map with the new scheme
+by updating URLs
+"""
 
 import shutil
 import re
@@ -180,7 +184,11 @@ def run_page(fn, dry=False):
                 print("")
                 print(txt)
         else:
+            print("  Shifting...")
             shutil.move(fn, fn + ".nouser")
+            print("  Committing...")
+            with open(fn, "w") as f:
+                f.write(txt)
 
 
 def run(fndir, dry=False, ignore_errors=False):

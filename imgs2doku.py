@@ -7,6 +7,7 @@ import os
 import re
 import errno
 import subprocess
+from sipr0n.util import parse_map_image_vcufe
 
 
 # https://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
@@ -20,17 +21,6 @@ def mkdir_p(path):
             raise
 
 
-def parse_image_name(fn):
-    m = re.match(r'([A-Za-z0-9-]+)_([A-Za-z0-9-]+)_(.*).jpg',
-                 os.path.basename(fn))
-    if not m:
-        raise Exception("Bad file name: %s" % (fn, ))
-    vendor = m.group(1)
-    chipid = m.group(2)
-    flavor = m.group(3)
-    return (vendor, chipid, flavor)
-
-
 def index_image_dir(dir_in):
     """Return dict as ret[vendor][chipid][flavor] = file_name"""
     images = []
@@ -42,7 +32,7 @@ def index_image_dir(dir_in):
 
     vendors = {}
     for image in images:
-        vendor, chipid, flavor = parse_image_name(image)
+        vendor, chipid, user, flavor, e = parse_map_image_vcufe(image)
         vendorm = vendors.setdefault(vendor, {})
         chipidm = vendorm.setdefault(chipid, {})
         chipidm[flavor] = image

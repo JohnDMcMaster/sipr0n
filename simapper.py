@@ -9,6 +9,7 @@ import traceback
 import map_user
 from sipr0n import env
 from sipr0n.util import FnRetry
+import json
 
 import img2doku
 from sipr0n.util import parse_map_image_user_vcufe, validate_username, map_image_uvcfe_to_basename
@@ -72,6 +73,36 @@ def shift_done(entry):
     dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
     print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
     shutil.move(entry["local_fn"], dst_fn)
+
+
+def map_manifest_add_file(basedir, fn, collection, type_):
+    """
+    JSON with explicit copyright information
+    """
+    assert type_ in ("image", "map")
+    jfn = os.path.join(basedir, ".manfiest")
+    if os.path.exists(jfn):
+        j = json.load(open(jfn))
+    else:
+        j = {
+            "files": {},
+        }
+
+    if fn[0] == "/":
+        raise ValueError("Require relative path")
+    j["files"][fn] = {
+        "collection": collection,
+        "type": type_,
+    }
+
+    # Be really careful not to corrupt records
+    json.dump(j,
+              open(jfn + ".tmp", "w"),
+              sort_keys=True,
+              indent=4,
+              separators=(',', ': '))
+    shutil.move(jfn, jfn + ".old")
+    shutil.move(jfn + ".tmp", jfn)
 
 
 def process(entry):
@@ -138,6 +169,11 @@ def process(entry):
         print("Fetching file...")
         print("Local copy %s => %s" % (entry["local_fn"], single_fn))
         shutil.copy(entry["local_fn"], single_fn)
+        single_rel = "single/" + os.path.basename(single_fn)
+        map_manifest_add_file(basedir=chipid_dir,
+                              fn=single_rel,
+                              collection=user,
+                              type_="image")
 
         # Sanity check its image file / multimedia
         # Mostly intended for failing faster on HTML in non-direct link
@@ -169,6 +205,12 @@ def process(entry):
         entry["map"] = map_chipid_url
         entry["wiki"] = wiki_url
         log_simapper_update(entry)
+
+        map_rel = os.path.basename(map_chipid_url)
+        map_manifest_add_file(basedir=chipid_dir,
+                              fn=map_rel,
+                              collection=user,
+                              type_="map")
 
         if "local_fn" in entry:
             shift_done(entry)
