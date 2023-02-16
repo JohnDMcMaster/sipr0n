@@ -12,6 +12,10 @@ from sipr0n import metadata
 from sipr0n import env
 
 
+class CustomPage(Exception):
+    pass
+
+
 def html2meta(txt):
     # auto generated
     # Make some assumptions how its formatted
@@ -21,6 +25,12 @@ def html2meta(txt):
             continue
         js = l.strip().replace("initViewer(", "").replace(");", "")
         return json.loads(js)
+    # A special custom page
+    # /var/www/map/mos/6581r3/vec-a/index.html
+    # print a warning and move on
+    if "SiProjection" in txt:
+        raise CustomPage()
+
     raise ValueError("unexpected page")
 
 
@@ -44,12 +54,22 @@ def guess_collection(person_cc, copyright_db):
 
 
 def run_page(fn, meta, copyright_db):
-    pagej = html2meta(open(fn).read())
+    custom = False
+    try:
+        pagej = html2meta(open(fn).read())
+    except CustomPage:
+        print("  WARNING: custom page")
+        pagej = None
+        custom = True
+
     # Stack overflow argues this isn't proper but seems to work well enough
     file_year = datetime.datetime.fromtimestamp(os.path.getctime(fn)).year
-    # "copyright": "&copy; 2022 Travis Goodspeed, CC0"}]
-    # "copyright": ""
-    map_copyright = pagej["layers"][0].get("copyright", "")
+
+    map_copyright = None
+    if pagej:
+        # "copyright": "&copy; 2022 Travis Goodspeed, CC0"}]
+        # "copyright": ""
+        map_copyright = pagej["layers"][0].get("copyright", "")
 
     parsed_year = None
     parsed_collection = None
@@ -93,6 +113,9 @@ def run_page(fn, meta, copyright_db):
         metaj["map_copyright_year"] = parsed_year
     if parsed_collection:
         metaj["collection"] = parsed_collection
+    # Flag for review
+    if custom:
+        metaj["custom_map"] = True
 
 
 def run(fndir=None, fn_out=None, ignore_errors=False):
