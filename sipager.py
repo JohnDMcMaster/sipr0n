@@ -57,7 +57,6 @@ from sipr0n.util import validate_username
 import simapper
 from simapper import print_log_break
 from sipr0n import env
-from test_hash import fn
 from sipr0n.util import FnRetry
 
 DEL_ON_DONE = True
@@ -257,7 +256,7 @@ def bucket_image_dir(scrape_dir, assume_user=None, verbose=False):
     ret = {}
     for fn_glob in glob.glob(scrape_dir + "/*"):
         fn_can = os.path.realpath(fn_glob)
-        if not fn_retry.try_fn(fn):
+        if not fn_retry.try_fn(fn_can):
             continue
 
         basename = os.path.basename(fn_can)
