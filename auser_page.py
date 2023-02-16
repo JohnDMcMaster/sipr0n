@@ -11,6 +11,7 @@ import glob
 from pathlib import Path
 import traceback
 from sipr0n import util
+from sipr0n import env
 
 
 def parse_page_fn_uvc(fn):
@@ -171,11 +172,15 @@ def run_page(fn, dry=False):
                 f.write(txt)
 
 
-def run(fndir, dry=False, ignore_errors=False):
-    if ".txt" in fndir:
+def run(fndir, dry=True, ignore_errors=False):
+    env.setup_env_default()
+
+    if fndir:
+        assert ".txt" in fndir
         assert os.path.isfile(fndir)
         run_page(fndir, dry=dry)
     else:
+        fndir = env.WWW_DIR + "/archive/data/pages"
         assert "data/pages" in fndir
         assert os.path.basename(fndir) == "pages"
         errors = 0
@@ -218,7 +223,7 @@ def main():
         description="Rewrite a page to point to new URL scheme")
     util.add_bool_arg(parser, "--dry", default=True)
     parser.add_argument("--ignore-errors", action="store_true")
-    parser.add_argument("fndir")
+    parser.add_argument("--fndir")
     args = parser.parse_args()
     run(args.fndir, dry=args.dry, ignore_errors=args.ignore_errors)
 

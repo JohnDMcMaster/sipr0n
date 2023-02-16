@@ -43,14 +43,48 @@ def guess_collection(person_cc, copyright_db):
     | marmontel     | Boris Marmontel, CC BY 4.0                                     |       |
     | nico          | nico <xxx@xxx.net>, CC BY 3.0     
     """
-    person_cc = person_cc.split(",")[0].split("CC")[0]
-    print("Guessing:", person_cc)
-    if person_cc == "FIXME" or not person_cc:
+    person_cc = person_cc.split(",")[0].split("CC")[0].lower()
+    print("  Guessing:", person_cc)
+    if person_cc == "FIXME" or not person_cc or person_cc == "None" or person_cc == "none":
         return None
     for this_collection, cstr in copyright_db.items():
+        this_collection = this_collection.lower()
+        cstr = cstr.lower()
         cstr = cstr.split(",")[0].split("CC")[0]
         if person_cc == cstr:
             return this_collection
+
+    if "travis" in person_cc:
+        return "goodspeed"
+    if "texplained" in person_cc:
+        return "texplained"
+    if "digshadow" in person_cc:
+        return "mcmaster"
+    if "caps0ff" in person_cc:
+        return "caps0ff"
+    if "gerlinsky" in person_cc:
+        return "gerlinsky"
+    if "nats" in person_cc:
+        return "nats"
+    if "furrtek" in person_cc:
+        return "furrtek"
+    if "whitequark" in person_cc:
+        return "whitequark"
+    if "shirriff" in person_cc:
+        return "shirriff"
+    if "lempinen" in person_cc:
+        return "lempinen"
+    if "riddle" in person_cc:
+        return "sean"
+    if "decap" in person_cc:
+        return "drdecap"
+    if "nico" in person_cc:
+        return "nico"
+    if "ogoun" in person_cc:
+        return "ogun"
+
+    print(f"  WARNING: failed to guess copyright: {person_cc}")
+    return None
 
 
 def run_page(fn, meta, copyright_db):
@@ -96,7 +130,7 @@ def run_page(fn, meta, copyright_db):
             else:
                 print(map_copyright)
                 assert 0
-        print("collection", parsed_collection, "from", map_copyright)
+        print("  collection", parsed_collection, "from", map_copyright)
 
     # www/map/wch/wch340g/mz_10x/index.html => mz_10x
     map_dir = os.path.basename(os.path.dirname(fn))

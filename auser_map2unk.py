@@ -42,6 +42,9 @@ def run(mapdir, dry=False, ignore_errors=False):
     assert os.path.basename(mapdir) == "map"
     for vendor_dir in sorted(os.listdir(mapdir)):
         vendor_dir = os.path.join(mapdir, vendor_dir)
+        if not os.path.isdir(vendor_dir):
+            print("Skip special", vendor_dir)
+            continue
         for chipid_dir in sorted(os.listdir(vendor_dir)):
             print("Check", chipid_dir)
             chipid_dir = os.path.join(vendor_dir, chipid_dir)
@@ -60,7 +63,10 @@ def run(mapdir, dry=False, ignore_errors=False):
                         print("    Skip .thumb")
                         continue
                     fn_orig = os.path.join(single_dir, base_fn)
-                    if not ".jpg" in fn_orig and not ".tif" in fn_orig and not ".png" in fn_orig:
+                    if not os.path.isfile(fn_orig):
+                        print("    Skip dir")
+                        continue
+                    if not ".jpg" in fn_orig and not ".tif" in fn_orig and not ".png" in fn_orig and not ".xcf" in fn_orig:
                         raise ValueError("Unexpected fn %s" % fn_orig)
                     base_fn_new = single_fn_add_user(base_fn,
                                                      collection=new_collection)

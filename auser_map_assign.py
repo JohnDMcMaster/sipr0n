@@ -61,6 +61,7 @@ def match_db_entry(db, vendor, chipid, basename, type_):
     elif len(ret) == 1:
         return ret[0]
     else:
+        print(ret)
         raise Exception("too many matches")
 
 
@@ -80,8 +81,9 @@ def collection_assign_map(url, archive_db=None, map_db=None):
         # Want to see how many mismatch
         # But in general suggest keeping archive as canonical if need automatic resolution
         if map_c and map_c != archive_c:
-            print(map_c, archive_c)
-            raise Exception("mismatch")
+            print("  WARNING: collection mismatch")
+            print(f"    /map:     {map_c}")
+            print(f"    /archive: {archive_c}")
         ret = map_entry
     elif archive_entry is not None:
         # All archive entries should be attributed
@@ -94,7 +96,8 @@ def collection_assign_map(url, archive_db=None, map_db=None):
     # Use copyright string if given, otherwise file timestamp
     if ret.get("map_copyright_year"):
         ret["copyright_year"] = ret["map_copyright_year"]
-    else:
+    # hmm obscure failure on here w/
+    elif "file_year" in ret:
         ret["copyright_year"] = ret["file_year"]
     return ret
 
@@ -173,6 +176,9 @@ def run(archive_db=None, map_db=None, dry=False, ignore_errors=False):
     assert os.path.basename(mapdir) == "map"
     for vendor_dir in sorted(os.listdir(mapdir)):
         vendor_dir = os.path.join(mapdir, vendor_dir)
+        if not os.path.isdir(vendor_dir):
+            print("skip non-dir", vendor_dir)
+            continue
         for chipid_dir in sorted(os.listdir(vendor_dir)):
             print("")
             chipid_dir = os.path.join(vendor_dir, chipid_dir)
@@ -183,24 +189,27 @@ def run(archive_db=None, map_db=None, dry=False, ignore_errors=False):
                 for base_fn in sorted(os.listdir(single_dir)):
                     print(f"Found single/{base_fn}")
                     fn_orig = os.path.join(single_dir, base_fn)
+                    if not os.path.isfile(fn_orig):
+                        print("  skip non-file")
+                        continue
                     if ".thumb" in base_fn:
                         # Instead of fixing thumbnails, just regenerate them
                         print(f"  rm {fn_orig}")
                         if not dry:
                             os.unlink(fn_orig)
                     else:
-                        if not ".jpg" in fn_orig and not ".tif" in fn_orig and not ".png" in fn_orig:
+                        if not ".jpg" in fn_orig and not ".tif" in fn_orig and not ".png" in fn_orig and not ".xcf" in fn_orig:
                             raise ValueError("Unexpected fn %s" % fn_orig)
                         new_meta = collection_assign_single(
                             base_fn, archive_db=archive_db, map_db=map_db)
-                        if "copyright_year" not in new_meta:
-                            file_year = datetime.datetime.fromtimestamp(
-                                os.path.getctime(fn_orig)).year
-                            new_meta["copyright_year"] = file_year
-                            print(f"  Detect file year {file_year}")
                         if not new_meta:
                             print("  Completely failed to assign :(")
                         else:
+                            if "copyright_year" not in new_meta:
+                                file_year = datetime.datetime.fromtimestamp(
+                                    os.path.getctime(fn_orig)).year
+                                new_meta["copyright_year"] = file_year
+                                print(f"  Detect file year {file_year}")
                             new_collection = new_meta.get("collection")
                             if not new_collection:
                                 print("  Matched w/o collection :(")
