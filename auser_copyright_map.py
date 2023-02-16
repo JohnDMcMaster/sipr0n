@@ -62,13 +62,20 @@ def run_page(fn, meta, copyright_db):
             map_copyright = "&copy; " + map_copyright
 
         m = re.match(r"&copy; ([0-9]+) (.+)", map_copyright)
-        if not m:
-            print(map_copyright)
-            assert 0
         if m:
             parsed_year = int(m.group(1))
             person_cc = m.group(2)
             parsed_collection = guess_collection(person_cc, copyright_db)
+        else:
+            # &copy;  Travis Goodspeed, CC0
+            # uggghhh
+            m = re.match(r"&copy; (.+)", map_copyright)
+            if m:
+                person_cc = m.group(1)
+                parsed_collection = guess_collection(person_cc, copyright_db)
+            else:
+                print(map_copyright)
+                assert 0
         print("collection", parsed_collection, "from", map_copyright)
 
     # www/map/wch/wch340g/mz_10x/index.html => mz_10x
