@@ -71,7 +71,7 @@ def file_completed(src_fn):
     """
 
     if DEL_ON_DONE:
-        print("Deleting local file %s => %s" % (src_fn, ))
+        print("Deleting local file %s" % (src_fn, ))
         os.unlink(src_fn)
     else:
         done_dir = os.path.dirname(src_fn) + "/done"

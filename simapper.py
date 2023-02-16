@@ -70,7 +70,7 @@ def reindex_all(dev=False):
 
 def shift_done(entry):
     if DEL_ON_DONE:
-        print("Deleting local file %s => %s" % (entry["local_fn"], ))
+        print("Deleting local file %s" % (entry["local_fn"], ))
         os.unlink(entry["local_fn"])
     else:
         done_dir = os.path.dirname(entry["local_fn"]) + "/done"
