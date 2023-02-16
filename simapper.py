@@ -22,6 +22,7 @@ STATUS_COLLISION = "Collision"
 
 fn_retry = FnRetry()
 
+DEL_ON_DONE = True
 
 def get_user_page(user):
     return env.SIMAPPER_USER_DIR + "/" + user + ".txt"
@@ -68,12 +69,16 @@ def reindex_all(dev=False):
 
 
 def shift_done(entry):
-    done_dir = os.path.dirname(entry["local_fn"]) + "/done"
-    if not os.path.exists(done_dir):
-        os.mkdir(done_dir)
-    dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
-    print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
-    shutil.move(entry["local_fn"], dst_fn)
+    if DEL_ON_DONE:
+        print("Deleting local file %s => %s" % (entry["local_fn"], ))
+        os.unlink(entry["local_fn"])
+    else:
+        done_dir = os.path.dirname(entry["local_fn"]) + "/done"
+        if not os.path.exists(done_dir):
+            os.mkdir(done_dir)
+        dst_fn = done_dir + "/" + os.path.basename(entry["local_fn"])
+        print("Archiving local file %s => %s" % (entry["local_fn"], dst_fn))
+        shutil.move(entry["local_fn"], dst_fn)
 
 
 def process(entry):
