@@ -60,7 +60,7 @@ from sipr0n import env
 from test_hash import fn
 from sipr0n.util import FnRetry
 
-DEL_ON_DONE = False
+DEL_ON_DONE = True
 
 fn_retry = FnRetry()
 
@@ -70,13 +70,13 @@ def file_completed(src_fn):
     Archive a file that was completed
     """
 
-    done_dir = os.path.dirname(src_fn) + "/done"
-    if not os.path.exists(done_dir):
-        os.mkdir(done_dir)
     if DEL_ON_DONE:
         print("Deleting local file %s => %s" % (src_fn, ))
         os.unlink(src_fn)
     else:
+        done_dir = os.path.dirname(src_fn) + "/done"
+        if not os.path.exists(done_dir):
+            os.mkdir(done_dir)
         dst_fn = done_dir + "/" + os.path.basename(src_fn)
         print("Archiving local file %s => %s" % (src_fn, dst_fn))
         shutil.move(src_fn, dst_fn)

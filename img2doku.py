@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from sipr0n.util import parse_image_name
+from sipr0n.util import parse_map_image_vcufe
 
 import subprocess
 import os
@@ -109,16 +109,19 @@ def process_fns(fns):
         else:
             map_fns.append(fn)
 
-    _fnbase, vendor, chipid, _flavor = parse_image_name(map_fns[0])
+    vendor, chipid, _user, _flavor, _ext = parse_map_image_vcufe(map_fns[0])
     return map_fns, page_fns, vendor, chipid
 
 
-def add_maps(map_fns, vendor, chipid, map_chipid_url):
+def add_maps(map_fns, vendor, chipid, user, map_chipid_url):
     out = ""
     for fn in map_fns:
-        fnbase, vendor_this, chipid_this, flavor = parse_image_name(fn)
+        fnbase = os.path.basename(fn)
+        vendor_this, chipid_this, user_this, flavor, _ext = parse_map_image_vcufe(
+            fn)
         assert vendor == vendor_this
         assert chipid == chipid_this
+        assert user == user_this
 
         # vendor_chpiid_flavor.jpg JPEG 1158x750 1158x750+0+0 8-bit sRGB 313940B 0.000u 0:00.000
         identify = subprocess.check_output(f"identify {fn}",
@@ -127,7 +130,7 @@ def add_maps(map_fns, vendor, chipid, map_chipid_url):
         wh = identify.split(" ")[2]
         size = identify.split(" ")[6]
         out += f"""\
-[[{map_chipid_url}/{flavor}/|{flavor}]]
+[[{map_chipid_url}/{user}_{flavor}/|{flavor}]]
 
   * [[{map_chipid_url}/single/{fnbase}|Single]] ({wh}, {size})
 
@@ -138,7 +141,7 @@ def add_maps(map_fns, vendor, chipid, map_chipid_url):
 def run(
     hi_fns=[],
     print_links=True,
-    collect="mcmaster",
+    collect=None,
     nspre="",
     mappre="map",
     host="https://siliconpr0n.org",
@@ -176,7 +179,7 @@ def run(
 
     wiki_page = f"{nspre}{collect}:{vendor}:{chipid}"
     wiki_url = f"{host}/archive/doku.php?id={wiki_page}"
-    map_chipid_url = f"{host}/{mappre}/{vendor}/{collect}_{chipid}"
+    map_chipid_url = f"{host}/{mappre}/{vendor}/{chipid}"
 
     wiki_data_dir = www_dir + "/archive/data"
     page_path = wiki_data_dir + "/pages/" + wiki_page.replace(":",
@@ -227,7 +230,11 @@ def run(
         out += "</code>\n"
         out += "\n"
 
-    out += add_maps(map_fns, vendor, chipid, map_chipid_url)
+    out += add_maps(map_fns,
+                    vendor=vendor,
+                    chipid=chipid,
+                    user=collect,
+                    map_chipid_url=map_chipid_url)
 
     if exists and force_fns:
         # Instead of placing images in specific places
