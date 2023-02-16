@@ -4,30 +4,7 @@ import subprocess
 import datetime
 import img2doku
 from sipr0n import env
-
-
-def default_copyright(user):
-    """
-    cat /var/www/archive/data/pages/copyright.txt
-    ^ User ^ Copyright ^ Note ^
-    | mcmaster | John McMaster, CC-BY |  |
-    """
-    f = open(env.COPYRIGHT_TXT, "r")
-    try:
-        f.readline()
-        for l in f:
-            l = l.strip()
-            if not l:
-                continue
-            _prefix, this_user, copyright, _notes, _postfix = l.split("|")
-            this_user = this_user.strip()
-            copyright = copyright.strip()
-            if user == this_user:
-                return copyright
-        else:
-            raise Exception("Failed to find copyright for " + user)
-    finally:
-        f.close()
+from sipr0n.metadata import default_copyright
 
 
 def run(user, copyright=None, files=[], run_img2doku=True):

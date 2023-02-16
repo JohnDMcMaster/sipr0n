@@ -16,6 +16,11 @@ SIPAGER_USER_DIR = None
 SIMAPPER_TMP_DIR = "/tmp/simapper"
 
 
+def setup_env_default():
+    if not COPYRIGHT_TXT:
+        setup_env()
+
+
 def setup_env(dev=False, remote=False):
     global WWW_DIR
     global MAP_DIR
@@ -31,7 +36,7 @@ def setup_env(dev=False, remote=False):
     assert not remote
 
     # Production
-    WWW_DIR = "/var/www"
+    WWW_DIR = os.getenv("SIPR0N_WWW", " /var/www")
     # Production debugged remotely
     # discouraged, used for intiial testing mostly
     if remote:

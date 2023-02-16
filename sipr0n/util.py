@@ -90,6 +90,17 @@ def parse_map_url_vc(url):
     return (vendor, chipid)
 
 
+def parse_map_local_vc(url):
+    if url.lower() != url:
+        raise Exception("Found uppercase in URL: %s" % (url, ))
+    m = re.search(r'www/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/', url)
+    if not m:
+        raise Exception("Non-confirming map URL file name: %s" % (url, ))
+    vendor = m.group(1)
+    chipid = m.group(2)
+    return (vendor, chipid)
+
+
 def parse_single_url_vc(url):
     m = re.search(
         r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/single/([a-z0-9\-]+)_([a-z0-9\-]+)',
@@ -244,3 +255,7 @@ class FnRetry:
         Need to think how to handle this better
         """
         self.tried[fn] = True
+
+
+class VCMismatch(Exception):
+    pass

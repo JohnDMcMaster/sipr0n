@@ -1,9 +1,10 @@
 import json
 import os
 import shutil
+import datetime
 
 
-def map_manifest_add_file(basedir, fn, collection, type_):
+def map_manifest_add_file(basedir, fn, collection, type_, copyright_year=None):
     """
     JSON with explicit copyright information
     """
@@ -16,11 +17,15 @@ def map_manifest_add_file(basedir, fn, collection, type_):
             "files": {},
         }
 
+    if not copyright_year:
+        copyright_year = datetime.datetime.now().year
+
     if fn[0] == "/":
         raise ValueError("Require relative path")
     j["files"][fn] = {
         "collection": collection,
         "type": type_,
+        "copyright_year": copyright_year,
     }
 
     # Be really careful not to corrupt records

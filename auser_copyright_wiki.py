@@ -7,80 +7,10 @@ import glob
 from pathlib import Path
 import re
 import json
-"""
-Think this format should be shuffle agnostic
-NOTE: there may be collisions for a (vendor, chipid, basename)
-We'll have to see how easy they are to resolve / how many
-
-{
-    "altera": {
-        "ep900": [
-            {
-                "type": "map",
-                "collection": "mcmaster",
-                "vendor": "altera",
-                "chipid": "ep900",
-                "basename": "mz_mit20x",
-            }
-            {
-                "type": "image",
-                "collection": "mcmaster",
-                "vendor": "altera",
-                "chipid": "ep900",
-                "dirname": "single",
-                "basename": "mz_mit20x.jpg",
-            }
-        ],
-    }
-}
-"""
+from sipr0n import metadata
 
 
-class VCMismatch(Exception):
-    pass
-
-
-def add_meta_image(meta, vendor, chipid, collection, dirname, basename):
-    assert vendor
-    assert chipid
-    assert collection
-    assert basename
-    assert dirname
-    j = {
-        "type": "image",
-        "collection": collection,
-        "vendor": vendor,
-        "chipid": chipid,
-        "dirname": dirname,
-        "basename": basename,
-    }
-
-    vendorj = meta.setdefault(vendor, {})
-    chipidj = vendorj.setdefault(chipid, [])
-    chipidj.append(j)
-    print(f"    image from {collection}: {vendor} {chipid} {basename}")
-
-
-def add_meta_map(meta, vendor, chipid, collection, basename):
-    assert vendor
-    assert chipid
-    assert collection
-    assert basename
-    j = {
-        "type": "map",
-        "collection": collection,
-        "vendor": vendor,
-        "chipid": chipid,
-        "basename": basename,
-    }
-
-    vendorj = meta.setdefault(vendor, {})
-    chipidj = vendorj.setdefault(chipid, [])
-    chipidj.append(j)
-    print(f"    map from {collection}: {vendor} {chipid} {basename}")
-
-
-def run_page(fn, meta, dry=False):
+def run_page(fn, meta):
     """
     Assume that links on page are correctly attributed
     This is important as they are already canonical
@@ -121,7 +51,7 @@ def run_page(fn, meta, dry=False):
                 print("      Page: ", page_vendor, page_chipid)
                 print("      URL:  ", url_vendor, url_chipid)
                 if not ignore_errors:
-                    raise VCMismatch(
+                    raise util.VCMismatch(
                         "page vendor/chipid does not match URL vendor/chipid")
 
         if "/single/" in url:
@@ -133,35 +63,35 @@ def run_page(fn, meta, dry=False):
                 single_vendor, single_chipid, flavor, ext = util.parse_map_image_vcfe(
                     single_fn)
             basename = flavor + "." + ext
-            add_meta_image(meta,
-                           vendor=single_vendor,
-                           chipid=single_chipid,
-                           collection=collection,
-                           dirname="single",
-                           basename=basename)
+            metadata.add_meta_image(meta,
+                                    vendor=single_vendor,
+                                    chipid=single_chipid,
+                                    collection=collection,
+                                    dirname="single",
+                                    basename=basename)
         else:
             # should end in /
             assert re.match("https?://siliconpr0n.org/map/.+/", url)
             map_dir = os.path.basename(os.path.dirname(url))
             map_vendor, map_chipid = util.parse_map_url_vc(url)
-            add_meta_map(meta,
-                         vendor=map_vendor,
-                         chipid=map_chipid,
-                         collection=collection,
-                         basename=map_dir)
+            metadata.add_meta_map(meta,
+                                  vendor=map_vendor,
+                                  chipid=map_chipid,
+                                  collection=collection,
+                                  basename=map_dir)
 
     if not has_url:
         print("  SKIP: no URLs")
 
 
-def run(fndir, fn_out=None, dry=False, ignore_errors=False):
+def run(fndir, fn_out=None, ignore_errors=False):
     """
     Search /wiki and try to guess linked images based on collection
     """
     meta = {}
     if ".txt" in fndir:
         assert os.path.isfile(fndir)
-        run_page(fndir, meta, dry=dry)
+        run_page(fndir, meta)
     else:
         assert "data/pages" in fndir
         assert os.path.basename(fndir) == "pages"
@@ -192,7 +122,7 @@ def run(fndir, fn_out=None, dry=False, ignore_errors=False):
                 print("  %s" % topage(path))
                 try:
                     npages += 1
-                    run_page(path, meta, dry=dry)
+                    run_page(path, meta)
                 except Exception as e:
                     errors += 1
                     if ignore_errors:
@@ -220,15 +150,11 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Rewrite a page to point to new URL scheme")
-    util.add_bool_arg(parser, "--dry", default=True)
     parser.add_argument("--ignore-errors", action="store_true")
     parser.add_argument("fndir")
     parser.add_argument("fn_out", nargs="?")
     args = parser.parse_args()
-    run(args.fndir,
-        fn_out=args.fn_out,
-        dry=args.dry,
-        ignore_errors=args.ignore_errors)
+    run(args.fndir, fn_out=args.fn_out, ignore_errors=args.ignore_errors)
 
 
 if __name__ == "__main__":
