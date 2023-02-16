@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import json
 from sipr0n import metadata
+from sipr0n import env
 
 
 def run_page(fn, meta):
@@ -89,10 +90,13 @@ def run(fndir, fn_out=None, ignore_errors=False):
     Search /wiki and try to guess linked images based on collection
     """
     meta = {}
-    if ".txt" in fndir:
+    env.setup_env_default()
+    if fndir:
+        assert ".txt" in fndir
         assert os.path.isfile(fndir)
         run_page(fndir, meta)
     else:
+        fndir = os.path.join(env.WWW_DIR, "archive/data/pages")
         assert "data/pages" in fndir
         assert os.path.basename(fndir) == "pages"
 
@@ -151,7 +155,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Rewrite a page to point to new URL scheme")
     parser.add_argument("--ignore-errors", action="store_true")
-    parser.add_argument("fndir")
+    parser.add_argument("--fndir")
     parser.add_argument("fn_out", nargs="?")
     args = parser.parse_args()
     run(args.fndir, fn_out=args.fn_out, ignore_errors=args.ignore_errors)

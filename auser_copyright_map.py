@@ -9,6 +9,7 @@ import re
 import json
 import datetime
 from sipr0n import metadata
+from sipr0n import env
 
 
 def html2meta(txt):
@@ -87,16 +88,19 @@ def run_page(fn, meta, copyright_db):
         metaj["collection"] = parsed_collection
 
 
-def run(fndir, fn_out=None, ignore_errors=False):
+def run(fndir=None, fn_out=None, ignore_errors=False):
     """
     Search /wiki and try to guess linked images based on collection
     """
     meta = {}
     copyright_db = metadata.load_copyright_db()
-    if ".html" in fndir:
+    env.setup_env_default()
+    if fndir:
+        assert ".html" in fndir
         assert os.path.isfile(fndir)
         run_page(fndir, meta, copyright_db=copyright_db)
     else:
+        fndir = env.MAP_DIR
         assert "www/map" in fndir
         assert os.path.basename(fndir) == "map"
 
@@ -144,7 +148,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Rewrite a page to point to new URL scheme")
     parser.add_argument("--ignore-errors", action="store_true")
-    parser.add_argument("fndir")
+    parser.add_argument("--fndir")
     parser.add_argument("fn_out", nargs="?")
     args = parser.parse_args()
     run(args.fndir, fn_out=args.fn_out, ignore_errors=args.ignore_errors)
