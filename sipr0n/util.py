@@ -3,6 +3,20 @@ import os
 import sys
 
 
+def add_bool_arg(parser, yes_arg, default=False, **kwargs):
+    dashed = yes_arg.replace('--', '')
+    dest = dashed.replace('-', '_')
+    parser.add_argument(yes_arg,
+                        dest=dest,
+                        action='store_true',
+                        default=default,
+                        **kwargs)
+    parser.add_argument('--no-' + dashed,
+                        dest=dest,
+                        action='store_false',
+                        **kwargs)
+
+
 class ParseError(Exception):
     pass
 
@@ -10,6 +24,10 @@ class ParseError(Exception):
 """
 Used by sipager/simapper for non-canonical file names with implicit username
 They will get transformed into canonical name
+"""
+"""
+Parse an image file name that doesn't have user/collection info
+DEPRECATED: will be obsolete soon
 """
 
 
@@ -34,6 +52,11 @@ def map_image_uvcfe_to_basename(vendor, chipid, user, flavor, ext):
     return vendor + "_" + chipid + "_" + user + "_" + flavor + "." + ext
 
 
+"""
+Parse an image file name that has user/collection info
+"""
+
+
 def parse_map_image_vcufe(fn):
     """
     Canonical name like
@@ -41,6 +64,7 @@ def parse_map_image_vcufe(fn):
     """
     # Normalize
     fnbase = os.path.basename(fn).lower()
+    print("fixme", fnbase)
     m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)',
                  fnbase)
     if not m:
@@ -53,6 +77,30 @@ def parse_map_image_vcufe(fn):
     flavor = m.group(4)
     ext = m.group(5)
     return (vendor, chipid, user, flavor, ext)
+
+
+def parse_map_url_vc(url):
+    if url.lower() != url:
+        raise Exception("Found uppercase in URL: %s" % (url, ))
+    m = re.search(r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/', url)
+    if not m:
+        raise Exception("Non-confirming map URL file name: %s" % (url, ))
+    vendor = m.group(1)
+    chipid = m.group(2)
+    return (vendor, chipid)
+
+
+def parse_single_url_vc(url):
+    m = re.search(
+        r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/single/([a-z0-9\-]+)_([a-z0-9\-]+)',
+        url)
+    if not m:
+        raise Exception("Non-confirming file name: %s" % (url, ))
+    _vendor = m.group(1)
+    _chipid = m.group(2)
+    vendor = m.group(3)
+    chipid = m.group(4)
+    return (vendor, chipid)
 
 
 def parse_map_image_user_vcufe(fn_can, assume_user):

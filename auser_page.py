@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-annotate .txt files under /map with the new scheme
+annotate .txt files under /archive with the new scheme under /map
 by updating URLs
 """
 
@@ -10,9 +10,10 @@ import os
 import glob
 from pathlib import Path
 import traceback
+from sipr0n import util
 
 
-def parse_fn_uvc(fn):
+def parse_page_fn_uvc(fn):
     """
     Canonical name like
     vendor_chipid_user_flavor.ext
@@ -38,30 +39,6 @@ def parse_fn_uvc(fn):
     return (user, vendor, chipid)
 
 
-def parse_map_url_vc(url):
-    if url.lower() != url:
-        raise Exception("Found uppercase in URL: %s" % (url, ))
-    m = re.search(r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/', url)
-    if not m:
-        raise Exception("Non-confirming map URL file name: %s" % (url, ))
-    vendor = m.group(1)
-    chipid = m.group(2)
-    return (vendor, chipid)
-
-
-def parse_single_url_vc(url):
-    m = re.search(
-        r'siliconpr0n.org/map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/single/([a-z0-9\-]+)_([a-z0-9\-]+)',
-        url)
-    if not m:
-        raise Exception("Non-confirming file name: %s" % (url, ))
-    _vendor = m.group(1)
-    _chipid = m.group(2)
-    vendor = m.group(3)
-    chipid = m.group(4)
-    return (vendor, chipid)
-
-
 class Mismatch(Exception):
     pass
 
@@ -74,7 +51,7 @@ def run_page(fn, dry=False):
     """
     data/pages/user/vendor/chipid.txt
     """
-    user, page_vendor, page_chipid = parse_fn_uvc(fn)
+    user, page_vendor, page_chipid = parse_page_fn_uvc(fn)
     print(f"  Page info")
     print(f"    user: {user}")
     print(f"    vendor: {page_vendor}")
@@ -109,7 +86,7 @@ def run_page(fn, dry=False):
         if "siliconpr0n.org/map" not in url:
             print("    Skip")
             continue
-        map_vendor, map_chipid = parse_map_url_vc(url)
+        map_vendor, map_chipid = util.parse_map_url_vc(url)
         if page_vendor and page_chipid:
             if (page_vendor, page_chipid) != (map_vendor, map_chipid):
                 print("    ERROR: vc mismatch")
@@ -129,6 +106,9 @@ def run_page(fn, dry=False):
                 raise Mismatch("Unexpected URL")
         vendor = map_vendor
         chipid = map_chipid
+        # Some early vendors and chpiids had _
+        # However these are used as seperate now, so make them canonical
+        # /map has already been fixed and these links are now broken
         vendor_new = vendor.replace("_", "-")
         chipid_new = chipid.replace("_", "-")
         if vendor != vendor_new or chipid != chipid_new:
@@ -136,7 +116,7 @@ def run_page(fn, dry=False):
             print("    munge new: %s %s" % (vendor_new, chipid_new))
 
         if "/single/" in url:
-            single_vendor, single_chipid = parse_single_url_vc(url)
+            single_vendor, single_chipid = util.parse_single_url_vc(url)
             if (vendor, chipid) != (single_vendor, single_chipid):
                 print("    ERROR: vc mismatch")
                 print("    Page based:")
@@ -236,7 +216,7 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Rewrite a page to point to new URL scheme")
-    parser.add_argument("--dry", action="store_true")
+    util.add_bool_arg(parser, "--dry", default=True)
     parser.add_argument("--ignore-errors", action="store_true")
     parser.add_argument("fndir")
     args = parser.parse_args()
