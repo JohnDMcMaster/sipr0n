@@ -9,7 +9,7 @@ def map_manifest_add_file(basedir, fn, collection, type_, copyright_year=None):
     JSON with explicit copyright information
     """
     assert type_ in ("image", "map")
-    jfn = os.path.join(basedir, ".manfiest")
+    jfn = os.path.join(basedir, ".manifest")
     if os.path.exists(jfn):
         j = json.load(open(jfn))
     else:
@@ -34,5 +34,6 @@ def map_manifest_add_file(basedir, fn, collection, type_, copyright_year=None):
               sort_keys=True,
               indent=4,
               separators=(',', ': '))
-    shutil.move(jfn, jfn + ".old")
+    if os.path.exists(jfn):
+        shutil.move(jfn, jfn + ".old")
     shutil.move(jfn + ".tmp", jfn)

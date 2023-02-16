@@ -64,8 +64,7 @@ def parse_map_image_vcufe(fn):
     """
     # Normalize
     fnbase = os.path.basename(fn).lower()
-    print("fixme", fnbase)
-    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)',
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_([a-z0-9\-]+)_(.*)\.(.+)',
                  fnbase)
     if not m:
         raise ParseError(
@@ -90,6 +89,21 @@ def parse_map_url_vc(url):
     return (vendor, chipid)
 
 
+def parse_map_url_vcuf(url):
+    if url.lower() != url:
+        raise Exception("Found uppercase in URL: %s" % (url, ))
+    m = re.search(
+        r'map/([_a-z0-9\-]+)/([_a-z0-9\-]+)/([a-z0-9\-]+)_([_a-z0-9\-]+)/index.html',
+        url)
+    if not m:
+        raise Exception("Non-confirming map URL file name: %s" % (url, ))
+    vendor = m.group(1)
+    chipid = m.group(2)
+    user = m.group(3)
+    flavor = m.group(4)
+    return (vendor, chipid, user, flavor)
+
+
 def parse_map_local_vc(url):
     if url.lower() != url:
         raise Exception("Found uppercase in URL: %s" % (url, ))
@@ -112,6 +126,20 @@ def parse_single_url_vc(url):
     vendor = m.group(3)
     chipid = m.group(4)
     return (vendor, chipid)
+
+
+"""
+mcmaster_mz_mit20x => (mcmaster, mz_mit20x)
+"""
+
+
+def parse_map_basename_uf(url):
+    m = re.search(r'([a-z0-9\-]+)_([_a-z0-9\-]+)', url)
+    if not m:
+        raise Exception("Non-confirming file name: %s" % (url, ))
+    user = m.group(1)
+    flavor = m.group(2)
+    return (user, flavor)
 
 
 def parse_map_image_user_vcufe(fn_can, assume_user):
