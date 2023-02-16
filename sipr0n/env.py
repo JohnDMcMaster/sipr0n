@@ -36,7 +36,7 @@ def setup_env(dev=False, remote=False):
     assert not remote
 
     # Production
-    WWW_DIR = os.getenv("SIPR0N_WWW", " /var/www")
+    WWW_DIR = os.getenv("SIPR0N_WWW", "/var/www")
     # Production debugged remotely
     # discouraged, used for intiial testing mostly
     if remote:
