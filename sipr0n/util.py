@@ -35,7 +35,7 @@ DEPRECATED: will be obsolete soon
 def parse_map_image_vcfe(fn):
     # Normalize
     fnbase = os.path.basename(fn).lower()
-    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).(jpg)', fnbase)
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*)\.(.+)', fnbase)
     if not m:
         raise ParseError(
             "Non-confirming file name (need vendor_chipid_flavor.jpg): %s" %
