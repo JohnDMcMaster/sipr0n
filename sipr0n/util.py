@@ -145,12 +145,12 @@ def parse_map_basename_uf(url):
 def parse_map_image_user_vcufe(fn_can, assume_user):
     if assume_user:
         parsed = parse_map_image_vcfe(fn_can)
-        basename, vendor, chipid, flavor, ext = parsed
+        vendor, chipid, flavor, ext = parsed
         user = assume_user
     else:
         parsed = parse_map_image_vcufe(fn_can)
-        basename, vendor, chipid, user, flavor, ext = parsed
-    return (basename, vendor, chipid, user, flavor, ext)
+        vendor, chipid, user, flavor, ext = parsed
+    return (vendor, chipid, user, flavor, ext)
 
 
 """
