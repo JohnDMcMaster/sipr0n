@@ -24,6 +24,7 @@ fn_retry = FnRetry()
 
 DEL_ON_DONE = True
 
+
 def get_user_page(user):
     return env.SIMAPPER_USER_DIR + "/" + user + ".txt"
 

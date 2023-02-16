@@ -113,6 +113,12 @@ def process_fns(fns):
     return map_fns, page_fns, vendor, chipid
 
 
+def image_2_thumb_name(fn):
+    vendor_this, chipid_this, user_this, flavor, ext = parse_map_image_vcufe(
+        fn)
+    return f"{vendor_this}_{chipid_this}_{user_this}_{flavor}.thumb.{ext}"
+
+
 def add_maps(map_fns, vendor, chipid, user, map_chipid_url):
     out = ""
     for fn in map_fns:
@@ -129,11 +135,14 @@ def add_maps(map_fns, vendor, chipid, user, map_chipid_url):
                                            text=True)
         wh = identify.split(" ")[2]
         size = identify.split(" ")[6]
+        thumb_name = image_2_thumb_name(fnbase)
+        image_thumb_txt = "{{" + f"{map_chipid_url}/single/{thumb_name}" + "}}"
         out += f"""\
+{image_thumb_txt}
+
 [[{map_chipid_url}/{user}_{flavor}/|{flavor}]]
 
   * [[{map_chipid_url}/single/{fnbase}|Single]] ({wh}, {size})
-
 """
     return out
 
