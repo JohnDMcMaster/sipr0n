@@ -190,20 +190,21 @@ def extract_archives(scrape_dir, assume_user, verbose=False):
 
     for fn_glob in glob.glob(scrape_dir + "/*.tar"):
         tar_fn = os.path.realpath(fn_glob)
-        tar = tarfile.open(tar_fn, "r")
 
-        if not fn_retry.try_fn(tar):
-            verbose and print("Ignoring tried: " + tar)
+        if not fn_retry.try_fn(tar_fn):
+            verbose and print("Ignoring tried: " + tar_fn)
             continue
-
         print("tar: examining %s" % (tar_fn, ))
+
+        tar = tarfile.open(tar_fn, "r")
         fn_cache = set()
         try:
             for tarinfo in tar:
+                if tarinfo.isdir():
+                    continue
                 if not tarinfo.isreg():
-                    if not tarinfo.isdir():
-                        print("  WARNING: unrecognized tar element: %s" %
-                              (str(tarinfo), ))
+                    print("  WARNING: unrecognized tar element: %s" %
+                          (str(tarinfo), ))
                     raise ParseError()
 
                 basename = os.path.basename(tarinfo.name).lower()
@@ -220,7 +221,8 @@ def extract_archives(scrape_dir, assume_user, verbose=False):
 
             # Extracted: trash it
             file_completed(tar_fn)
-        except ParseError:
+        except ParseError as e:
+            traceback.print_exc()
             print("WARNING: aborted tar on parse error")
             for fn in fn_cache:
                 os.unlink(fn)
