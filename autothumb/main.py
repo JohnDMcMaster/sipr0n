@@ -11,6 +11,11 @@ from watchdog.observers import Observer
 # Have to disable DecompressionBombError limits because these images are large
 PIL.Image.MAX_IMAGE_PIXELS = None
 
+# 2023-06-23: some large images require this
+# Unclear if they are actually damaged, but life moves on with this set
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 GALLERY_IMAGES = 20
 
 ALLOWED_ENDINGS = ["png", "jpg", "jpeg"]
