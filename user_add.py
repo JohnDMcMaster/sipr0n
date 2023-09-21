@@ -124,8 +124,9 @@ def main():
         description="Create a user that can upload assets")
     util.add_bool_arg(parser, "--dry", default=True)
     parser.add_argument("--user", required=True)
+    parser.add_argument("--copyright", required=True)
     args = parser.parse_args()
-    run(vendor=args.vendor, chipid=args.chipid, user=args.user, dry=args.dry)
+    run(vendor=args.vendor, chipid=args.chipid, user=args.user, copyright=copyright, dry=args.dry)
 
 
 if __name__ == "__main__":
