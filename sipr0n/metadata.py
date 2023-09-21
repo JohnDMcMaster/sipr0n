@@ -27,6 +27,9 @@ We'll have to see how easy they are to resolve / how many
 }
 """
 
+class CollectionNotFound(Exception):
+    pass
+
 
 def add_meta_image(meta, vendor, chipid, collection, dirname, basename):
     assert vendor
@@ -113,6 +116,10 @@ def default_copyright(collection):
             if collection == this_collection:
                 return copyright
         else:
-            raise Exception("Failed to find copyright for " + collection)
+            raise CollectionNotFound("Failed to find copyright for " + collection)
     finally:
         f.close()
+
+def assert_collection_exists(collection):
+    # throws an exception as a side effect
+    default_copyright(collection)
