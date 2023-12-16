@@ -11,28 +11,33 @@ from sipr0n.metadata import assert_collection_exists
 
 def users():
     ret = {}
-    user_fn = env.WWW_DIR + "/conf/users.auth.php"
+    user_fn = env.WWW_DIR + "/archive/conf/users.auth.php"
     with open(user_fn, "r") as f:
         for l in f:
+            l = l.strip()
+            if not l:
+                continue
+            if "#" in l:
+                continue
             user, _hash, _name, _email, groups = l.strip().split(":")
             if not user:
                 continue
-            ret[user] = set(groups)
+            ret[user] = set(groups.split(","))
     return ret    
 
 
-def run(user=None, dry=True, copyright=None):
+def run(user=None, dry=True, copyright_=None):
     env.setup_env_default()
 
     print("Checking if user exists...")
     # validate_username(user)
     user_index = users()
     assert user in user_index, f"Create user account first for {user}"
-    assert "tool" in user_index[user], "User must be part of tool group"
+    assert "tool" in user_index[user], f"User must be part of tool group, got {user_index[user]}"
 
     def update_copyright():
         # This could be added here
-        if copyright:
+        if copyright_:
             copyright_fn = env.WWW_DIR + "/archive/data/pages/tool/copyright.txt"
             assert os.path.exists(copyright_fn)
             with open(copyright_fn, "r") as f:
@@ -71,11 +76,11 @@ def run(user=None, dry=True, copyright=None):
                 f.write(full)
         
         log_template = f"""\
-{{FileSharing>sipager/{user}}}
+{{{{FileSharing>simapper/{user}}}}}
 
 ====== Log ======
 """
-        log_fn = env.WWW_DIR + f"/archive/data/pages/tool/sipager/{user}.txt"
+        log_fn = env.WWW_DIR + f"/archive/data/pages/tool/simapper/{user}.txt"
         if not dry:
             with open(log_fn, "w") as f:
                 f.write(log_template)
@@ -94,17 +99,38 @@ def run(user=None, dry=True, copyright=None):
 
 
         log_template = f"""\
-{{FileSharing>simapper/{user}}}
+{{{{FileSharing>sipager/{user}}}}}
 
 ====== Log ======
 """
-        log_fn = env.WWW_DIR + f"/archive/data/pages/tool/simapper/{user}.txt"
+        log_fn = env.WWW_DIR + f"/archive/data/pages/tool/sipager/{user}.txt"
         if not dry:
             with open(log_fn, "w") as f:
                 f.write(log_template)
 
+
+    def add_user_page():
+        user_dir = env.WWW_DIR + f"/archive/data/pages/{user}"
+        assert not os.path.exists(user_dir)
+        user_page_fn = user_dir + "/start.txt"
+        full = """\
+{{tag>collection}}
+
+Data is released under a """ + copyright_ + """ license unless otherwise specified.
+
+Images:
+
+{{topic>collection_""" + user + """}}
+"""
+        if not dry:
+            os.mkdir(user_dir)
+            with open(user_page_fn, "w") as f:
+                f.write(full)
+
+
     update_simapper()
     update_sipager()
+    add_user_page()
 
     print(f"Account created for {user}")
     print(f"This page contains information on quickly uploading images")
@@ -124,9 +150,10 @@ def main():
         description="Create a user that can upload assets")
     util.add_bool_arg(parser, "--dry", default=True)
     parser.add_argument("--user", required=True)
+    # Blank if not needed
     parser.add_argument("--copyright", required=True)
     args = parser.parse_args()
-    run(vendor=args.vendor, chipid=args.chipid, user=args.user, copyright=copyright, dry=args.dry)
+    run(user=args.user, copyright_=args.copyright, dry=args.dry)
 
 
 if __name__ == "__main__":
