@@ -56,7 +56,7 @@ def img2j(img_fn):
     try:
         # Scraped from pr0nmap.main
         source = ImageMapSource(img_fn, threads=1)
-        m = GroupXIV(source, copyright="copyright")
+        m = GroupXIV(source, copyright_="copyright")
         m.set_title("title")
         m.set_js_only(True)
         m.set_skip_missing(True)
@@ -200,9 +200,9 @@ def run_pair(img_fn, html_fn, dry=False, verbose=False):
         if "copyright" in l1n:
             raise Exception("FIXME: might be overwriting copyright info")
         # "copyright": "&copy; 2020 John McMaster, CC-BY"
-        copyright = j_new["copyright"]
-        copyright = copyright.replace("&copy; ", "")
-        l1n["copyright"] = copyright
+        copyright_ = j_new["copyright"]
+        copyright_ = copyright.replace("&copy; ", "")
+        l1n["copyright"] = copyright_
         del j_new["copyright"]
 
     if j_new["name"] == "???":

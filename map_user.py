@@ -7,19 +7,19 @@ from sipr0n import env
 from sipr0n.metadata import default_copyright
 
 
-def run(user, copyright=None, files=[], run_img2doku=True):
-    if not copyright:
-        copyright = default_copyright(user)
+def run(user, copyright_=None, files=[], run_img2doku=True):
+    if not copyright_:
+        copyright_ = default_copyright(user)
     print("Files")
     for f in files:
         print("  " + f)
     print("")
     print("")
     print("")
-    copyright = "&copy; " + str(
-        datetime.datetime.today().year) + " " + copyright
-    print("Copyright: " + copyright)
-    cmd = "pr0nmap -c '%s' %s" % (copyright, " ".join(files))
+    copyright_ = "&copy; " + str(
+        datetime.datetime.today().year) + " " + copyright_
+    print("Copyright: " + copyright_)
+    cmd = "pr0nmap -c '%s' %s" % (copyright_, " ".join(files))
     print("Running: " + cmd)
     subprocess.check_call(cmd, shell=True)
     print("")
@@ -50,7 +50,7 @@ def main():
     parser.add_argument('files', nargs="+", help='Images to map')
     args = parser.parse_args()
     run(user=args.user,
-        copyright=args.copyright,
+        copyright_=args.copyright,
         files=args.files,
         run_img2doku=True)
 

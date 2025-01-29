@@ -7,7 +7,7 @@ from sipr0n import util
 from sipr0n import env
 from sipr0n.util import validate_username
 from sipr0n.metadata import assert_collection_exists
-
+import dw_add_user
 
 def users():
     ret = {}
@@ -32,7 +32,17 @@ def run(user=None, dry=True, copyright_=None):
     print("Checking if user exists...")
     # validate_username(user)
     user_index = users()
-    assert user in user_index, f"Create user account first for {user}"
+    if user in user_index:
+        print("User account already exists")
+        new_password = None
+    else:
+        # We have a bit of a namespace conflict
+        # Make sure there isn't something special in the way
+        # ex: you don't create a user named "tool"
+        if os.path.exists(f"/var/www/archive/data/pages/{user}"):
+            raise ValueError("ERROR: namesapce conflict with user name")
+        new_password = dw_add_user.run(user=user)
+
     assert "tool" in user_index[user], f"User must be part of tool group, got {user_index[user]}"
 
     def update_copyright():
@@ -133,6 +143,9 @@ Images:
     add_user_page()
 
     print(f"Account created for {user}")
+    print(f"{user} / {new_password}")
+    print("Your namespace / home page is here. Feel free to edit it as you like")
+    print("https://siliconpr0n.org/archive/doku.php?id={user}:start")
     print(f"This page contains information on quickly uploading images")
     print(f"Please also check out the tool pages there for additional information such as naming rules")
     print("https://siliconpr0n.org/archive/doku.php?id=tool:start")
