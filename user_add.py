@@ -41,7 +41,7 @@ def run(user=None, dry=True, copyright_=None):
         # ex: you don't create a user named "tool"
         if os.path.exists(f"/var/www/archive/data/pages/{user}"):
             raise ValueError("ERROR: namesapce conflict with user name")
-        new_password = dw_add_user.run(user=user)
+        new_password = dw_add_user.run(user=user, dry=False)
 
     assert "tool" in user_index[user], f"User must be part of tool group, got {user_index[user]}"
 
