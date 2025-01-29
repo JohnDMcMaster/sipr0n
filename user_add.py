@@ -53,7 +53,7 @@ def run(user=None, dry=True, copyright_=None):
             with open(copyright_fn, "r") as f:
                 full = f.read()
             assert f" {user} " not in full, "duplicate user add?"
-            new = f"\n| {user}     | {copyright}                                        |       |\n"
+            new = f"\n| {user}     | {copyright_}                                        |       |\n"
             full = full + new
             full = full.replace("\n\n", "\n")
             if not dry:
@@ -145,7 +145,7 @@ Images:
     print(f"Account created for {user}")
     print(f"{user} / {new_password}")
     print("Your namespace / home page is here. Feel free to edit it as you like")
-    print("https://siliconpr0n.org/archive/doku.php?id={user}:start")
+    print(f"https://siliconpr0n.org/archive/doku.php?id={user}:start")
     print(f"This page contains information on quickly uploading images")
     print(f"Please also check out the tool pages there for additional information such as naming rules")
     print("https://siliconpr0n.org/archive/doku.php?id=tool:start")
