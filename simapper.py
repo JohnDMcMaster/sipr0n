@@ -59,13 +59,12 @@ def log_simapper_update(entry, page=None):
 
 def reindex_all(dev=False):
     print("Running reindex all")
-    # subprocess.check_call("sudo -u www-data php /var/www/archive/bin/indexer.php", shell=True)
+    # subprocess.check_call(["sudo", "-u", "www-data", "php", "/var/www/archive/bin/indexer.php"])
     # Already running as www-data
     if dev:
         print("dev: skip reindex")
     else:
-        subprocess.check_output("php /var/www/archive/bin/indexer.php",
-                                shell=True)
+        subprocess.check_output(["php", "/var/www/archive/bin/indexer.php"])
     print("Reindex complete")
 
 

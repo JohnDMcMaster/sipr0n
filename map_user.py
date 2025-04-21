@@ -19,9 +19,9 @@ def run(user, copyright_=None, files=[], run_img2doku=True):
     copyright_ = "&copy; " + str(
         datetime.datetime.today().year) + " " + copyright_
     print("Copyright: " + copyright_)
-    cmd = "pr0nmap -c '%s' %s" % (copyright_, " ".join(files))
-    print("Running: " + cmd)
-    subprocess.check_call(cmd, shell=True)
+    cmd = ["pr0nmap", "-c", copyright_] + files
+    print("Running: " + str(cmd))
+    subprocess.check_call(cmd)
     print("")
     print("")
     print("")

@@ -130,8 +130,7 @@ def add_maps(map_fns, vendor, chipid, user, map_chipid_url):
         assert user == user_this
 
         # vendor_chpiid_flavor.jpg JPEG 1158x750 1158x750+0+0 8-bit sRGB 313940B 0.000u 0:00.000
-        identify = subprocess.check_output(f"identify {fn}",
-                                           shell=True,
+        identify = subprocess.check_output(["identify", fn],
                                            text=True)
         wh = identify.split(" ")[2]
         size = identify.split(" ")[6]
@@ -272,7 +271,7 @@ def run(
         with open(page_path, "a") as f:
             f.write(out)
         write_lazy and print("Wrote to " + page_path)
-        # subprocess.run(f"sudo chown www-data:www-data {page_path}", shell=True)
+        # subprocess.run(["sudo", "chown", "www-data:www-data", page_path])
         return True
 
     wrote = False
