@@ -53,7 +53,7 @@ def thumb(path):
     print("Resizing", path)
 
     img = Image.open(path)
-    img.thumbnail((SMALL_MAX_WIDTH, SMALL_MAX_HEIGHT), Image.ANTIALIAS)
+    img.thumbnail((SMALL_MAX_WIDTH, SMALL_MAX_HEIGHT), Image.LANCZOS)
     img.save(smallthumbpath)
 
 

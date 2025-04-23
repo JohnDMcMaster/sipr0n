@@ -1,0 +1,8 @@
+[Unit]
+Description=sipr0n page data generator
+After=network.target
+[Service]
+ExecStart=/opt/sipr0n/sipager.sh
+[Install]
+WantedBy=default.target
+

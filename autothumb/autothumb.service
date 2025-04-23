@@ -1,0 +1,8 @@
+[Unit]
+Description=sipr0n thumbnail generator
+After=network.target
+[Service]
+ExecStart=/opt/sipr0n/autothumb/run.sh
+[Install]
+WantedBy=default.target
+

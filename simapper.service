@@ -1,0 +1,8 @@
+[Unit]
+Description=sipr0n map generator
+After=network.target
+[Service]
+ExecStart=/opt/sipr0n/simapper.sh
+[Install]
+WantedBy=default.target
+
