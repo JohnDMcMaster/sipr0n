@@ -57,7 +57,7 @@ from sipr0n.util import validate_username
 import simapper
 from simapper import print_log_break
 from sipr0n import env
-from sipr0n.util import FnRetry
+from sipr0n.util import FnRetry, archive_page_last_change_user
 
 DEL_ON_DONE = True
 

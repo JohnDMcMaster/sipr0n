@@ -8,6 +8,8 @@ from sipr0n import env
 from sipr0n.util import validate_username
 from sipr0n.metadata import assert_collection_exists
 import dw_add_user
+import json
+
 
 def users():
     ret = {}
@@ -26,24 +28,30 @@ def users():
     return ret    
 
 
-def run(user=None, dry=True, copyright_=None):
+def run(user=None, dry=True, login=True, copyright_=None):
     env.setup_env_default()
 
-    print("Checking if user exists...")
-    # validate_username(user)
-    user_index = users()
-    if user in user_index:
-        print("User account already exists")
-        new_password = None
+    assert user
+    if not login:
+        print("Not creating / checking login")
     else:
-        # We have a bit of a namespace conflict
-        # Make sure there isn't something special in the way
-        # ex: you don't create a user named "tool"
-        if os.path.exists(f"/var/www/archive/data/pages/{user}"):
-            raise ValueError("ERROR: namesapce conflict with user name")
-        new_password = dw_add_user.run(user=user, dry=False)
+        print("Checking if user exists...")
+        # validate_username(user)
+        user_index = users()
+        if user in user_index:
+            print("User account already exists")
+            new_password = None
+        else:
+            # We have a bit of a namespace conflict
+            # Make sure there isn't something special in the way
+            # ex: you don't create a user named "tool"
+            if os.path.exists(f"/var/www/archive/data/pages/{user}"):
+                raise ValueError("ERROR: namesapce conflict with user name")
+            new_password = dw_add_user.run(user=user, dry=False)
+            # re-index after add
+            user_index = users()
 
-    assert "tool" in user_index[user], f"User must be part of tool group, got {user_index[user]}"
+        assert "tool" in user_index[user], f"User must be part of tool group, got {user_index[user]}"
 
     def update_copyright():
         # This could be added here
@@ -142,31 +150,38 @@ Images:
     update_sipager()
     add_user_page()
 
-    print(f"Account created for {user}")
-    print(f"{user} / {new_password}")
-    print("Your namespace / home page is here. Feel free to edit it as you like")
-    print(f"https://siliconpr0n.org/archive/doku.php?id={user}:start")
-    print(f"This page contains information on quickly uploading images")
-    print(f"Please also check out the tool pages there for additional information such as naming rules")
-    print("https://siliconpr0n.org/archive/doku.php?id=tool:start")
-    print("  Direct link to upload high resolution image (ex: big die scan):")
-    print(f"  https://siliconpr0n.org/archive/doku.php?id=tool:simapper:{user}")
-    print("  Direct link to upload misc wiki images (ex: package):")
-    print(f"  https://siliconpr0n.org/archive/doku.php?id=tool:sipager:{user}")
-    print(f"More general info can be found here:")
-    print("https://siliconpr0n.org/archive/doku.php?id=your_first_page")
+    if login:
+        print(f"Account created for {user}")
+        print(f"{user} / {new_password}")
+        print("Your namespace / home page is here. Feel free to edit it as you like")
+        print(f"https://siliconpr0n.org/archive/doku.php?id={user}:start")
+        print(f"This page contains information on quickly uploading images")
+        print(f"Please also check out the tool pages there for additional information such as naming rules")
+        print("https://siliconpr0n.org/archive/doku.php?id=tool:start")
+        print("  Direct link to upload high resolution image (ex: big die scan):")
+        print(f"  https://siliconpr0n.org/archive/doku.php?id=tool:simapper:{user}")
+        print("  Direct link to upload misc wiki images (ex: package):")
+        print(f"  https://siliconpr0n.org/archive/doku.php?id=tool:sipager:{user}")
+        print(f"More general info can be found here:")
+        print("https://siliconpr0n.org/archive/doku.php?id=your_first_page")
+    else:
+        print(f"Upload stubs created for {user}")
+        print(f"https://siliconpr0n.org/archive/doku.php?id={user}:start")
+        print(f"  https://siliconpr0n.org/archive/doku.php?id=tool:simapper:{user}")
+        print(f"  https://siliconpr0n.org/archive/doku.php?id=tool:sipager:{user}")
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Create a user that can upload assets")
+        description="Create a user landing page and (optionally) a login to upload assets")
     util.add_bool_arg(parser, "--dry", default=True)
-    parser.add_argument("--user", required=True)
+    util.add_bool_arg(parser, "--login", default=True, help="Just the copyright or can the user also log in")
+    parser.add_argument("--user", required=True, help="User ID for login and copyright table")
     # Blank if not needed
     parser.add_argument("--copyright", required=True)
     args = parser.parse_args()
-    run(user=args.user, copyright_=args.copyright, dry=args.dry)
+    run(user=args.user, copyright_=args.copyright, login=args.login, dry=args.dry)
 
 
 if __name__ == "__main__":

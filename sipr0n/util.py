@@ -184,7 +184,49 @@ def parse_wiki_image_user_vcufe(fn_can, assume_user):
 
 
 def validate_username(username):
-    return re.match("[a-z]+", username)
+    return re.match("[a-z0-9]+", username)
+
+def archive_page_meta(page):
+    """
+    # sudo -u www-data php bin/dwpage.php getmeta start
+    {   
+        "date": {
+            "created": 1327740735,
+            "modified": 1744613389
+        },
+        "creator": "John McMaster",
+        "user": "mcmaster",
+        "last_change": {
+            "date": 1744613389,
+            "ip": "66.xx",
+            "type": "E",
+            "id": "start",
+            "user": "mcmaster",
+            "sum": "",
+            "extra": "",
+            "sizechange": 8,
+            "mode": "page"
+        },
+        "contributor": {
+            "mcmaster": "John McMaster",
+            "nats": "nats"
+        },
+        ...
+    }
+
+
+    # sudo -u www-data php dwpage.php getmeta bad_page
+    []
+
+    """
+    out = subprocess.check_output(["php", "/var/www/archive/bin/dwpage.php", "getmeta", page], encoding='utf_8')
+    j = json.fromstring(out)
+    if len(j) == 0:
+        raise ValueError(f"bad page {page}")
+    return j
+
+def archive_page_last_change_user(page):
+    return archive_page_meta["last_change"]["user"]
 
 
 def tobytes(buff):
