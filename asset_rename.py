@@ -24,7 +24,12 @@ def diff_strings(s1, s2):
     with open(fn2, "w") as f:
         f.write(s2)
 
-    subprocess.check_output(["diff", "-w", fn1, fn2])
+    print("")
+    print("****************************************")
+    print("diff")
+    subprocess.run(["diff", "-w", fn1, fn2], check=False, stderr=subprocess.PIPE)
+    print("****************************************")
+    print("")
 
 def rename_page(old_vcu, new_vcu, dry):
     """
@@ -44,7 +49,7 @@ def rename_page(old_vcu, new_vcu, dry):
         """
         Look at the image
         """
-        print("  Page: found {user}:{old_vendor}:{old_chipid}")
+        print(f"  Page: found {user}:{old_vendor}:{old_chipid}")
         with open(old_page_fn, "r") as f:
             page_txt = f.read()
         # Image reference
@@ -54,13 +59,19 @@ def rename_page(old_vcu, new_vcu, dry):
         # Page reference
         # [[https://siliconpr0n.org/map/efabless/gf-mpw18h1-slot4-openfasoc/mcmaster_mit20x/|mit20x]]
         # * [[https://siliconpr0n.org/map/efabless/gf-mpw18h1-slot4-openfasoc/single/efabless_gf-mpw18h1-slot4-openfasoc_mcmaster_mit20x.jpg|Single]] (22444x17485, 41.3425MiB)
-        page_txt_new = page_txt_new.replace("/{old_vendor}/{old_chipid}/", "/{new_vendor}/{new_chipid}/")
-        page_txt_new = page_txt_new.replace("/{old_vendor}_{old_chipid}_", "{new_vendor}_{new_chipid}_")
-        diff_strings(page_txt, page_txt_new)
+        page_txt_new = page_txt_new.replace(f"/{old_vendor}/{old_chipid}/", f"/{new_vendor}/{new_chipid}/")
+        page_txt_new = page_txt_new.replace(f"/{old_vendor}_{old_chipid}_", f"/{new_vendor}_{new_chipid}_")
+        # vendor_efabless => vendor_tiny-tapeout
+        page_txt_new = page_txt_new.replace(f"vendor_{old_vendor}", f"vendor_{new_vendor}")
+        if page_txt_new == page_txt:
+            print(page_txt_new)
+        else:
+            diff_strings(page_txt, page_txt_new)
         print("  Write new txt")
         if not dry:
             with open(old_page_fn, "w") as f:
                 f.write(page_txt_new)
+        # FIXME: sudo -u www-data mkdir /var/www/archive/data/pages/infosecdj/tiny-tapeout/
         print(f"  mv {old_page_fn} {new_page_fn}")
         if not dry:
             shutil.move(old_page_fn, new_page_fn)
@@ -79,16 +90,20 @@ def rename_page(old_vcu, new_vcu, dry):
 def run(old_vendor_chipid, new_vendor_chipid, dry=True):
     env.setup_env_default()
 
+    assert old_vendor_chipid != new_vendor_chipid, old_vendor_chipid
     old_vendor, old_chipid = parse_vendor_chipid(old_vendor_chipid)
     new_vendor, new_chipid = parse_vendor_chipid(new_vendor_chipid)
     print(f"{old_vendor} {old_chipid} => {new_vendor} {new_chipid}")
+    assert (old_vendor, old_chipid) != (new_vendor, new_chipid)
 
-    old_page_fns = glob.glob(env.WWW_DIR + f"/archive/data/pages/*/{old_vendor}/{old_chipid}.txt")
+    glob_str = env.WWW_DIR + f"/archive/data/pages/*/{old_vendor}/{old_chipid}.txt"
+    print("Checking " + glob_str)
+    old_page_fns = glob.glob(glob_str)
     print("Found %u pages" % len(old_page_fns))
     for old_page_fn in old_page_fns:
-        old_user = old_page_fns.split("/")[-3]
-        print("  page user {old_user}")
-        rename_page((old_user, old_vendor, old_chipid), (old_user, new_vendor, new_chipid))
+        old_user = old_page_fn.split("/")[-3]
+        print(f"  page user {old_user}")
+        rename_page((old_vendor, old_chipid, old_user), (new_vendor, new_chipid, old_user), dry=dry)
 
     def move_map_files():
         old_map_root_dir = env.WWW_DIR + f"/map/{old_vendor}/{old_chipid}"
@@ -120,12 +135,15 @@ def run(old_vendor_chipid, new_vendor_chipid, dry=True):
         print("Map single images: %u" % len(old_map_single_images))
         for old_fn in old_map_single_images:
             new_fn = old_fn.replace(f"{old_vendor}_{old_chipid}", f"{new_vendor}_{new_chipid}")
-            print(f"  mv {old_fn} {new_fn}")
-            if not dry:
-                shutil.move(old_fn, new_fn)
+            if old_fn == new_fn:
+                print(f"  Already renamed: {old_fn}")
+            else:
+                print(f"  mv {old_fn} {new_fn}")
+                if not dry:
+                    shutil.move(old_fn, new_fn)
 
-    move_map_files()
     rename_single_images()
+    move_map_files()
 
 
 def main():
