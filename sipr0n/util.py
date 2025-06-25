@@ -30,6 +30,19 @@ Parse an image file name that doesn't have user/collection info
 DEPRECATED: will be obsolete soon
 """
 
+def validate_vendor(vendor):
+    m = re.match(r'([a-z0-9\-]+)', vendor)
+    if not m:
+        raise ValueError(
+            "Non-confirming vendor: %s" %
+            (vendor, ))
+
+def validate_chipid(chipid):
+    m = re.match(r'([a-z0-9\-]+)', chipid)
+    if not m:
+        raise ValueError(
+            "Non-confirming chipid: %s" %
+            (chipid, ))
 
 #def parse_vendor_chipid_flavor(fn):
 def parse_map_image_vcfe(fn):
